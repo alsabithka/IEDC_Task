@@ -32,3 +32,4 @@ export const CosmicNebula: React.FC = () => {
 }
 
 export default CosmicNebula
+
