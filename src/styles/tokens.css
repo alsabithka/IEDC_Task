@@ -1,0 +1,74 @@
+:root {
+  /* ==========================================================================
+     Design Tokens — HOURGLASS // IEDC IDEA SPRINT 2026
+     ========================================================================== */
+
+  /* Cosmic Deep Space Surface & Backgrounds */
+  --bg-primary: #08070d;
+  --bg-secondary: #0f0d19;
+  --bg-surface: #161324;
+  --bg-surface-elevated: #1f1b32;
+  --bg-glass: rgba(22, 19, 36, 0.72);
+
+  /* Signature Accents: Cosmic Violet */
+  --accent-violet: #8b5cf6;
+  --accent-violet-hover: #7c3aed;
+  --accent-violet-subtle: rgba(139, 92, 246, 0.1);
+  --accent-violet-glow: rgba(139, 92, 246, 0.35);
+
+  /* Primary Volt & Secondary Orange (Preserved) */
+  --accent-primary: #c7ff45;
+  --accent-primary-hover: #b3ee32;
+  --accent-primary-subtle: rgba(199, 255, 69, 0.08);
+  --accent-primary-glow: rgba(199, 255, 69, 0.3);
+
+  --accent-secondary: #ff6b35;
+  --accent-secondary-hover: #e85924;
+  --accent-secondary-subtle: rgba(255, 107, 53, 0.1);
+  --accent-secondary-glow: rgba(255, 107, 53, 0.28);
+
+  /* Realistic Hourglass Champagne & Warm Pale Gold Sand */
+  --sand-gold: #e2c799;
+  --sand-champagne: #f5e6be;
+  --sand-deep: #c5a059;
+  --sand-ambient: #8c6e3b;
+  --sand-glow: rgba(226, 199, 153, 0.35);
+
+  /* Liquid Glass Primitives */
+  --liquid-glass-bg: rgba(255, 255, 255, 0.04);
+  --liquid-glass-border: rgba(255, 255, 255, 0.12);
+  --liquid-glass-hover: rgba(255, 255, 255, 0.08);
+  --liquid-glass-shine: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0) 60%);
+
+  /* Typography / Text Colors */
+  --text-primary: #f5f4f8;
+  --text-secondary: #9a94a9;
+  --text-dim: #655f75;
+  --text-inverse: #08070d;
+
+  /* Architectural Borders */
+  --border-subtle: #1c182c;
+  --border-default: #2a2440;
+  --border-prominent: #3d355c;
+  --border-accent: rgba(139, 92, 246, 0.35);
+
+  /* Font Families */
+  --font-display: 'Fraunces', 'Space Grotesk', serif;
+  --font-serif: 'Fraunces', serif;
+  --font-sans: 'Inter', 'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', 'JetBrains Mono', monospace;
+
+  /* Border Radii */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --radius-2xl: 28px;
+  --radius-full: 9999px;
+
+  /* Transitions */
+  --transition-fast: 150ms cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-normal: 260ms cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-smooth: 450ms cubic-bezier(0.16, 1, 0.3, 1);
+}

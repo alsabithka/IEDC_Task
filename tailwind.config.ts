@@ -1,0 +1,88 @@
+import type { Config } from 'tailwindcss'
+
+export default {
+  darkMode: 'class',
+  content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
+  theme: {
+    extend: {
+      colors: {
+        bg: {
+          primary: 'var(--bg-primary, #08070D)',
+          secondary: 'var(--bg-secondary, #0F0D19)',
+          surface: 'var(--bg-surface, #161324)',
+          'surface-elevated': 'var(--bg-surface-elevated, #1F1B32)',
+          glass: 'var(--bg-glass, rgba(22, 19, 36, 0.72))',
+        },
+        accent: {
+          DEFAULT: 'var(--accent-violet, #8B5CF6)',
+          violet: 'var(--accent-violet, #8B5CF6)',
+          'violet-hover': 'var(--accent-violet-hover, #7C3AED)',
+          'violet-subtle': 'var(--accent-violet-subtle, rgba(139, 92, 246, 0.1))',
+          'violet-glow': 'var(--accent-violet-glow, rgba(139, 92, 246, 0.35))',
+          primary: 'var(--accent-primary, #C7FF45)',
+          'primary-hover': 'var(--accent-primary-hover, #B3EE32)',
+          'primary-subtle': 'var(--accent-primary-subtle, rgba(199, 255, 69, 0.08))',
+          secondary: 'var(--accent-secondary, #FF6B35)',
+          'secondary-hover': 'var(--accent-secondary-hover, #E85924)',
+          'secondary-subtle': 'var(--accent-secondary-subtle, rgba(255, 107, 53, 0.1))',
+        },
+        sand: {
+          gold: 'var(--sand-gold, #E2C799)',
+          champagne: 'var(--sand-champagne, #F5E6BE)',
+          deep: 'var(--sand-deep, #C5A059)',
+          ambient: 'var(--sand-ambient, #8C6E3B)',
+          glow: 'var(--sand-glow, rgba(226, 199, 153, 0.35))',
+        },
+        text: {
+          primary: 'var(--text-primary, #F5F4F8)',
+          secondary: 'var(--text-secondary, #9A94A9)',
+          dim: 'var(--text-dim, #655F75)',
+          inverse: 'var(--text-inverse, #08070D)',
+        },
+        border: {
+          subtle: 'var(--border-subtle, #1C182C)',
+          default: 'var(--border-default, #2A2440)',
+          prominent: 'var(--border-prominent, #3D355C)',
+          accent: 'var(--border-accent, rgba(139, 92, 246, 0.35))',
+        },
+      },
+      fontFamily: {
+        display: ['var(--font-display)', 'Fraunces', 'Space Grotesk', 'serif'],
+        fraunces: ['Fraunces', 'serif'],
+        sans: ['var(--font-sans)', 'Inter', 'Plus Jakarta Sans', 'system-ui', 'sans-serif'],
+        inter: ['Inter', 'sans-serif'],
+        mono: ['var(--font-mono)', '"IBM Plex Mono"', '"JetBrains Mono"', 'monospace'],
+        ibm: ['"IBM Plex Mono"', 'monospace'],
+      },
+      fontSize: {
+        'display-2xl': ['clamp(3rem, 7vw, 5.25rem)', { lineHeight: '1.05', letterSpacing: '-0.03em' }],
+        'display-xl': ['clamp(2.5rem, 5.5vw, 4.25rem)', { lineHeight: '1.08', letterSpacing: '-0.025em' }],
+        'display-lg': ['clamp(2rem, 4.5vw, 3.25rem)', { lineHeight: '1.12', letterSpacing: '-0.02em' }],
+        'heading-xl': ['clamp(1.75rem, 3.5vw, 2.5rem)', { lineHeight: '1.2', letterSpacing: '-0.015em' }],
+        'heading-lg': ['1.875rem', { lineHeight: '1.25' }],
+        'heading-md': ['1.5rem', { lineHeight: '1.3' }],
+        'heading-sm': ['1.25rem', { lineHeight: '1.4' }],
+        'body-lg': ['1.125rem', { lineHeight: '1.6' }],
+        body: ['1rem', { lineHeight: '1.6' }],
+        'body-sm': ['0.875rem', { lineHeight: '1.5' }],
+        caption: ['0.75rem', { lineHeight: '1.4', letterSpacing: '0.06em' }],
+        mono: ['0.8125rem', { lineHeight: '1.5', letterSpacing: '0.02em' }],
+      },
+      borderRadius: {
+        xs: 'var(--radius-xs, 4px)',
+        sm: 'var(--radius-sm, 6px)',
+        md: 'var(--radius-md, 10px)',
+        lg: 'var(--radius-lg, 14px)',
+        xl: 'var(--radius-xl, 20px)',
+        '2xl': 'var(--radius-2xl, 28px)',
+      },
+      boxShadow: {
+        'glow-violet': '0 0 40px -4px rgba(139, 92, 246, 0.35)',
+        'glow-sand': '0 0 35px -5px rgba(226, 199, 153, 0.4)',
+        'card-elevated': '0 16px 40px -10px rgba(0, 0, 0, 0.65), 0 0 0 1px var(--border-subtle)',
+        'liquid-glass': '0 8px 32px 0 rgba(0, 0, 0, 0.37), inset 0 1px 1px 0 rgba(255, 255, 255, 0.1)',
+      },
+    },
+  },
+  plugins: [],
+} satisfies Config
