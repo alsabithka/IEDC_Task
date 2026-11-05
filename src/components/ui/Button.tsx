@@ -3,7 +3,14 @@ import { motion, type HTMLMotionProps } from 'motion/react'
 import { Loader2 } from 'lucide-react'
 import { cn } from '../../lib/utils'
 
-export type ButtonVariant = 'primary' | 'secondary' | 'accent' | 'outline' | 'ghost'
+export type ButtonVariant =
+  | 'primary'
+  | 'secondary'
+  | 'accent'
+  | 'outline'
+  | 'ghost'
+  | 'glass'
+
 export type ButtonSize = 'sm' | 'md' | 'lg'
 
 export interface ButtonProps
@@ -21,19 +28,21 @@ export interface ButtonProps
 
 const variantStyles: Record<ButtonVariant, string> = {
   primary:
-    'bg-accent-primary text-text-inverse hover:bg-accent-primary-hover shadow-glow-primary font-semibold border border-transparent',
+    'bg-accent-violet text-white hover:bg-accent-violet-hover shadow-glow-violet font-semibold border border-transparent',
   secondary:
     'bg-bg-surface text-text-primary border border-border-default hover:border-border-accent hover:bg-bg-surface-elevated font-medium',
   accent:
-    'bg-accent-secondary text-text-primary hover:bg-accent-secondary-hover shadow-glow-secondary font-semibold border border-transparent',
+    'bg-accent-secondary text-text-primary hover:bg-accent-secondary-hover font-semibold border border-transparent',
   outline:
-    'bg-transparent text-text-primary border border-border-default hover:border-accent-primary hover:text-accent-primary hover:bg-accent-primary-subtle/40 font-medium',
+    'bg-transparent text-text-primary border border-border-default hover:border-accent-violet hover:text-accent-violet hover:bg-accent-violet-subtle font-medium',
   ghost:
     'bg-transparent text-text-secondary hover:text-text-primary hover:bg-white/5 border border-transparent font-medium',
+  glass:
+    'liquid-glass text-text-primary hover:text-white hover:border-accent-violet/50 font-medium shadow-liquid-glass',
 }
 
 const sizeStyles: Record<ButtonSize, string> = {
-  sm: 'text-caption px-3 py-1.5 rounded-sm gap-1.5 h-8',
+  sm: 'text-caption px-3.5 py-1.5 rounded-sm gap-1.5 h-8',
   md: 'text-body-sm px-5 py-2.5 rounded-md gap-2 h-10',
   lg: 'text-body px-6 py-3.5 rounded-lg gap-2.5 h-12',
 }
@@ -57,7 +66,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     ref,
   ) => {
     const baseClasses = cn(
-      'group inline-flex items-center justify-center select-none font-sans transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-primary focus-visible:ring-offset-2 focus-visible:ring-offset-bg-primary disabled:opacity-50 disabled:pointer-events-none disabled:cursor-not-allowed',
+      'group inline-flex items-center justify-center select-none font-sans transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-violet focus-visible:ring-offset-2 focus-visible:ring-offset-bg-primary disabled:opacity-50 disabled:pointer-events-none disabled:cursor-not-allowed',
       variantStyles[variant],
       sizeStyles[size],
       className,
@@ -111,3 +120,4 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 
 Button.displayName = 'Button'
 
+export default Button

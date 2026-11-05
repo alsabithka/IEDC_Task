@@ -6,4 +6,4 @@ export * from './NavigationLink'
 export * from './AnimatedText'
 export * from './SectionWrapper'
 export * from './Card'
-
+export * from './HourglassCountdown'
