@@ -1,51 +1,37 @@
 :root {
   /* ==========================================================================
-     NEUTRAL DESIGN TOKENS — Simple & Configurable Foundation
+     PHASE 2 DESIGN SYSTEM TOKENS — Unified Full-Page Palette
      ========================================================================== */
 
-  /* Neutral Background Colors */
-  --bg-primary: #0a0a0a;
-  --bg-secondary: #121212;
-  --bg-card: #161616;
-  --bg-card-hover: #1e1e1e;
-  --bg-muted: #222222;
+  /* Unified Background Foundation — No dual-tone separation */
+  --color-page-bg: #241c1d;
+  --color-panel-bg: #241c1d;
 
-  /* Neutral Borders */
-  --border-subtle: #242424;
-  --border-default: #303030;
-  --border-strong: #444444;
-
-  /* Text & Foreground */
-  --text-primary: #f5f5f5;
-  --text-secondary: #a3a3a3;
-  --text-muted: #737373;
-  --text-inverse: #0a0a0a;
-
-  /* Interactive Elements */
-  --btn-primary-bg: #f5f5f5;
-  --btn-primary-text: #0a0a0a;
-  --btn-primary-hover: #e5e5e5;
-
-  --btn-secondary-bg: #161616;
-  --btn-secondary-text: #f5f5f5;
-  --btn-secondary-border: #303030;
-  --btn-secondary-hover: #222222;
-
-  /* Accent Highlight (Subtle) */
-  --accent-subtle: #2a2a2a;
-  --accent-dot: #10b981;
+  /* Red Accents */
+  --color-primary-red: #f0444d;
+  --color-secondary-red: #c92e39;
+  --color-red-glow: rgba(240, 68, 77, 0.25);
 
   /* Typography */
-  --font-sans: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #c5c0c0;
+  --color-text-muted: #8e8989;
+
+  /* Borders & Dividers */
+  --color-panel-border: rgba(255, 255, 255, 0.10);
+  --color-panel-border-hover: rgba(255, 255, 255, 0.20);
+
+  /* Typography Families */
+  --font-display: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-body: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'Geist Mono', SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
-  /* Layout, Radius & Transitions */
-  --container-max: 1200px;
-  --radius-sm: 4px;
-  --radius-md: 6px;
-  --radius-lg: 8px;
-  --radius-full: 9999px;
+  /* Layout & Radii */
+  --radius-panel: 24px;
+  --radius-button: 9999px;
+  --radius-card: 16px;
 
-  --duration-fast: 150ms;
-  --ease-standard: cubic-bezier(0.16, 1, 0.3, 1);
+  /* Transitions */
+  --duration-default: 150ms;
+  --ease-default: cubic-bezier(0.16, 1, 0.3, 1);
 }

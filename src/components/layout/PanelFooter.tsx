@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Mail, MapPin } from 'lucide-react'
-import { Container } from '../ui/Container'
 import { siteConfig } from '../../config/siteConfig'
+import { BrandEmblem } from '../ui/BrandEmblem'
 
 // Clean SVG Social Icons
 const LinkedInIcon: React.FC<{ className?: string }> = ({ className }) => (
@@ -48,38 +48,43 @@ const XIcon: React.FC<{ className?: string }> = ({ className }) => (
   </svg>
 )
 
-export const Footer: React.FC = () => {
+export const PanelFooter: React.FC = () => {
   const [currentYear] = useState<number>(() => new Date().getFullYear())
 
   return (
-    <footer id="contact" className="border-t border-border-subtle bg-bg-secondary text-text-secondary">
-      <Container size="default" className="py-12 sm:py-16">
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-12 md:gap-8">
-          {/* Organization & Brand Column */}
+    <footer id="contact" className="relative z-20 w-full border-t border-white/10 bg-[#241C1D]">
+      <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-12 py-12 sm:py-16">
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-12 md:gap-8 items-start">
+          {/* Organization Brand Information */}
           <div className="md:col-span-5">
-            <h3 className="font-sans text-base font-semibold text-text-primary">
-              {siteConfig.brand.fullName}
-            </h3>
-            <p className="mt-1 font-mono text-xs text-text-muted">
-              {siteConfig.organizer.name}
-            </p>
+            <div className="flex items-center gap-3.5 mb-3">
+              <BrandEmblem className="h-12 sm:h-14 w-auto object-contain shrink-0" />
+              <div>
+                <h3 className="font-sans text-base sm:text-lg font-bold text-white leading-tight">
+                  {siteConfig.brand.fullName}
+                </h3>
+                <p className="mt-1 font-mono text-xs uppercase tracking-wider text-[#F0444D] leading-none">
+                  {siteConfig.organizer.name}
+                </p>
+              </div>
+            </div>
 
-            <p className="mt-3 text-sm text-text-secondary leading-relaxed max-w-sm">
+            <p className="mt-3 text-xs sm:text-sm text-[#C5C0C0] leading-relaxed max-w-md">
               {siteConfig.organizer.cell} at{' '}
-              <span className="text-text-primary">
+              <span className="text-white font-medium">
                 {siteConfig.organizer.institution}
               </span>
-              . Cultivating an ecosystem of engineering student builders, venture creators, and problem solvers.
+              . Fostering engineering student innovation, venture ideation, and venture acceleration.
             </p>
 
             {/* Social Links */}
-            <div className="mt-5 flex items-center gap-3">
+            <div className="mt-5 flex items-center gap-2.5">
               {siteConfig.socials.linkedin && (
                 <a
                   href={siteConfig.socials.linkedin}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-border-default bg-bg-card text-text-secondary transition-colors hover:text-text-primary hover:border-border-strong"
+                  className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-white/15 bg-white/5 text-[#C5C0C0] hover:text-white hover:border-white/30 transition-colors"
                   aria-label="LinkedIn"
                 >
                   <LinkedInIcon className="h-4 w-4" />
@@ -91,7 +96,7 @@ export const Footer: React.FC = () => {
                   href={siteConfig.socials.instagram}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-border-default bg-bg-card text-text-secondary transition-colors hover:text-text-primary hover:border-border-strong"
+                  className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-white/15 bg-white/5 text-[#C5C0C0] hover:text-white hover:border-white/30 transition-colors"
                   aria-label="Instagram"
                 >
                   <InstagramIcon className="h-4 w-4" />
@@ -103,7 +108,7 @@ export const Footer: React.FC = () => {
                   href={siteConfig.socials.github}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-border-default bg-bg-card text-text-secondary transition-colors hover:text-text-primary hover:border-border-strong"
+                  className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-white/15 bg-white/5 text-[#C5C0C0] hover:text-white hover:border-white/30 transition-colors"
                   aria-label="GitHub"
                 >
                   <GithubIcon className="h-4 w-4" />
@@ -115,7 +120,7 @@ export const Footer: React.FC = () => {
                   href={siteConfig.socials.x}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-border-default bg-bg-card text-text-secondary transition-colors hover:text-text-primary hover:border-border-strong"
+                  className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-white/15 bg-white/5 text-[#C5C0C0] hover:text-white hover:border-white/30 transition-colors"
                   aria-label="X (Twitter)"
                 >
                   <XIcon className="h-4 w-4" />
@@ -124,63 +129,55 @@ export const Footer: React.FC = () => {
             </div>
           </div>
 
-          {/* Quick Navigation Links */}
+          {/* Navigation Shortcuts */}
           <div className="md:col-span-3">
-            <h4 className="font-mono text-xs font-semibold uppercase tracking-wider text-text-primary">
+            <span className="font-mono text-xs font-semibold uppercase tracking-wider text-[#F0444D] block mb-3">
               Navigation
-            </h4>
-            <ul className="mt-3 space-y-2 text-sm">
-              {siteConfig.navigation.map((item) => (
-                <li key={item.href}>
+            </span>
+            <ul className="space-y-1.5 text-xs font-mono uppercase tracking-wider text-[#C5C0C0]">
+              {siteConfig.panelNav.map((link) => (
+                <li key={link.href}>
                   <a
-                    href={item.href}
-                    className="text-text-secondary hover:text-text-primary transition-colors duration-150"
+                    href={link.href}
+                    className="hover:text-white transition-colors"
                   >
-                    {item.label}
+                    {link.label}
                   </a>
                 </li>
               ))}
             </ul>
           </div>
 
-          {/* Contact & Location */}
-          <div className="md:col-span-4">
-            <h4 className="font-mono text-xs font-semibold uppercase tracking-wider text-text-primary">
-              Contact & Campus
-            </h4>
-            <div className="mt-3 space-y-3 text-sm">
-              <div className="flex items-start gap-2.5">
-                <MapPin className="h-4 w-4 shrink-0 text-text-muted mt-0.5" />
-                <span className="text-text-secondary leading-snug">
-                  {siteConfig.contact.locationNotice}
-                </span>
+          {/* Contact Coordinates */}
+          <div className="md:col-span-4 flex flex-col md:items-end md:text-right">
+            <span className="font-mono text-xs font-semibold uppercase tracking-wider text-[#F0444D]">
+              Campus Coordinates
+            </span>
+            <div className="mt-3 space-y-2 text-xs sm:text-sm text-[#C5C0C0]">
+              <div className="flex items-center md:justify-end gap-2">
+                <MapPin className="h-4 w-4 text-[#F0444D] shrink-0" />
+                <span>{siteConfig.contact.locationNotice}</span>
               </div>
-
-              <div className="flex items-center gap-2.5">
-                <Mail className="h-4 w-4 shrink-0 text-text-muted" />
+              <div className="flex items-center md:justify-end gap-2">
+                <Mail className="h-4 w-4 text-[#F0444D] shrink-0" />
                 <a
                   href={`mailto:${siteConfig.contact.email}`}
-                  className="font-mono text-xs text-text-secondary hover:text-text-primary transition-colors underline-offset-4 hover:underline"
+                  className="font-mono text-xs text-white hover:underline underline-offset-4"
                 >
                   {siteConfig.contact.email}
                 </a>
               </div>
             </div>
-          </div>
-        </div>
 
-        {/* Bottom Bar */}
-        <div className="mt-12 border-t border-border-subtle pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono text-text-muted">
-          <div>
-            © {currentYear} {siteConfig.organizer.name}. All rights reserved.
-          </div>
-          <div>
-            {siteConfig.organizer.institution}
+            <div className="mt-6 pt-4 border-t border-white/10 w-full text-xs font-mono text-[#8e8989] flex flex-col sm:flex-row items-start md:items-center justify-between gap-2">
+              <span>© {currentYear} {siteConfig.organizer.name}. All rights reserved.</span>
+              <span>College of Engineering Chengannur</span>
+            </div>
           </div>
         </div>
-      </Container>
+      </div>
     </footer>
   )
 }
 
-export default Footer
+export default PanelFooter

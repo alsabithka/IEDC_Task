@@ -6,50 +6,35 @@ export default {
   theme: {
     extend: {
       colors: {
-        bg: {
-          primary: 'var(--bg-primary)',
-          secondary: 'var(--bg-secondary)',
-          card: 'var(--bg-card)',
-          'card-hover': 'var(--bg-card-hover)',
-          muted: 'var(--bg-muted)',
+        page: '#241C1D',
+        panel: {
+          DEFAULT: '#241C1D',
+          border: 'rgba(255, 255, 255, 0.10)',
         },
-        border: {
-          subtle: 'var(--border-subtle)',
-          default: 'var(--border-default)',
-          strong: 'var(--border-strong)',
+        coral: {
+          DEFAULT: '#F0444D',
+          dark: '#C92E39',
         },
-        text: {
-          primary: 'var(--text-primary)',
-          secondary: 'var(--text-secondary)',
-          muted: 'var(--text-muted)',
-          inverse: 'var(--text-inverse)',
-        },
-        btn: {
-          'primary-bg': 'var(--btn-primary-bg)',
-          'primary-text': 'var(--btn-primary-text)',
-          'primary-hover': 'var(--btn-primary-hover)',
-          'secondary-bg': 'var(--btn-secondary-bg)',
-          'secondary-text': 'var(--btn-secondary-text)',
-          'secondary-border': 'var(--btn-secondary-border)',
-          'secondary-hover': 'var(--btn-secondary-hover)',
+        ref: {
+          bg: '#241C1D',
+          panel: '#241C1D',
+          red: '#F0444D',
+          redDark: '#C92E39',
+          text: '#FFFFFF',
+          textMuted: '#C5C0C0',
+          border: 'rgba(255, 255, 255, 0.10)',
         },
       },
       fontFamily: {
         sans: ['Geist', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
         mono: ['"Geist Mono"', 'SFMono-Regular', 'Menlo', 'monospace'],
+        display: ['Geist', 'system-ui', 'sans-serif'],
       },
       borderRadius: {
-        sm: 'var(--radius-sm)',
-        DEFAULT: 'var(--radius-md)',
-        md: 'var(--radius-md)',
-        lg: 'var(--radius-lg)',
-        full: 'var(--radius-full)',
+        panel: '24px',
       },
       maxWidth: {
-        container: 'var(--container-max)',
-      },
-      transitionDuration: {
-        fast: '150ms',
+        panel: '1180px',
       },
     },
   },

@@ -1,28 +1,29 @@
 import React from 'react'
-import { Navbar } from './Navbar'
-import { Footer } from './Footer'
+import { PanelHeader } from './PanelHeader'
+import { PanelFooter } from './PanelFooter'
 
 export interface LayoutProps {
   children: React.ReactNode
 }
 
 /**
- * Clean, flexible site layout wrapper.
- * Combines navigation, flexible main content area, and minimal footer.
+ * Unified Full-Page Layout
+ * - The entire background is #241C1D with zero separation or outer dual-tone borders
+ * - All content runs seamlessly across the full viewport height from top to bottom
  */
 export const Layout: React.FC<LayoutProps> = ({ children }) => {
   return (
-    <div className="min-h-screen w-full flex flex-col bg-bg-primary text-text-primary antialiased">
-      {/* Top Navigation */}
-      <Navbar />
+    <div className="min-h-screen w-full bg-[#241C1D] text-white flex flex-col justify-start selection:bg-[#F0444D] selection:text-white">
+      {/* Top Header & Navigation running seamlessly on the unified background */}
+      <PanelHeader />
 
-      {/* Main Content Area */}
+      {/* Main Content Flow */}
       <main className="flex-1 w-full">
         {children}
       </main>
 
-      {/* Footer */}
-      <Footer />
+      {/* Unified Footer */}
+      <PanelFooter />
     </div>
   )
 }

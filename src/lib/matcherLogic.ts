@@ -5,201 +5,259 @@ import type {
   MatchResult,
 } from '../types/matcher'
 
-export const TRACK_DEFINITIONS: Record<string, TrackDefinition> = {
-  'ai-systems': {
-    id: 'ai-systems',
-    name: 'AI & Autonomous Systems',
-    code: 'TRACK_01 // INTEL',
-    tagline: 'Leverage foundation models, vision, and agentic workflows to automate high-friction processes.',
-    badgeColor: 'border-accent-violet text-accent-violet bg-accent-violet/10',
+export const DOMAIN_TRACKS: Record<string, TrackDefinition> = {
+  healthcare: {
+    id: 'healthcare',
+    name: 'Healthcare & Well-being',
+    code: 'TRACK_01 // HEALTH',
+    tagline: 'Enhance clinical accessibility, assistive devices, and patient care diagnostics.',
+    badgeColor: 'border-rose-500/40 text-rose-400 bg-rose-500/10',
     description:
-      'Engineered for developers and researchers exploring computer vision, natural language reasoning, and autonomous multi-agent systems to solve complex cognitive bottlenecks.',
-    idealFor: ['ML Engineers', 'Fullstack Builders', 'Automation Architects'],
-    recommendedTools: ['PyTorch / TensorFlow', 'LangChain / LlamaIndex', 'FastAPI / Python', 'TensorRT / ONNX'],
+      'Empower health workers and patients by bridging diagnostic gaps, creating assistive tactile technologies, and streamlining emergency care response in underserved communities.',
+    idealFor: ['Bio-Engineers', 'Mobile App Builders', 'Accessibility Designers'],
+    recommendedTools: ['Flutter / React Native', 'CoreML / TFLite', 'FHIR Health Protocols', 'WebRTC Telehealth'],
     sampleChallenges: [
-      'Edge-deployed visual inspection for localized manufacturing.',
-      'Agentic workflow assisting doctors with medical literature synthesis.',
-      'Automated disaster alert synthesis from low-bandwidth satellite feeds.',
+      'Low-bandwidth mobile screening tool for rural community health workers.',
+      'Low-cost assistive tactile navigation interface for visually impaired students.',
+      'Emergency response triage and volunteer medic coordination portal.',
     ],
   },
-  cleantech: {
-    id: 'cleantech',
-    name: 'CleanTech & Circular Sustainability',
-    code: 'TRACK_02 // TERRA',
-    tagline: 'Address climate resilience, renewable micro-grids, and sustainable resource loops.',
-    badgeColor: 'border-emerald-500 text-emerald-400 bg-emerald-500/10',
+  education: {
+    id: 'education',
+    name: 'Education & Learning Access',
+    code: 'TRACK_02 // EDU',
+    tagline: 'Democratize quality learning tools, interactive labs, and regional literacy.',
+    badgeColor: 'border-amber-500/40 text-amber-400 bg-amber-500/10',
     description:
-      'Focusing on smart resource management, energy tracking, carbon accounting, and hardware IoT monitoring to build sustainable ecosystems.',
-    idealFor: ['Embedded/IoT Engineers', 'Hardware Hackers', 'Environmental Strategists'],
-    recommendedTools: ['ESP32 / Arduino', 'MQTT / InfluxDB', 'Grafana / Next.js', 'Low-Power LoRaWAN'],
+      'Create adaptive learning companions, hands-on virtual lab environments, and accessible multilingual educational resources to bridge regional learning divides.',
+    idealFor: ['UI/UX Designers', 'Fullstack Developers', 'Pedagogy Enthusiasts'],
+    recommendedTools: ['Next.js / React', 'Web Speech API', 'Interactive Canvas / Three.js', 'IndexedDB Offline Cache'],
     sampleChallenges: [
-      'Decentralized solar micro-grid peer energy exchange simulator.',
-      'Smart agricultural sensor network optimizing water irrigation in real-time.',
-      'Automated e-waste collection and lifecycle tracking system.',
+      'Interactive low-data virtual physics and chemistry experiment simulator.',
+      'Vernacular speech-driven reading assistant for primary school learners.',
+      'Peer-to-peer textbook and study resource exchange ecosystem for colleges.',
     ],
   },
-  fintech: {
-    id: 'fintech',
-    name: 'FinTech & Trust Architectures',
-    code: 'TRACK_03 // VALOR',
-    tagline: 'Reinvent financial inclusion, fraud detection, and verifiable transaction systems.',
-    badgeColor: 'border-amber-500 text-amber-400 bg-amber-500/10',
+  agriculture: {
+    id: 'agriculture',
+    name: 'Agriculture & Rural Tech',
+    code: 'TRACK_03 // AGRI',
+    tagline: 'Optimize precision farming, soil intelligence, and fair farmer market linkages.',
+    badgeColor: 'border-emerald-500/40 text-emerald-400 bg-emerald-500/10',
     description:
-      'Bridging unbanked populations, automated auditing, micro-insurance protocols, and programmable digital assets to democratize capital flow.',
-    idealFor: ['Backend Developers', 'Smart Contract Engineers', 'Financial Analysts'],
-    recommendedTools: ['Go / Node.js', 'PostgreSQL / Timescale', 'Solidity / Viem', 'Zero-Knowledge Proofs'],
+      'Deploy smart sensors, weather predictive insights, and direct-to-consumer farm produce exchanges that protect smallholder farmers against market volatility and crop diseases.',
+    idealFor: ['IoT & Embedded Hackers', 'Data Analysts', 'Agri-Tech Explorers'],
+    recommendedTools: ['ESP32 / Arduino', 'MQTT / InfluxDB', 'OpenWeather APIs', 'Computer Vision (YOLO)'],
     sampleChallenges: [
-      'Micro-credit scoring protocol for informal workers using verifiable alternate metrics.',
-      'Real-time fraud prevention scanner for digital retail payments.',
-      'Transparent community grant allocation system with milestone escrow.',
+      'Real-time leaf disease identification app operating completely offline on low-end phones.',
+      'Smart micro-irrigation controller balancing soil moisture and electricity tariffs.',
+      'Fair pricing transparency and localized produce auction platform for rural cooperatives.',
     ],
   },
-  healthtech: {
-    id: 'healthtech',
-    name: 'HealthTech & Patient Diagnostics',
-    code: 'TRACK_04 // VITA',
-    tagline: 'Enhance clinical accessibility, assistive robotics, and digital medical diagnostics.',
-    badgeColor: 'border-rose-500 text-rose-400 bg-rose-500/10',
+  environment: {
+    id: 'environment',
+    name: 'Environment & Sustainability',
+    code: 'TRACK_04 // ECO',
+    tagline: 'Accelerate waste recycling loops, carbon tracking, and clean water preservation.',
+    badgeColor: 'border-teal-500/40 text-teal-400 bg-teal-500/10',
     description:
-      'Empowering healthcare practitioners and patients with rapid symptom triaging, assistive accessibility hardware, and secure health records.',
-    idealFor: ['Bio-Engineers', 'Mobile App Developers', 'UI/UX Accessibility Designers'],
-    recommendedTools: ['Flutter / React Native', 'CoreML / TFLite', 'WebRTC Telehealth', 'FHIR / Health Standards'],
+      'Tackle climate resilience, decentralized solar monitoring, community waste audit networks, and aquatic ecosystem cleanup through measurable technological interventions.',
+    idealFor: ['Environmental Strategists', 'Hardware Engineers', 'Civic Tech Builders'],
+    recommendedTools: ['Sensor Fusion (LoRaWAN)', 'Grafana / Supabase', 'Mapbox GeoJSON', 'Microcontroller Telemetry'],
     sampleChallenges: [
-      'Offline-first mobile screening tool for rural community health workers.',
-      'Low-cost assistive tactile interface for visually impaired students.',
-      'Secure, patient-owned encrypted health record ledger.',
+      'Decentralized solar micro-grid peer energy exchange and monitoring dashboard.',
+      'Automated campus e-waste and plastic recovery reward tracking system.',
+      'Localized water quality sensor probe alerting communities of contamination risks.',
     ],
   },
-  'open-innovation': {
-    id: 'open-innovation',
-    name: 'Open Innovation & Civic Tech',
-    code: 'TRACK_05 // NEXUS',
-    tagline: 'Rapid solutions for public infrastructure, student life, and civic collaboration.',
-    badgeColor: 'border-cyan-500 text-cyan-400 bg-cyan-500/10',
+  transportation: {
+    id: 'transportation',
+    name: 'Transportation & Smart Mobility',
+    code: 'TRACK_05 // TRANS',
+    tagline: 'Improve urban transit safety, route optimization, and clean electric commuting.',
+    badgeColor: 'border-blue-500/40 text-blue-400 bg-blue-500/10',
     description:
-      'An open playground for non-traditional ideas: civic transparency platforms, campus community utilities, and creative developer tools.',
-    idealFor: ['Product Designers', 'Generalist Builders', 'Community Advocates'],
-    recommendedTools: ['Next.js / Tailwind', 'Supabase / Firebase', 'Mapbox / GeoJSON', 'WebSockets'],
+      'Eliminate transit bottlenecks, enhance last-mile pedestrian safety, optimize multi-modal public bus routing, and build charging station sharing for electric vehicles.',
+    idealFor: ['Spatial Data Analysts', 'System Architects', 'Mobile Developers'],
+    recommendedTools: ['OpenStreetMap / GeoPandas', 'WebSockets / Socket.io', 'Google Transit GTFS', 'Routing Algorithms'],
     sampleChallenges: [
-      'Crowdsourced municipal grievance reporting and verification dashboard.',
-      'Student skill-sharing and campus venture co-founder matching network.',
-      'Open disaster relief coordination map with live resource tracking.',
+      'Real-time crowdsourced rural bus arrival tracking system for student commuters.',
+      'Campus micro-mobility and bicycle sharing network with anti-theft geofencing.',
+      'Accident hotspot mapping and emergency auto-dispatch beacon system.',
+    ],
+  },
+  technology: {
+    id: 'technology',
+    name: 'Deep Technology & Intelligent Systems',
+    code: 'TRACK_06 // TECH',
+    tagline: 'Pioneer foundation models, automated workflows, and cybersecurity infrastructure.',
+    badgeColor: 'border-purple-500/40 text-purple-400 bg-purple-500/10',
+    description:
+      'Harness modern artificial intelligence, agentic workflows, embedded hardware, and cryptography to solve complex engineering and operational bottlenecks.',
+    idealFor: ['Algorithm Developers', 'ML Engineers', 'Security Researchers'],
+    recommendedTools: ['PyTorch / ONNX', 'FastAPI / Python', 'Zero-Knowledge Proofs', 'WebAssembly / Rust'],
+    sampleChallenges: [
+      'Autonomous edge-deployed visual inspection for small-scale local manufacturers.',
+      'Agentic workflow assisting engineering students with literature synthesis and patent search.',
+      'Phishing detection browser engine tailored for regional language banking portals.',
+    ],
+  },
+  community: {
+    id: 'community',
+    name: 'Community Development & Civic Impact',
+    code: 'TRACK_07 // CIVIC',
+    tagline: 'Empower public transparency, citizen grievances, and local social safety nets.',
+    badgeColor: 'border-cyan-500/40 text-cyan-400 bg-cyan-500/10',
+    description:
+      'Harness citizen participation, disaster relief coordination, localized volunteer matching, and transparent public utility reporting to build stronger grassroots resilience.',
+    idealFor: ['Product Strategists', 'Community Leaders', 'Frontend Craftsmen'],
+    recommendedTools: ['Next.js / Tailwind', 'Supabase / PostgreSQL', 'OpenStreetMap', 'Progressive Web Apps'],
+    sampleChallenges: [
+      'Crowdsourced municipal pothole and streetlight grievance tracker with photographic verification.',
+      'Rapid disaster relief resource allocation and rescue coordination hub for Kerala monsoons.',
+      'Local senior citizen assistance and volunteer grocery/medicine delivery registry.',
     ],
   },
 }
+
+export const TRACK_DEFINITIONS = DOMAIN_TRACKS
 
 export const MATCHER_QUESTIONS: MatcherQuestion[] = [
   {
     id: 'interests',
     stepNumber: 1,
-    title: 'What core technological frontier excites you most?',
-    subtitle: 'Select the primary technological domain where you want to focus your 24 hours.',
+    title: 'Which real-world problem domain sparks your curiosity?',
+    subtitle: 'Select the problem domain where you want to focus your 24 hours of ideation and exploration.',
     options: [
       {
-        id: 'opt-ai',
-        label: 'Artificial Intelligence & Neural Models',
-        description: 'Foundation models, computer vision, automated decision engines.',
-        trackWeights: { 'ai-systems': 4, 'open-innovation': 1 },
-      },
-      {
-        id: 'opt-sustain',
-        label: 'Climate, Energy & Ecological Balance',
-        description: 'Renewable energy, waste reduction, environmental monitoring.',
-        trackWeights: { cleantech: 4, 'open-innovation': 1 },
-      },
-      {
-        id: 'opt-finance',
-        label: 'Financial Systems & Trust Verification',
-        description: 'Micro-payments, fraud detection, decentralized ledger protocols.',
-        trackWeights: { fintech: 4, 'ai-systems': 1 },
-      },
-      {
         id: 'opt-health',
-        label: 'Healthcare, Well-being & Assistive Tools',
-        description: 'Medical diagnostics, accessibility hardware, patient care.',
-        trackWeights: { healthtech: 4, 'ai-systems': 1 },
+        label: 'Healthcare & Assistive Technology',
+        description: 'Patient diagnostics, accessible medical tools, hospital and clinic workflows.',
+        trackWeights: { healthcare: 4, technology: 1 },
+      },
+      {
+        id: 'opt-edu',
+        label: 'Education & Knowledge Access',
+        description: 'Interactive learning tools, vernacular literacy, virtual laboratories.',
+        trackWeights: { education: 4, community: 1 },
+      },
+      {
+        id: 'opt-agri',
+        label: 'Agriculture & Rural Innovation',
+        description: 'Soil health, crop disease detection, farmer market price transparency.',
+        trackWeights: { agriculture: 4, environment: 1 },
+      },
+      {
+        id: 'opt-env',
+        label: 'Environment & Climate Sustainability',
+        description: 'Clean energy, water conservation, circular waste management.',
+        trackWeights: { environment: 4, agriculture: 1 },
+      },
+      {
+        id: 'opt-trans',
+        label: 'Transportation & Smart Mobility',
+        description: 'Commuter transit, road safety, pedestrian accessibility, electric mobility.',
+        trackWeights: { transportation: 4, technology: 1 },
+      },
+      {
+        id: 'opt-tech',
+        label: 'Deep Technology & Intelligent Software',
+        description: 'AI algorithms, autonomous agents, automation, security frameworks.',
+        trackWeights: { technology: 4, community: 1 },
       },
       {
         id: 'opt-civic',
-        label: 'Civic Systems, Education & Public Tools',
-        description: 'Open public infrastructure, governance, campus innovation.',
-        trackWeights: { 'open-innovation': 4, cleantech: 1 },
+        label: 'Community Development & Civic Impact',
+        description: 'Grassroots democracy, public grievance tracking, disaster resilience.',
+        trackWeights: { community: 4, education: 1 },
       },
     ],
   },
   {
     id: 'skills',
     stepNumber: 2,
-    title: 'What is your team’s dominant superpower skill?',
-    subtitle: 'Identify the strength you will rely upon to build your working prototype.',
+    title: 'What is your core problem-solving capability?',
+    subtitle: 'Identify the primary capability your team brings to dissecting and structuring ideas.',
     options: [
       {
-        id: 'opt-ml-data',
-        label: 'Data Science & Algorithm Engineering',
-        description: 'Training models, structuring datasets, statistical pipelines.',
-        trackWeights: { 'ai-systems': 3, fintech: 2 },
+        id: 'opt-ai-data',
+        label: 'Data Science & Machine Learning',
+        description: 'Predictive analytics, computer vision, natural language understanding.',
+        trackWeights: { technology: 3, healthcare: 2, agriculture: 1 },
       },
       {
         id: 'opt-iot-hard',
-        label: 'Hardware, Embedded Circuits & IoT',
-        description: 'Microcontrollers, sensor fusion, robotics, edge computing.',
-        trackWeights: { cleantech: 3, healthtech: 2 },
+        label: 'Hardware, Sensors & Embedded IoT',
+        description: 'Microcontrollers, sensor telemetry, automation, edge computing.',
+        trackWeights: { agriculture: 3, environment: 3, transportation: 2 },
       },
       {
         id: 'opt-fullstack',
-        label: 'Fullstack Web & Cloud Engineering',
-        description: 'High-throughput APIs, reactive interfaces, distributed backends.',
-        trackWeights: { fintech: 2, 'open-innovation': 3, 'ai-systems': 1 },
+        label: 'Web & Mobile Application Craft',
+        description: 'Interactive user interfaces, APIs, cloud backends, offline-first PWA.',
+        trackWeights: { education: 3, community: 3, transportation: 2 },
       },
       {
-        id: 'opt-design-ux',
-        label: 'User Experience & Human-Centered Design',
-        description: 'Interface friction reduction, intuitive workflows, visual design.',
-        trackWeights: { healthtech: 3, 'open-innovation': 2 },
+        id: 'opt-ux-research',
+        label: 'User Research & Human-Centered Design',
+        description: 'Empathy interviews, friction removal, accessible typography, visual design.',
+        trackWeights: { healthcare: 3, education: 3, community: 2 },
       },
       {
-        id: 'opt-product-strat',
-        label: 'Product Strategy & Venture Validation',
-        description: 'Market problem framing, pitch storytelling, unit economics.',
-        trackWeights: { 'open-innovation': 2, fintech: 2, cleantech: 1 },
+        id: 'opt-systems-strat',
+        label: 'Systems Thinking & Practical Feasibility',
+        description: 'Operational economics, user journey modeling, resource planning.',
+        trackWeights: { transportation: 2, environment: 2, community: 2 },
       },
     ],
   },
   {
     id: 'impact',
     stepNumber: 3,
-    title: 'What kind of real-world impact matters most to you?',
-    subtitle: 'Choose the destination where you want your prototype to create a ripple effect.',
+    title: 'What tangible outcome do you want to create?',
+    subtitle: 'Choose the real-world difference you aim to validate during this ideathon.',
     options: [
       {
-        id: 'opt-impact-automate',
-        label: 'Autonomous Efficiency',
-        description: 'Eliminating repetitive manual labor and augmenting human decisions.',
-        trackWeights: { 'ai-systems': 3, 'open-innovation': 1 },
+        id: 'opt-impact-health',
+        label: 'Saving Lives & Clinical Inclusivity',
+        description: 'Make critical diagnostics and assistive accessibility available to all.',
+        trackWeights: { healthcare: 4 },
+      },
+      {
+        id: 'opt-impact-learn',
+        label: 'Unlocking Knowledge & Equal Opportunity',
+        description: 'Ensure every student has equal access to quality tools and mentorship.',
+        trackWeights: { education: 4 },
+      },
+      {
+        id: 'opt-impact-farm',
+        label: 'Strengthening Rural & Farmer Livelihoods',
+        description: 'Empower farmers with technological insights to boost yields and incomes.',
+        trackWeights: { agriculture: 4 },
       },
       {
         id: 'opt-impact-planet',
-        label: 'Planetary & Resource Preservation',
-        description: 'Measurable reductions in carbon emissions, water loss, and energy waste.',
-        trackWeights: { cleantech: 3 },
+        label: 'Protecting Natural Ecosystems & Clean Air',
+        description: 'Drive tangible metrics in emission reductions and zero-waste loops.',
+        trackWeights: { environment: 4 },
       },
       {
-        id: 'opt-impact-capital',
-        label: 'Economic Empowerment & Transparency',
-        description: 'Providing fair access to financial capital and unforgeable audits.',
-        trackWeights: { fintech: 3 },
+        id: 'opt-impact-move',
+        label: 'Safer, Smoother Daily Commuting',
+        description: 'Make everyday transit seamless, accident-free, and accessible for everyone.',
+        trackWeights: { transportation: 4 },
       },
       {
-        id: 'opt-impact-lives',
-        label: 'Saving Lives & Universal Accessibility',
-        description: 'Making physical and medical well-being accessible to every human.',
-        trackWeights: { healthtech: 3 },
+        id: 'opt-impact-auto',
+        label: 'Advancing Scalable Digital Technology',
+        description: 'Automate high-friction cognitive work using intelligent engineering.',
+        trackWeights: { technology: 4 },
       },
       {
-        id: 'opt-impact-community',
-        label: 'Public Empowerment & Community Action',
-        description: 'Strengthening local communities and student collaborative potential.',
-        trackWeights: { 'open-innovation': 3, cleantech: 1 },
+        id: 'opt-impact-comm',
+        label: 'Empowering Local Communities & Civic Action',
+        description: 'Give citizens effective tools to solve neighborhood bottlenecks together.',
+        trackWeights: { community: 4 },
       },
     ],
   },
@@ -210,11 +268,13 @@ export const MATCHER_QUESTIONS: MatcherQuestion[] = [
  */
 export function calculateTrackMatch(selectedOptionIds: string[]): MatchResult {
   const scores: Record<string, number> = {
-    'ai-systems': 0,
-    cleantech: 0,
-    fintech: 0,
-    healthtech: 0,
-    'open-innovation': 0,
+    healthcare: 0,
+    education: 0,
+    agriculture: 0,
+    environment: 0,
+    transportation: 0,
+    technology: 0,
+    community: 0,
   }
 
   const allOptions = MATCHER_QUESTIONS.flatMap((q) => q.options)
@@ -231,7 +291,7 @@ export function calculateTrackMatch(selectedOptionIds: string[]): MatchResult {
   })
 
   // Find track with highest score
-  let bestTrackId = 'ai-systems'
+  let bestTrackId = 'technology'
   let maxScore = -1
 
   Object.entries(scores).forEach(([trackId, score]) => {
@@ -241,28 +301,32 @@ export function calculateTrackMatch(selectedOptionIds: string[]): MatchResult {
     }
   })
 
-  const track = TRACK_DEFINITIONS[bestTrackId] || TRACK_DEFINITIONS['ai-systems']
+  const track = DOMAIN_TRACKS[bestTrackId] || DOMAIN_TRACKS['technology']
 
-  // Normalize match percentage (max realistic points is ~10)
-  const matchPercentage = Math.min(98, Math.max(76, Math.round((maxScore / 10) * 100)))
+  // Normalize match percentage (max realistic points is ~11)
+  const matchPercentage = Math.min(99, Math.max(82, Math.round((maxScore / 11) * 100)))
 
   const reasonSummaries: Record<string, string> = {
-    'ai-systems':
-      'Your strong preference for algorithmic thinking and automated workflows aligns directly with Track 01, where teams will deploy intelligent models to eliminate cognitive bottlenecks.',
-    cleantech:
-      'Your affinity for planetary impact and hardware/sensor systems makes Track 02 your ideal arena to prototype sustainable resource monitoring and climate resilience systems.',
-    fintech:
-      'Your focus on economic empowerment, robust backend engineering, and verification rules points to Track 03, challenging you to design fair and transparent financial protocols.',
-    healthtech:
-      'Your commitment to human well-being and intuitive accessible interfaces fits Track 04, where your team can bridge diagnostic gaps for patients and medical staff.',
-    'open-innovation':
-      'Your multidisciplinary generalist skill set and passion for public empowerment make Track 05 the perfect launchpad to tackle civic and campus bottlenecks.',
+    healthcare:
+      'Your strong drive to address clinical bottlenecks and user accessibility directly aligns with the Healthcare & Well-being domain.',
+    education:
+      'Your passion for unlocking learning opportunities and human-centered design makes Education & Learning Access your natural problem arena.',
+    agriculture:
+      'Your interest in rural impact, sensor systems, and fair economic loops pairs perfectly with the Agriculture & Rural Tech domain.',
+    environment:
+      'Your focus on climate resilience, conservation, and sustainable resource loops matches the Environment & Sustainability domain.',
+    transportation:
+      'Your ambition to eliminate transit delays, improve safety, and optimize spatial systems points to Transportation & Smart Mobility.',
+    technology:
+      'Your affinity for algorithmic problem solving, automation, and intelligent systems aligns directly with Deep Technology & Intelligent Systems.',
+    community:
+      'Your commitment to civic empowerment, citizen action, and local community resilience makes Community Development your ideal challenge track.',
   }
 
   return {
     track,
     matchScore: matchPercentage,
-    reasonSummary: reasonSummaries[bestTrackId] || 'Your answers highlight a high synergy with this innovation track.',
+    reasonSummary: reasonSummaries[bestTrackId] || 'Your answers highlight a high synergy with this innovation domain.',
     matchedPillars: track.idealFor,
   }
 }
