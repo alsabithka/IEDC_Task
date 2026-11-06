@@ -6,28 +6,50 @@ export default {
   theme: {
     extend: {
       colors: {
-        space: {
-          DEFAULT: '#080611',
-          900: '#080611',
+        bg: {
+          primary: 'var(--bg-primary)',
+          secondary: 'var(--bg-secondary)',
+          card: 'var(--bg-card)',
+          'card-hover': 'var(--bg-card-hover)',
+          muted: 'var(--bg-muted)',
         },
-        violet: {
-          accent: '#9b6bff',
-          hover: '#b18fff',
+        border: {
+          subtle: 'var(--border-subtle)',
+          default: 'var(--border-default)',
+          strong: 'var(--border-strong)',
+        },
+        text: {
+          primary: 'var(--text-primary)',
+          secondary: 'var(--text-secondary)',
+          muted: 'var(--text-muted)',
+          inverse: 'var(--text-inverse)',
+        },
+        btn: {
+          'primary-bg': 'var(--btn-primary-bg)',
+          'primary-text': 'var(--btn-primary-text)',
+          'primary-hover': 'var(--btn-primary-hover)',
+          'secondary-bg': 'var(--btn-secondary-bg)',
+          'secondary-text': 'var(--btn-secondary-text)',
+          'secondary-border': 'var(--btn-secondary-border)',
+          'secondary-hover': 'var(--btn-secondary-hover)',
         },
       },
       fontFamily: {
-        serif: ['Fraunces', 'serif'],
-        sans: ['Inter', 'sans-serif'],
-        mono: ['"IBM Plex Mono"', 'monospace'],
+        sans: ['Geist', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+        mono: ['"Geist Mono"', 'SFMono-Regular', 'Menlo', 'monospace'],
       },
-      animation: {
-        'accent-pulse': 'accentPulse 7s ease-in-out infinite',
+      borderRadius: {
+        sm: 'var(--radius-sm)',
+        DEFAULT: 'var(--radius-md)',
+        md: 'var(--radius-md)',
+        lg: 'var(--radius-lg)',
+        full: 'var(--radius-full)',
       },
-      keyframes: {
-        accentPulse: {
-          '0%, 100%': { boxShadow: '0 0 40px -14px rgba(155, 107, 255, 0.45)' },
-          '50%': { boxShadow: '0 0 64px -8px rgba(155, 107, 255, 0.72)' },
-        },
+      maxWidth: {
+        container: 'var(--container-max)',
+      },
+      transitionDuration: {
+        fast: '150ms',
       },
     },
   },

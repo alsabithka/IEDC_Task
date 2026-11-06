@@ -48,8 +48,9 @@ export const EVENT_CONFIG: EventConfig = {
   navLinks: [
     { label: 'Overview', href: '#about', index: '01' },
     { label: 'Schedule', href: '#schedule', index: '02' },
-    { label: 'Why Participate', href: '#why-participate', index: '03' },
-    { label: 'Venue & Contact', href: '#contact', index: '04' },
+    { label: 'Track Matcher', href: '#matcher', index: '03' },
+    { label: 'Register', href: '#register', index: '04' },
+    { label: 'Contact', href: '#contact', index: '05' },
   ],
 
   introduction: {

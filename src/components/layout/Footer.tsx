@@ -1,14 +1,9 @@
-import React from 'react'
-import {
-  Mail,
-  MapPin,
-  ArrowUp,
-  Zap,
-} from 'lucide-react'
-import { Container } from '../ui'
-import { EVENT_CONFIG } from '../../data/eventConfig'
+import React, { useState } from 'react'
+import { Mail, MapPin } from 'lucide-react'
+import { Container } from '../ui/Container'
+import { siteConfig } from '../../config/siteConfig'
 
-// Clean SVG Brand Icons
+// Clean SVG Social Icons
 const LinkedInIcon: React.FC<{ className?: string }> = ({ className }) => (
   <svg
     viewBox="0 0 24 24"
@@ -54,96 +49,74 @@ const XIcon: React.FC<{ className?: string }> = ({ className }) => (
 )
 
 export const Footer: React.FC = () => {
-  const currentYear = new Date().getFullYear()
-
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  }
+  const [currentYear] = useState<number>(() => new Date().getFullYear())
 
   return (
-    <footer
-      id="contact"
-      className="relative hairline-t bg-bg-secondary/80 text-text-secondary overflow-hidden"
-      aria-label="Footer"
-    >
-      {/* Decorative Technical Coordinate */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute top-4 right-8 hidden select-none font-mono text-[0.625rem] tracking-widest text-text-dim sm:block opacity-50"
-      >
-        FOOTER // CEC_CAMPUS_NODE
-      </div>
-
-      <Container size="default" className="py-16 sm:py-20">
-        <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-8">
-          {/* Col 1: Brand & Institutional Anchor (5 cols) */}
-          <div className="lg:col-span-5">
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-border-default bg-bg-surface text-accent-primary">
-                <Zap className="h-5 w-5 fill-accent-primary text-accent-primary" />
-              </div>
-              <div>
-                <h3 className="font-display text-heading-sm font-bold text-text-primary">
-                  {EVENT_CONFIG.eventName} {EVENT_CONFIG.edition}
-                </h3>
-                <p className="font-mono text-caption text-accent-primary">
-                  {EVENT_CONFIG.organizer.name}
-                </p>
-              </div>
-            </div>
-
-            <p className="mt-4 max-w-sm text-body-sm text-text-secondary leading-relaxed">
-              {EVENT_CONFIG.organizer.cell} at{' '}
-              <span className="text-text-primary font-medium">
-                {EVENT_CONFIG.organizer.institution}
-              </span>
-              . Cultivating an ecosystem of engineering student builders, venture creators, and relentless problem solvers.
+    <footer id="contact" className="border-t border-border-subtle bg-bg-secondary text-text-secondary">
+      <Container size="default" className="py-12 sm:py-16">
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-12 md:gap-8">
+          {/* Organization & Brand Column */}
+          <div className="md:col-span-5">
+            <h3 className="font-sans text-base font-semibold text-text-primary">
+              {siteConfig.brand.fullName}
+            </h3>
+            <p className="mt-1 font-mono text-xs text-text-muted">
+              {siteConfig.organizer.name}
             </p>
 
-            <div className="mt-6 flex flex-wrap items-center gap-3">
-              {EVENT_CONFIG.socials.linkedin && (
+            <p className="mt-3 text-sm text-text-secondary leading-relaxed max-w-sm">
+              {siteConfig.organizer.cell} at{' '}
+              <span className="text-text-primary">
+                {siteConfig.organizer.institution}
+              </span>
+              . Cultivating an ecosystem of engineering student builders, venture creators, and problem solvers.
+            </p>
+
+            {/* Social Links */}
+            <div className="mt-5 flex items-center gap-3">
+              {siteConfig.socials.linkedin && (
                 <a
-                  href={EVENT_CONFIG.socials.linkedin}
+                  href={siteConfig.socials.linkedin}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex h-9 w-9 items-center justify-center rounded-lg border border-border-default bg-bg-surface text-text-secondary transition-colors hover:border-accent-primary hover:text-accent-primary"
-                  aria-label="IEDC BOOTCAMP CEC LinkedIn"
+                  className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-border-default bg-bg-card text-text-secondary transition-colors hover:text-text-primary hover:border-border-strong"
+                  aria-label="LinkedIn"
                 >
                   <LinkedInIcon className="h-4 w-4" />
                 </a>
               )}
 
-              {EVENT_CONFIG.socials.instagram && (
+              {siteConfig.socials.instagram && (
                 <a
-                  href={EVENT_CONFIG.socials.instagram}
+                  href={siteConfig.socials.instagram}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex h-9 w-9 items-center justify-center rounded-lg border border-border-default bg-bg-surface text-text-secondary transition-colors hover:border-accent-primary hover:text-accent-primary"
-                  aria-label="IEDC BOOTCAMP CEC Instagram"
+                  className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-border-default bg-bg-card text-text-secondary transition-colors hover:text-text-primary hover:border-border-strong"
+                  aria-label="Instagram"
                 >
                   <InstagramIcon className="h-4 w-4" />
                 </a>
               )}
 
-              {EVENT_CONFIG.socials.github && (
+              {siteConfig.socials.github && (
                 <a
-                  href={EVENT_CONFIG.socials.github}
+                  href={siteConfig.socials.github}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex h-9 w-9 items-center justify-center rounded-lg border border-border-default bg-bg-surface text-text-secondary transition-colors hover:border-accent-primary hover:text-accent-primary"
-                  aria-label="IEDC GitHub"
+                  className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-border-default bg-bg-card text-text-secondary transition-colors hover:text-text-primary hover:border-border-strong"
+                  aria-label="GitHub"
                 >
                   <GithubIcon className="h-4 w-4" />
                 </a>
               )}
 
-              {EVENT_CONFIG.socials.x && (
+              {siteConfig.socials.x && (
                 <a
-                  href={EVENT_CONFIG.socials.x}
+                  href={siteConfig.socials.x}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex h-9 w-9 items-center justify-center rounded-lg border border-border-default bg-bg-surface text-text-secondary transition-colors hover:border-accent-primary hover:text-accent-primary"
-                  aria-label="IEDC X Twitter"
+                  className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-border-default bg-bg-card text-text-secondary transition-colors hover:text-text-primary hover:border-border-strong"
+                  aria-label="X (Twitter)"
                 >
                   <XIcon className="h-4 w-4" />
                 </a>
@@ -151,94 +124,59 @@ export const Footer: React.FC = () => {
             </div>
           </div>
 
-          {/* Col 2: Navigation Shortcuts (3 cols) */}
-          <div className="lg:col-span-3">
-            <span className="font-mono text-caption font-semibold uppercase tracking-wider text-text-primary">
-              // Navigation Index
-            </span>
-            <ul className="mt-4 space-y-2.5 text-body-sm">
-              {EVENT_CONFIG.navLinks.map((link) => (
-                <li key={link.href}>
+          {/* Quick Navigation Links */}
+          <div className="md:col-span-3">
+            <h4 className="font-mono text-xs font-semibold uppercase tracking-wider text-text-primary">
+              Navigation
+            </h4>
+            <ul className="mt-3 space-y-2 text-sm">
+              {siteConfig.navigation.map((item) => (
+                <li key={item.href}>
                   <a
-                    href={link.href}
-                    className="group inline-flex items-center gap-2 text-text-secondary transition-colors hover:text-accent-primary"
+                    href={item.href}
+                    className="text-text-secondary hover:text-text-primary transition-colors duration-150"
                   >
-                    <span className="font-mono text-[0.6875rem] text-text-dim group-hover:text-accent-primary">
-                      [{link.index}]
-                    </span>
-                    <span>{link.label}</span>
+                    {item.label}
                   </a>
                 </li>
               ))}
-              <li>
-                <a
-                  href="#register"
-                  className="group inline-flex items-center gap-2 text-accent-primary transition-colors hover:underline"
-                >
-                  <span className="font-mono text-[0.6875rem] text-accent-primary/60">
-                    [05]
-                  </span>
-                  <span>Register Team</span>
-                </a>
-              </li>
             </ul>
           </div>
 
-          {/* Col 3: Contact & Campus Coordinates (4 cols) */}
-          <div className="lg:col-span-4">
-            <span className="font-mono text-caption font-semibold uppercase tracking-wider text-text-primary">
-              // Contact & Campus Node
-            </span>
-            <div className="mt-4 space-y-3.5 text-body-sm">
-              <div className="flex items-start gap-3">
-                <MapPin className="h-4 w-4 shrink-0 text-accent-primary mt-0.5" />
-                <div>
-                  <p className="font-medium text-text-primary">
-                    {EVENT_CONFIG.venue.name}
-                  </p>
-                  <p className="text-caption text-text-secondary">
-                    {EVENT_CONFIG.contact.locationNotice}
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-3">
-                <Mail className="h-4 w-4 shrink-0 text-accent-primary" />
-                <a
-                  href={`mailto:${EVENT_CONFIG.contact.email}`}
-                  className="font-mono text-caption text-text-primary transition-colors hover:text-accent-primary underline-offset-4 hover:underline"
-                >
-                  {EVENT_CONFIG.contact.email}
-                </a>
-              </div>
-
-              <div className="rounded-lg border border-border-subtle bg-bg-surface/50 p-3 text-caption font-mono">
-                <span className="text-text-dim block">CAMPUS INQUIRIES:</span>
-                <span className="text-text-secondary mt-0.5 block">
-                  {EVENT_CONFIG.contact.leadContact} • Student Coordination
+          {/* Contact & Location */}
+          <div className="md:col-span-4">
+            <h4 className="font-mono text-xs font-semibold uppercase tracking-wider text-text-primary">
+              Contact & Campus
+            </h4>
+            <div className="mt-3 space-y-3 text-sm">
+              <div className="flex items-start gap-2.5">
+                <MapPin className="h-4 w-4 shrink-0 text-text-muted mt-0.5" />
+                <span className="text-text-secondary leading-snug">
+                  {siteConfig.contact.locationNotice}
                 </span>
+              </div>
+
+              <div className="flex items-center gap-2.5">
+                <Mail className="h-4 w-4 shrink-0 text-text-muted" />
+                <a
+                  href={`mailto:${siteConfig.contact.email}`}
+                  className="font-mono text-xs text-text-secondary hover:text-text-primary transition-colors underline-offset-4 hover:underline"
+                >
+                  {siteConfig.contact.email}
+                </a>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Bottom Bar: Copyright & Back to Top */}
-        <div className="hairline-t mt-16 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
-          <div className="flex flex-col sm:flex-row items-center gap-2 font-mono text-caption text-text-dim">
-            <span>© {currentYear} {EVENT_CONFIG.organizer.name}.</span>
-            <span className="hidden sm:inline">•</span>
-            <span>Web Manager Selection Assignment.</span>
+        {/* Bottom Bar */}
+        <div className="mt-12 border-t border-border-subtle pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono text-text-muted">
+          <div>
+            © {currentYear} {siteConfig.organizer.name}. All rights reserved.
           </div>
-
-          <button
-            type="button"
-            onClick={scrollToTop}
-            className="group flex items-center gap-2 rounded-lg border border-border-subtle bg-bg-surface px-3 py-1.5 font-mono text-caption text-text-secondary transition-colors hover:border-accent-primary hover:text-accent-primary focus-visible:outline-none"
-            aria-label="Back to top"
-          >
-            <span>TOP OF SYSTEM</span>
-            <ArrowUp className="h-3.5 w-3.5 transition-transform group-hover:-translate-y-0.5" />
-          </button>
+          <div>
+            {siteConfig.organizer.institution}
+          </div>
         </div>
       </Container>
     </footer>
