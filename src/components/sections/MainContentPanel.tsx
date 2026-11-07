@@ -87,7 +87,7 @@ export const MainContentPanel: React.FC = () => {
             RIGHT COLUMN: PLAYFUL CARTOON 3D CALENDAR & STOPWATCH SCENE (55%)
             ================================================================== */}
         <div className="flex flex-col items-center justify-center w-full relative">
-          <div className="w-full h-[400px] sm:h-[480px] lg:h-[min(550px,calc(100vh-160px))] xl:h-[min(630px,calc(100vh-180px))] 2xl:h-[700px] flex items-center justify-center relative">
+          <div className="w-full h-[260px] sm:h-[320px] md:h-[380px] lg:h-[min(550px,calc(100vh-160px))] xl:h-[min(630px,calc(100vh-180px))] 2xl:h-[700px] flex items-center justify-center relative">
             <CountdownInstrumentScene
               days={countdown.days}
               hours={countdown.hours}

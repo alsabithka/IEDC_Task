@@ -32,24 +32,20 @@ function SceneContent({
   seconds,
   isMobile = false,
 }: CountdownInstrumentSceneProps) {
-  // Desktop and Tablet: Always Side-by-Side!
-  // Mobile phones (< 768px): Stacked
-  const isStacked = Boolean(isMobile)
+  // Both Desktop and Mobile: Always Side-by-Side!
+  // Snug, companion layout with aligned vertical centers (y = 0)
+  const calScale = isMobile ? 0.80 : 0.90
+  const stopScale = isMobile ? 0.72 : 0.82
 
-  // Side-by-Side: Reduced gap between instruments (snug & cohesive pair)
-  // Calendar at x = -1.42, Stopwatch at x = 1.32, both centered vertically at y = 0
-  // Stacked: Calendar at y = 1.45, Stopwatch at y = -1.75
-  const calendarPos: [number, number, number] = isStacked
-    ? [0, 1.45, 0]
-    : [-1.42, 0, 0]
+  const calX = isMobile ? -1.30 : -1.42
+  const stopX = isMobile ? 1.20 : 1.32
 
-  const stopwatchPos: [number, number, number] = isStacked
-    ? [0, -1.75, 0]
-    : [1.32, 0, 0]
+  const calendarPos: [number, number, number] = [calX, 0, 0]
+  const stopwatchPos: [number, number, number] = [stopX, 0, 0]
 
-  // Frame instruments comfortably with zero edge clipping
-  const cameraZ = isStacked ? 9.2 : 7.9
-  const cameraY = isStacked ? -0.15 : 0
+  // Frame side-by-side instruments comfortably on all devices
+  const cameraZ = isMobile ? 7.6 : 7.9
+  const cameraY = 0
 
   return (
     <>
@@ -85,20 +81,20 @@ function SceneContent({
         color="#FFFFFF"
       />
 
-      {/* ── 1. CARTOON CALENDAR (Dominant instrument on LEFT, reduced size) ── */}
+      {/* ── 1. CARTOON CALENDAR (Dominant instrument on LEFT, side-by-side) ── */}
       <CartoonCalendar3D
         days={days}
         position={calendarPos}
-        scale={isStacked ? 0.88 : 0.90}
+        scale={calScale}
       />
 
-      {/* ── 2. CARTOON STOPWATCH (Clearly legible on RIGHT, reduced size) ── */}
+      {/* ── 2. CARTOON STOPWATCH (Clearly legible on RIGHT, side-by-side) ── */}
       <CartoonStopwatch3D
         hours={hours}
         minutes={minutes}
         seconds={seconds}
         position={stopwatchPos}
-        scale={isStacked ? 0.80 : 0.82}
+        scale={stopScale}
       />
     </>
   )
@@ -112,13 +108,10 @@ function FallbackInstruments({
   hours,
   minutes,
   seconds,
-  isMobile,
 }: CountdownInstrumentSceneProps) {
   return (
     <div
-      className={`w-full flex ${
-        isMobile ? 'flex-col' : 'flex-row'
-      } items-center justify-center gap-6 py-4 select-none`}
+      className="w-full flex flex-row items-center justify-center gap-3 sm:gap-6 py-4 select-none"
     >
       {/* Calendar Card */}
       <div className="w-full max-w-[280px] bg-[#F4F4F0] text-black rounded-2xl p-5 shadow-2xl border-2 border-[#1E1E1E] flex flex-col items-center">
