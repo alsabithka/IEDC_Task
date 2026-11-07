@@ -166,6 +166,7 @@ export const ScheduleRoadmapSection: React.FC<ScheduleRoadmapSectionProps> = ({
   onPlayGame,
 }) => {
   const [activeTab, setActiveTab] = useState<'day1' | 'day2'>('day1')
+  const [slideDirection, setSlideDirection] = useState<'right' | 'left'>('right')
 
   const trackContainerRef = useRef<HTMLDivElement>(null)
   const progressBarRef = useRef<HTMLDivElement>(null)
@@ -174,6 +175,8 @@ export const ScheduleRoadmapSection: React.FC<ScheduleRoadmapSectionProps> = ({
   const finishNodeRef = useRef<HTMLDivElement>(null)
 
   const handleTabChange = (tab: 'day1' | 'day2') => {
+    if (tab === activeTab) return
+    setSlideDirection(tab === 'day2' ? 'right' : 'left')
     setActiveTab(tab)
     setTimeout(() => {
       ScrollTrigger.refresh()
@@ -186,6 +189,23 @@ export const ScheduleRoadmapSection: React.FC<ScheduleRoadmapSectionProps> = ({
     if (prefersReducedMotion || !trackContainerRef.current) return
 
     const ctx = gsap.context(() => {
+      // Smooth toggle slide animation on container when switching days
+      if (trackContainerRef.current) {
+        gsap.fromTo(
+          trackContainerRef.current,
+          {
+            opacity: 0,
+            x: slideDirection === 'right' ? 32 : -32,
+          },
+          {
+            opacity: 1,
+            x: 0,
+            duration: 0.38,
+            ease: 'power3.out',
+          }
+        )
+      }
+
       // 1. Left side white line showing scroll progress
       if (progressBarRef.current && trackContainerRef.current) {
         gsap.fromTo(
@@ -272,7 +292,7 @@ export const ScheduleRoadmapSection: React.FC<ScheduleRoadmapSectionProps> = ({
     }, trackContainerRef)
 
     return () => ctx.revert()
-  }, [activeTab])
+  }, [activeTab, slideDirection])
 
   const visibleDays = SCHEDULE_ROADMAP.filter((day) => day.dayId === activeTab)
 
@@ -322,14 +342,24 @@ export const ScheduleRoadmapSection: React.FC<ScheduleRoadmapSectionProps> = ({
             3. DAY 1 / DAY 2 TAB SELECTOR (SMOOTH TOGGLE TRANSFER)
             ================================================================== */}
         <div id="day-tab-selector" className="w-full max-w-4xl mx-auto flex items-center justify-between mb-6 sm:mb-8 scroll-mt-24">
-          <div className="flex items-center gap-2 p-1.5 rounded-full bg-[#0d0d0d] border border-[#222222]">
+          <div className="relative inline-flex items-center p-1 rounded-full bg-[#0d0d0d] border border-[#222222] select-none">
+            {/* Smooth Sliding Pill Thumb */}
+            <div
+              className={`absolute top-1 bottom-1 w-[calc(50%-4px)] rounded-full bg-white shadow-md transition-transform duration-300 ease-[cubic-bezier(0.25,1,0.5,1)] pointer-events-none ${
+                activeTab === 'day1'
+                  ? 'left-1 translate-x-0'
+                  : 'left-1 translate-x-full'
+              }`}
+              aria-hidden="true"
+            />
+
             <button
               type="button"
               onClick={() => handleTabChange('day1')}
-              className={`px-5 sm:px-7 py-2 rounded-full font-sans text-xs sm:text-sm font-bold uppercase tracking-wider transition-all duration-300 ease-out cursor-pointer ${
+              className={`relative z-10 w-24 sm:w-28 py-2 rounded-full font-sans text-xs sm:text-sm font-bold uppercase tracking-wider text-center transition-colors duration-200 cursor-pointer ${
                 activeTab === 'day1'
-                  ? 'bg-white text-black shadow-md'
-                  : 'text-[#888888] hover:text-white hover:bg-white/5'
+                  ? 'text-black'
+                  : 'text-[#888888] hover:text-white'
               }`}
             >
               Day 1
@@ -337,10 +367,10 @@ export const ScheduleRoadmapSection: React.FC<ScheduleRoadmapSectionProps> = ({
             <button
               type="button"
               onClick={() => handleTabChange('day2')}
-              className={`px-5 sm:px-7 py-2 rounded-full font-sans text-xs sm:text-sm font-bold uppercase tracking-wider transition-all duration-300 ease-out cursor-pointer ${
+              className={`relative z-10 w-24 sm:w-28 py-2 rounded-full font-sans text-xs sm:text-sm font-bold uppercase tracking-wider text-center transition-colors duration-200 cursor-pointer ${
                 activeTab === 'day2'
-                  ? 'bg-white text-black shadow-md'
-                  : 'text-[#888888] hover:text-white hover:bg-white/5'
+                  ? 'text-black'
+                  : 'text-[#888888] hover:text-white'
               }`}
             >
               Day 2
