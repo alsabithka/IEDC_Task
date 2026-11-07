@@ -27,30 +27,17 @@ export const TrainGamePromo: React.FC<TrainGamePromoProps> = ({
         <div className="h-px flex-1 bg-gradient-to-l from-transparent via-white/25 to-white/40" />
       </div>
 
-      {/* ── Main Editorial Content (No Enclosing Box) ── */}
+      {/* ── Main Editorial Content (Clean Headline & Action, No Clutter) ── */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 sm:gap-10 py-1">
         <div className="max-w-3xl">
-          {/* Eyebrow Label */}
-          <div className="flex items-center gap-2 mb-2 sm:mb-3">
-            <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
-            <span className="font-mono text-[11px] sm:text-xs font-bold uppercase tracking-[0.24em] text-[#888888]">
-              INTERACTIVE 3D SIMULATION
-            </span>
-          </div>
-
           {/* Main Headline */}
-          <h3 className="font-display font-normal uppercase text-white tracking-[-0.015em] text-2xl sm:text-3xl md:text-4xl lg:text-5xl leading-[1.02]">
+          <h3 className="font-display font-normal uppercase text-white tracking-[-0.015em] text-2xl sm:text-3xl md:text-4xl lg:text-[2.6rem] leading-[1.02]">
             WHY SCROLL THROUGH THE SCHEDULE WHEN YOU CAN RIDE THROUGH IT?
           </h3>
-
-          {/* Supporting Text */}
-          <p className="mt-3 sm:mt-4 text-sm sm:text-base md:text-lg text-[#A0A0A0] font-sans font-medium leading-relaxed max-w-2xl">
-            The sessions are your stations. The tracks are waiting. Take the driver&apos;s seat and experience IDEA SPRINT differently.
-          </p>
         </div>
 
         {/* CTA Button: GET INTO THE LOCO → */}
-        <div className="shrink-0 pt-2 lg:pt-0">
+        <div className="shrink-0 pt-1 lg:pt-0">
           <button
             type="button"
             onClick={onPlayGame}
