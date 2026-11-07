@@ -39,17 +39,14 @@ export const TextCountdownCounter: React.FC<TextCountdownCounterProps> = ({
       <span className="absolute bottom-2.5 left-2.5 w-2 h-2 border-b border-l border-white/30 pointer-events-none" aria-hidden="true" />
       <span className="absolute bottom-2.5 right-2.5 w-2 h-2 border-b border-r border-white/30 pointer-events-none" aria-hidden="true" />
 
-      {/* ── 2. EVENT DATE HEADER BADGE ── */}
-      <div className="flex items-center justify-between pb-4 sm:pb-5 mb-5 sm:mb-7 border-b border-white/10">
+      {/* ── 2. EVENT DATE ── */}
+      <div className="flex items-center justify-center pb-4 sm:pb-5 mb-5 sm:mb-7 border-b border-white/10">
         <div className="flex items-center gap-2.5">
           <span className="w-2 h-2 rounded-full bg-white animate-pulse" aria-hidden="true" />
           <span className="font-mono text-xs sm:text-sm font-bold uppercase tracking-[0.2em] text-[#E0E0E0]">
-            EVENT DATE // {dateRange}
+            {dateRange}
           </span>
         </div>
-        <span className="hidden sm:inline-block font-mono text-[10px] sm:text-xs font-bold tracking-[0.2em] text-[#777777] uppercase">
-          EDITION 2026
-        </span>
       </div>
 
       {/* ── 3. FOUR-COLUMN LIVE TEXT COUNTDOWN ── */}
@@ -75,12 +72,6 @@ export const TextCountdownCounter: React.FC<TextCountdownCounterProps> = ({
             )}
           </div>
         ))}
-      </div>
-
-      {/* ── 4. BOTTOM TECHNICAL STRIP ── */}
-      <div className="mt-5 sm:mt-7 pt-4 sm:pt-5 border-t border-white/10 flex items-center justify-between text-[10px] sm:text-xs font-mono text-[#888888]">
-        <span className="tracking-wider uppercase">24-HOUR SPRINT COUNTDOWN</span>
-        <span className="tracking-wider text-[#CCCCCC] font-bold">CEC CAMPUS, KERALA</span>
       </div>
     </div>
   )
