@@ -65,11 +65,16 @@ export const GameHUD: React.FC<GameHUDProps> = ({
     if (typeof window === 'undefined') return false
     return window.innerHeight > window.innerWidth
   })
+  const [dismissPortraitLock, setDismissPortraitLock] = useState<boolean>(false)
 
   // Track orientation changes
   useEffect(() => {
     const handleResize = () => {
-      setIsPortrait(window.innerHeight > window.innerWidth)
+      const portrait = window.innerHeight > window.innerWidth
+      setIsPortrait(portrait)
+      if (!portrait) {
+        setDismissPortraitLock(false)
+      }
     }
     window.addEventListener('resize', handleResize)
     window.addEventListener('orientationchange', handleResize)
@@ -156,7 +161,7 @@ export const GameHUD: React.FC<GameHUDProps> = ({
           MANDATORY MOBILE LANDSCAPE LOCK SCREEN (Full-Screen Overlay)
           Guarantees the game is never played in squashed portrait mode
           ================================================================== */}
-      {isPortrait && (
+      {isPortrait && !dismissPortraitLock && (
         <div className="fixed inset-0 z-50 pointer-events-auto flex flex-col items-center justify-center p-6 bg-slate-950/98 backdrop-blur-2xl text-center select-none animate-in fade-in duration-200">
           <div className="relative mb-6">
             <div className="relative flex h-24 w-24 items-center justify-center rounded-3xl border-2 border-amber-400 bg-slate-900 shadow-[0_0_50px_rgba(245,158,11,0.3)]">
@@ -166,7 +171,7 @@ export const GameHUD: React.FC<GameHUDProps> = ({
           </div>
 
           <div className="inline-flex items-center gap-2 rounded-full border border-amber-400/40 bg-amber-950/60 px-3.5 py-1 text-[11px] font-mono font-bold uppercase tracking-wider text-amber-300 mb-3">
-            <span>Orientation Lock</span>
+            <span>Orientation Recommended</span>
           </div>
 
           <h2 className="font-display font-normal uppercase text-2xl sm:text-3xl text-white tracking-wide mb-2">
@@ -174,28 +179,38 @@ export const GameHUD: React.FC<GameHUDProps> = ({
           </h2>
 
           <p className="font-sans text-xs sm:text-sm text-slate-300 max-w-xs mb-6 leading-relaxed">
-            Idea Sprint Express is designed exclusively for horizontal cockpit driving. Turn your phone sideways to take the driver&apos;s seat.
+            Idea Sprint Express is designed for horizontal cockpit driving. Turn your phone sideways for the best driver experience.
           </p>
 
-          <button
-            type="button"
-            onClick={async () => {
-              try {
-                if (document.documentElement.requestFullscreen) {
-                  await document.documentElement.requestFullscreen()
+          <div className="flex flex-col gap-2.5 w-full max-w-xs">
+            <button
+              type="button"
+              onClick={async () => {
+                try {
+                  if (document.documentElement.requestFullscreen) {
+                    await document.documentElement.requestFullscreen()
+                  }
+                  if (screen.orientation && 'lock' in screen.orientation) {
+                    await screen.orientation.lock('landscape')
+                  }
+                } catch {
+                  // Ignore if browser restricts orientation lock
                 }
-                if (screen.orientation && 'lock' in screen.orientation) {
-                  await screen.orientation.lock('landscape')
-                }
-              } catch {
-                // Ignore if browser restricts orientation lock
-              }
-            }}
-            className="inline-flex items-center gap-2 rounded-full px-6 py-3 bg-gradient-to-r from-amber-400 via-rose-500 to-indigo-600 text-white font-sans font-black text-xs uppercase tracking-wider shadow-xl active:scale-95 transition-all cursor-pointer"
-          >
-            <RotateCw className="h-4 w-4" />
-            <span>Lock Landscape & Play</span>
-          </button>
+              }}
+              className="inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 bg-gradient-to-r from-amber-400 via-rose-500 to-indigo-600 text-white font-sans font-black text-xs uppercase tracking-wider shadow-xl active:scale-95 transition-all cursor-pointer"
+            >
+              <RotateCw className="h-4 w-4" />
+              <span>Rotate / Lock Landscape</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setDismissPortraitLock(true)}
+              className="inline-flex items-center justify-center gap-1.5 rounded-full px-5 py-2.5 border border-slate-700 bg-slate-900/90 text-slate-300 font-mono text-xs uppercase tracking-wider hover:text-white active:scale-95 transition-all cursor-pointer"
+            >
+              <span>Continue in Portrait</span>
+            </button>
+          </div>
         </div>
       )}
 

@@ -418,43 +418,12 @@ export const ScheduleRoadmapSection: React.FC<ScheduleRoadmapSectionProps> = ({
                     </button>
                   </div>
                 )}
+
+                
+                
               </div>
             </div>
           ))}
-        </div>
-
-        {/* ==================================================================
-            3. ROADMAP FOOTER SUMMARY (Clean, Static Technical Footer)
-            ================================================================== */}
-        <div className="mt-12 sm:mt-16 lg:mt-20 rounded-2xl border border-[#202020] bg-[#080808] p-5 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="flex items-center gap-4">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white text-black">
-              <Compass className="h-6 w-6 text-black" />
-            </div>
-            <div>
-              <p className="font-sans font-bold text-sm sm:text-base text-white">
-                24-Hour Continuous Ideathon Roadmap
-              </p>
-              <p className="text-xs sm:text-sm text-[#888888] mt-0.5">
-                College of Engineering Chengannur · Hosted by IEDC BOOTCAMP CEC
-              </p>
-            </div>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-3 sm:gap-4">
-            <a
-              href="#home"
-              className="inline-flex items-center justify-center rounded-full border border-white/20 bg-white/5 text-white px-5 sm:px-6 py-2.5 font-sans text-xs sm:text-sm font-bold uppercase tracking-wider hover:bg-white/10 hover:border-white/40 transition-all cursor-pointer"
-            >
-              Back to Hero
-            </a>
-            <a
-              href="#register"
-              className="inline-flex items-center justify-center rounded-full bg-white text-black px-6 sm:px-7 py-2.5 font-sans text-xs sm:text-sm font-bold uppercase tracking-wider hover:bg-[#EAEAEA] transition-all cursor-pointer"
-            >
-              Register Team
-            </a>
-          </div>
         </div>
       </div>
     </section>

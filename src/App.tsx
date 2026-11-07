@@ -3,6 +3,7 @@ import { Preloader } from './components/ui/Preloader'
 import { Layout } from './components/layout/Layout'
 import { MainContentPanel } from './components/sections/MainContentPanel'
 import { ScheduleRoadmapSection } from './components/sections/ScheduleRoadmapSection'
+import { RegistrationSection } from './components/sections/RegistrationSection'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
 // Lazy-load the heavy 3D Train Driving Game only when requested
@@ -57,10 +58,15 @@ export const App: React.FC = () => {
     if (window.location.pathname.startsWith('/train-game')) {
       window.history.pushState({}, '', '/')
     } else {
-      window.location.hash = ''
+      window.location.hash = '#register'
     }
     setIsGameRoute(false)
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+    setTimeout(() => {
+      const regEl = document.getElementById('register')
+      if (regEl) {
+        regEl.scrollIntoView({ behavior: 'smooth' })
+      }
+    }, 150)
   }
 
   // If in Train Game Mode, render isolated 3D simulation with lightweight loading fallback
@@ -94,10 +100,11 @@ export const App: React.FC = () => {
       {/* GSAP Cinematic Preloader (Preserved: IDEA SPRINT -> IEDC transformation) */}
       <Preloader onComplete={() => ScrollTrigger.refresh()} />
 
-      {/* Main Website Flow: Hero Section, Event Schedule & Train Game Invitation */}
+      {/* Main Website Flow: Hero Section, Event Schedule & Train Game Promo, Registration */}
       <Layout>
         <MainContentPanel />
         <ScheduleRoadmapSection onPlayGame={navigateToGame} />
+        <RegistrationSection />
       </Layout>
     </>
   )
