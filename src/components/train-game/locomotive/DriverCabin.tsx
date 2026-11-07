@@ -13,218 +13,194 @@ export const DriverCabin: React.FC<DriverCabinProps> = ({
 }) => {
   // Compute dial needle and lever angles declaratively
   const speedRatio = Math.min(1, Math.max(0, speedKmh / 70))
-  const needleRotationZ = 1.6 - speedRatio * 3.2
-  const throttleRotationX = -(throttlePercent / 100) * 0.75
-  const brakeRotationZ = (brakePercent / 100) * 0.8
+  const needleRotationZ = 1.5 - speedRatio * 3.0
+  const throttleRotationX = -(throttlePercent / 100) * 0.65
+  const brakeRotationZ = (brakePercent / 100) * 0.75
 
   return (
     <group position={[0, 0, 0]}>
       {/* ==================================================================
-          1. FORWARD BOILER & HOOD (Visible through bottom of windshield)
+          1. FORWARD LOCOMOTIVE NOSE & BOILER (Framed below windshield sightline)
           ================================================================== */}
-      <group position={[0, 0.54, 1.8]}>
-        {/* Vibrant Crimson Red Enamel Boiler extending ahead */}
+      <group position={[0, 0.38, 1.8]}>
+        {/* Sleek Crimson Red Enamel Boiler extending forward */}
         <mesh position={[0, 0, 0]} rotation={[Math.PI / 2, 0, 0]} castShadow>
-          <cylinderGeometry args={[0.56, 0.56, 2.5, 24]} />
+          <cylinderGeometry args={[0.42, 0.42, 2.6, 24]} />
           <meshStandardMaterial color="#DC2626" roughness={0.25} metalness={0.15} />
         </mesh>
 
         {/* Polished Golden Brass Boiler Bands */}
-        {[-0.6, 0.1, 0.8].map((z, idx) => (
+        {[-0.7, 0.0, 0.7].map((z, idx) => (
           <mesh key={`band-${idx}`} position={[0, 0, z]} rotation={[Math.PI / 2, 0, 0]}>
-            <cylinderGeometry args={[0.575, 0.575, 0.07, 24]} />
+            <cylinderGeometry args={[0.435, 0.435, 0.05, 24]} />
             <meshStandardMaterial color="#F59E0B" metalness={0.8} roughness={0.25} />
           </mesh>
         ))}
 
-        {/* Royal Blue Front Nose Rounding */}
-        <mesh position={[0, 0, 1.25]} castShadow>
-          <sphereGeometry args={[0.56, 24, 16, 0, Math.PI * 2, 0, Math.PI / 2]} />
+        {/* Royal Blue Front Cowl Nose */}
+        <mesh position={[0, 0, 1.3]} castShadow>
+          <sphereGeometry args={[0.42, 24, 16, 0, Math.PI * 2, 0, Math.PI / 2]} />
           <meshStandardMaterial color="#1D4ED8" roughness={0.3} />
         </mesh>
 
-        {/* Golden Brass Steam Dome */}
-        <mesh position={[0, 0.56, 0.1]} castShadow>
-          <sphereGeometry args={[0.22, 16, 12, 0, Math.PI * 2, 0, Math.PI / 2]} />
+        {/* Compact Brass Steam Dome (Low profile to keep horizon clear) */}
+        <mesh position={[0, 0.40, 0.0]} castShadow>
+          <sphereGeometry args={[0.16, 16, 12, 0, Math.PI * 2, 0, Math.PI / 2]} />
           <meshStandardMaterial color="#F59E0B" metalness={0.8} roughness={0.2} />
         </mesh>
 
-        {/* Charcoal Smokestack with Brass Ring Collar */}
-        <group position={[0, 0.68, 0.85]}>
+        {/* Compact Smokestack with Brass Ring Collar (Kept below windshield line) */}
+        <group position={[0, 0.42, 0.85]}>
           <mesh castShadow>
-            <cylinderGeometry args={[0.16, 0.12, 0.45, 16]} />
+            <cylinderGeometry args={[0.12, 0.09, 0.28, 16]} />
             <meshStandardMaterial color="#1E293B" roughness={0.5} />
           </mesh>
-          <mesh position={[0, 0.22, 0]}>
-            <cylinderGeometry args={[0.18, 0.18, 0.06, 16]} />
+          <mesh position={[0, 0.14, 0]}>
+            <cylinderGeometry args={[0.13, 0.13, 0.04, 16]} />
             <meshStandardMaterial color="#F59E0B" metalness={0.8} roughness={0.2} />
           </mesh>
         </group>
       </group>
 
       {/* ==================================================================
-          2. CABIN ARCHITECTURE (Panoramic Windshield Frame & Dark Dashboard)
+          2. WIDE PANORAMIC CABIN ARCHITECTURE (Framed for Landscape Mobile)
           ================================================================== */}
-      {/* Front Dashboard Base Deck (Warm Rich Teak Wood Finish) */}
-      <mesh position={[0, 0.72, 0.55]} receiveShadow>
-        <boxGeometry args={[1.7, 0.44, 0.9]} />
+      {/* Front Dashboard Base Deck (Warm Rich Teak Wood Finish, low profile) */}
+      <mesh position={[0, 0.65, 0.62]} receiveShadow>
+        <boxGeometry args={[3.2, 0.28, 0.75]} />
         <meshStandardMaterial color="#2E180D" roughness={0.7} />
       </mesh>
 
-      {/* Angled Upper Dashboard Console (Polished Midnight Charcoal) */}
-      <mesh position={[0, 0.95, 0.52]} rotation={[-0.38, 0, 0]} receiveShadow>
-        <boxGeometry args={[1.65, 0.32, 0.55]} />
+      {/* Angled Upper Instrument Console (Polished Midnight Charcoal) */}
+      <mesh position={[0, 0.78, 0.58]} rotation={[-0.42, 0, 0]} receiveShadow>
+        <boxGeometry args={[3.1, 0.24, 0.42]} />
         <meshStandardMaterial color="#0F172A" roughness={0.5} metalness={0.2} />
       </mesh>
 
-      {/* Left Windshield Pillar (Cobalt Blue with Gold Bevel) */}
-      <mesh position={[-0.85, 1.5, 0.5]} rotation={[0, 0, -0.06]}>
-        <boxGeometry args={[0.1, 1.2, 0.1]} />
+      {/* Sleek Left Windshield Pillar (Positioned at X = -1.52m to frame the screen edge) */}
+      <mesh position={[-1.52, 1.45, 0.55]} rotation={[0, 0, -0.05]}>
+        <boxGeometry args={[0.08, 1.3, 0.08]} />
         <meshStandardMaterial color="#1D4ED8" roughness={0.4} />
       </mesh>
 
-      {/* Right Windshield Pillar (Cobalt Blue with Gold Bevel) */}
-      <mesh position={[0.85, 1.5, 0.5]} rotation={[0, 0, 0.06]}>
-        <boxGeometry args={[0.1, 1.2, 0.1]} />
+      {/* Sleek Right Windshield Pillar (Positioned at X = +1.52m to frame the screen edge) */}
+      <mesh position={[1.52, 1.45, 0.55]} rotation={[0, 0, 0.05]}>
+        <boxGeometry args={[0.08, 1.3, 0.08]} />
         <meshStandardMaterial color="#1D4ED8" roughness={0.4} />
       </mesh>
 
-      {/* Overhead Windshield Top Header Arch (No Center Pillar - Open Panoramic View!) */}
-      <mesh position={[0, 2.05, 0.5]}>
-        <boxGeometry args={[1.75, 0.08, 0.12]} />
+      {/* Left Side Window Frame */}
+      <mesh position={[-1.68, 1.40, 0.15]} rotation={[0, 0.12, 0]}>
+        <boxGeometry args={[0.06, 0.9, 0.8]} />
+        <meshStandardMaterial color="#0F172A" roughness={0.5} />
+      </mesh>
+
+      {/* Right Side Window Frame */}
+      <mesh position={[1.68, 1.40, 0.15]} rotation={[0, -0.12, 0]}>
+        <boxGeometry args={[0.06, 0.9, 0.8]} />
+        <meshStandardMaterial color="#0F172A" roughness={0.5} />
+      </mesh>
+
+      {/* Overhead Windshield Top Header Arch (Slim line high overhead) */}
+      <mesh position={[0, 2.05, 0.55]}>
+        <boxGeometry args={[3.2, 0.08, 0.10]} />
         <meshStandardMaterial color="#1D4ED8" roughness={0.4} />
       </mesh>
 
       {/* Cabin Roof Frame Overhead */}
-      <group position={[0, 2.12, 0.0]}>
+      <group position={[0, 2.12, 0.1]}>
         <mesh>
-          <boxGeometry args={[1.75, 0.12, 1.1]} />
+          <boxGeometry args={[3.2, 0.10, 1.1]} />
           <meshStandardMaterial color="#0F172A" roughness={0.6} />
         </mesh>
       </group>
 
       {/* ==================================================================
-          3. MECHANICAL DASHBOARD CONTROLS & GAUGES
+          3. MECHANICAL DASHBOARD CONTROLS & GAUGES (Compact Height)
           ================================================================== */}
-      <group position={[0, 1.05, 0.48]} rotation={[-0.35, 0, 0]}>
+      <group position={[0, 0.85, 0.55]} rotation={[-0.40, 0, 0]}>
         {/* Speedometer Dial Plate (Left Console — Ivory Face & Gold Bezel) */}
-        <group position={[-0.45, 0.02, 0]}>
+        <group position={[-0.55, 0.02, 0]}>
           {/* Dial Face */}
           <mesh rotation={[-Math.PI / 2, 0, 0]}>
-            <circleGeometry args={[0.18, 24]} />
+            <circleGeometry args={[0.14, 24]} />
             <meshStandardMaterial color="#FFFBEB" roughness={0.3} />
           </mesh>
           {/* Golden Brass Bezel Ring */}
-          <mesh position={[0, 0.01, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-            <ringGeometry args={[0.16, 0.19, 24]} />
+          <mesh position={[0, 0.008, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+            <ringGeometry args={[0.13, 0.155, 24]} />
             <meshStandardMaterial color="#F59E0B" metalness={0.8} roughness={0.2} />
           </mesh>
-          {/* Fiery Red Dial Needle (Rotates Declaratively with Speed) */}
-          <mesh position={[0, 0.015, 0]} rotation={[0, 0, needleRotationZ]}>
-            <boxGeometry args={[0.02, 0.15, 0.005]} />
+          {/* Red Dial Needle */}
+          <mesh position={[0, 0.012, 0]} rotation={[0, 0, needleRotationZ]}>
+            <boxGeometry args={[0.018, 0.12, 0.005]} />
             <meshStandardMaterial color="#EF4444" emissive="#EF4444" emissiveIntensity={0.8} />
           </mesh>
-          {/* Dial Pivot Cap */}
-          <mesh position={[0, 0.02, 0]}>
-            <cylinderGeometry args={[0.025, 0.025, 0.01, 12]} />
+          {/* Pivot Cap */}
+          <mesh position={[0, 0.016, 0]}>
+            <cylinderGeometry args={[0.02, 0.02, 0.01, 12]} />
             <meshStandardMaterial color="#F59E0B" metalness={0.8} />
           </mesh>
         </group>
 
-        {/* Center Illuminated Navigation Radar Screen (High-Tech Retro Console) */}
+        {/* Center Illuminated Navigation Radar Screen */}
         <group position={[0, 0.02, 0]}>
           {/* Bezel */}
           <mesh rotation={[-Math.PI / 2, 0, 0]}>
-            <planeGeometry args={[0.48, 0.24]} />
+            <planeGeometry args={[0.42, 0.18]} />
             <meshStandardMaterial color="#020617" roughness={0.2} />
           </mesh>
           {/* Gold Screen Outer Border */}
-          <mesh position={[0, 0.005, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-            <ringGeometry args={[0.22, 0.24, 4]} />
+          <mesh position={[0, 0.004, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+            <ringGeometry args={[0.18, 0.20, 4]} />
             <meshStandardMaterial color="#F59E0B" metalness={0.7} />
           </mesh>
 
-          {/* Illuminated Horizontal Track Signal Level Bars */}
-          <mesh position={[0, 0.01, -0.06]} rotation={[-Math.PI / 2, 0, 0]}>
-            <planeGeometry args={[0.38, 0.03]} />
-            <meshStandardMaterial
-              color="#38BDF8"
-              emissive="#38BDF8"
-              emissiveIntensity={1.5}
-            />
+          {/* Illuminated Signal Level Bars */}
+          <mesh position={[0, 0.008, -0.04]} rotation={[-Math.PI / 2, 0, 0]}>
+            <planeGeometry args={[0.32, 0.025]} />
+            <meshStandardMaterial color="#38BDF8" emissive="#38BDF8" emissiveIntensity={1.5} />
           </mesh>
-          <mesh position={[0, 0.01, 0.0]} rotation={[-Math.PI / 2, 0, 0]}>
-            <planeGeometry args={[0.34, 0.03]} />
-            <meshStandardMaterial
-              color="#FACC15"
-              emissive="#FACC15"
-              emissiveIntensity={1.5}
-            />
+          <mesh position={[0, 0.008, 0.0]} rotation={[-Math.PI / 2, 0, 0]}>
+            <planeGeometry args={[0.28, 0.025]} />
+            <meshStandardMaterial color="#FACC15" emissive="#FACC15" emissiveIntensity={1.5} />
           </mesh>
-          <mesh position={[0, 0.01, 0.06]} rotation={[-Math.PI / 2, 0, 0]}>
-            <planeGeometry args={[0.30, 0.03]} />
-            <meshStandardMaterial
-              color="#4ADE80"
-              emissive="#4ADE80"
-              emissiveIntensity={1.5}
-            />
-          </mesh>
-
-          {/* Circular Indicator Beacon Lights */}
-          <mesh position={[-0.18, 0.015, 0]}>
-            <cylinderGeometry args={[0.018, 0.018, 0.008, 12]} />
-            <meshStandardMaterial
-              color="#10B981"
-              emissive="#10B981"
-              emissiveIntensity={2.0}
-            />
-          </mesh>
-          <mesh position={[0.18, 0.015, 0]}>
-            <cylinderGeometry args={[0.018, 0.018, 0.008, 12]} />
-            <meshStandardMaterial
-              color="#F59E0B"
-              emissive="#F59E0B"
-              emissiveIntensity={2.0}
-            />
+          <mesh position={[0, 0.008, 0.04]} rotation={[-Math.PI / 2, 0, 0]}>
+            <planeGeometry args={[0.24, 0.025]} />
+            <meshStandardMaterial color="#4ADE80" emissive="#4ADE80" emissiveIntensity={1.5} />
           </mesh>
         </group>
 
         {/* Mechanical Throttle Lever Assembly (Right Console) */}
-        <group position={[0.42, 0.02, 0]}>
+        <group position={[0.52, 0.02, 0]}>
           {/* Lever Base Slot */}
           <mesh rotation={[-Math.PI / 2, 0, 0]}>
-            <boxGeometry args={[0.14, 0.24, 0.02]} />
+            <boxGeometry args={[0.12, 0.18, 0.02]} />
             <meshStandardMaterial color="#1E293B" />
           </mesh>
           {/* Throttle Lever Arm (Tilts Declaratively) */}
-          <group position={[0, 0.04, 0]} rotation={[throttleRotationX, 0, 0]}>
-            <mesh position={[0, 0.08, 0]}>
-              <cylinderGeometry args={[0.012, 0.012, 0.16, 12]} />
+          <group position={[0, 0.03, 0]} rotation={[throttleRotationX, 0, 0]}>
+            <mesh position={[0, 0.06, 0]}>
+              <cylinderGeometry args={[0.010, 0.010, 0.13, 12]} />
               <meshStandardMaterial color="#E2E8F0" metalness={0.8} />
             </mesh>
-            {/* Glossy Cherry Red Ball Knob */}
-            <mesh position={[0, 0.16, 0]}>
-              <sphereGeometry args={[0.035, 16, 16]} />
+            {/* Cherry Red Ball Knob */}
+            <mesh position={[0, 0.12, 0]}>
+              <sphereGeometry args={[0.028, 16, 16]} />
               <meshStandardMaterial color="#EF4444" roughness={0.2} metalness={0.1} />
             </mesh>
           </group>
-          {/* Lever Gradation Markings */}
-          <mesh position={[0, 0.015, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-            <planeGeometry args={[0.08, 0.16]} />
-            <meshStandardMaterial color="#F59E0B" roughness={0.5} />
-          </mesh>
         </group>
 
         {/* Mechanical Brake Valve Handle (Far Right) */}
-        <group position={[0.68, 0.02, 0]}>
-          <group position={[0, 0.03, 0]} rotation={[0, 0, brakeRotationZ]}>
-            <mesh position={[0, 0.06, 0]}>
-              <cylinderGeometry args={[0.014, 0.014, 0.12, 12]} />
+        <group position={[0.82, 0.02, 0]}>
+          <group position={[0, 0.025, 0]} rotation={[0, 0, brakeRotationZ]}>
+            <mesh position={[0, 0.05, 0]}>
+              <cylinderGeometry args={[0.012, 0.012, 0.10, 12]} />
               <meshStandardMaterial color="#94A3B8" metalness={0.7} />
             </mesh>
-            {/* Valve Cross Handle (Vibrant Alert Ruby / Golden Yellow) */}
-            <mesh position={[0, 0.12, 0]}>
-              <boxGeometry args={[0.09, 0.025, 0.025]} />
+            <mesh position={[0, 0.09, 0]}>
+              <boxGeometry args={[0.075, 0.02, 0.02]} />
               <meshStandardMaterial
                 color={brakePercent > 10 ? '#EF4444' : '#FACC15'}
                 emissive={brakePercent > 10 ? '#DC2626' : '#78350F'}

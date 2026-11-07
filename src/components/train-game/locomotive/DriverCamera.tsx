@@ -1,5 +1,5 @@
-import { useEffect, useRef } from 'react'
-import { useThree, useFrame } from '@react-three/fiber'
+import { useRef } from 'react'
+import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 import { getTrackFrameAt } from '../track/trackMath'
 import type { TrainInputState } from '../controls/useTrainControls'
@@ -15,55 +15,55 @@ export const DriverCamera: React.FC<DriverCameraProps> = ({
   speedKmh,
   inputRef,
 }) => {
-  const { camera } = useThree()
-
-  // Head look mouse offset (constrained normalized -1 to +1)
-  const pointerLook = useRef({ x: 0, y: 0 })
   // Current smoothed look offsets
   const smoothedLook = useRef({ x: 0, y: 0 })
 
-  useEffect(() => {
-    const handlePointerMove = (e: MouseEvent) => {
-      // Normalized from center of screen (-1 to +1)
-      const nx = (e.clientX / window.innerWidth) * 2 - 1
-      const ny = -(e.clientY / window.innerHeight) * 2 + 1
-      const cx = THREE.MathUtils.clamp(nx, -1, 1)
-      const cy = THREE.MathUtils.clamp(ny, -1, 1)
-      pointerLook.current.x = cx
-      pointerLook.current.y = cy
+  useFrame((state) => {
+    // 1. Dynamic Responsive Aspect Ratio & FOV Adjustment
+    const aspect = state.size.width / state.size.height
+    const pCam = state.camera as THREE.PerspectiveCamera
 
-      if (inputRef?.current && inputRef.current.cameraLookX === 0 && inputRef.current.cameraLookY === 0) {
-        inputRef.current.cameraLookX = cx
-        inputRef.current.cameraLookY = cy
+    if (pCam && pCam.isPerspectiveCamera) {
+      // Target a natural, cinematic horizontal field of view (~84 degrees in landscape)
+      let targetFov: number
+      if (aspect >= 1.2) {
+        // Landscape mode: derive vertical FOV from target horizontal FOV = 84 deg
+        const targetHalfHRad = (84 / 2) * (Math.PI / 180)
+        const targetHalfVRad = Math.atan(Math.tan(targetHalfHRad) / aspect)
+        targetFov = THREE.MathUtils.clamp((targetHalfVRad * 2 * 180) / Math.PI, 38, 56)
+      } else {
+        // Portrait mode
+        targetFov = 58
+      }
+
+      if (Math.abs(pCam.fov - targetFov) > 0.3) {
+        pCam.fov = targetFov
+        pCam.updateProjectionMatrix()
       }
     }
 
-    window.addEventListener('mousemove', handlePointerMove)
-    return () => window.removeEventListener('mousemove', handlePointerMove)
-  }, [inputRef])
-
-  useFrame((state) => {
-    // 1. Get locomotive world position and direction from the track curve
+    // 2. Get locomotive world position and direction from the track curve
     const { position: trackPos, tangent, normal, up } = getTrackFrameAt(trackProgress)
 
-    // 2. Compute Driver's Eye position inside the locomotive cabin:
-    const eyeHeight = 1.42
-    const forwardOffset = 0.15
+    // 3. Compute Driver's Eye position inside the locomotive cabin:
+    // Eye height 1.34m aligns perfectly with the panoramic windshield center
+    const eyeHeight = 1.34
+    const forwardOffset = 0.20
     const sideOffset = 0.0
 
-    // Add subtle speed vibration / track joint click-clack (only when moving)
+    // Add subtle speed vibration / track click-clack when moving
     const absSpeed = Math.abs(speedKmh)
     const speedRatio = Math.min(1.0, absSpeed / 60)
     const rumble =
       absSpeed > 0.8
-        ? (Math.sin(state.clock.elapsedTime * 22) * 0.005 +
-           Math.sin(state.clock.elapsedTime * 11) * 0.0025) * speedRatio
+        ? (Math.sin(state.clock.elapsedTime * 22) * 0.004 +
+           Math.sin(state.clock.elapsedTime * 11) * 0.002) * speedRatio
         : 0
 
     // Subtle lateral sway on curves
     const lateralSway =
       absSpeed > 0.8
-        ? Math.sin(state.clock.elapsedTime * 4.5) * 0.004 * speedRatio
+        ? Math.sin(state.clock.elapsedTime * 4.5) * 0.0035 * speedRatio
         : 0
 
     const eyePosition = new THREE.Vector3()
@@ -72,31 +72,32 @@ export const DriverCamera: React.FC<DriverCameraProps> = ({
       .addScaledVector(tangent, forwardOffset)
       .addScaledVector(normal, sideOffset + lateralSway)
 
-    camera.position.copy(eyePosition)
+    state.camera.position.copy(eyePosition)
 
-    // 3. Compute Base Forward Look Direction along Track Tangent
+    // 4. Compute Base Forward Look Direction along Track Tangent
+    // Look 20m ahead with a subtle natural downward pitch (-1.86 deg) to frame rails and horizon
     const forwardTarget = new THREE.Vector3()
       .copy(eyePosition)
-      .addScaledVector(tangent, 16) // Look ahead on track
+      .addScaledVector(tangent, 20)
+      .addScaledVector(up, -0.65)
 
-    // 4. Smooth Camera Look Interpolation
-    const targetLookX = inputRef?.current?.cameraLookX ?? pointerLook.current.x
-    const targetLookY = inputRef?.current?.cameraLookY ?? pointerLook.current.y
+    // 5. Smooth Camera Look Interpolation (Controlled via Touch/Mouse windshield drag)
+    const targetLookX = inputRef?.current?.cameraLookX ?? 0
+    const targetLookY = inputRef?.current?.cameraLookY ?? 0
 
     smoothedLook.current.x = THREE.MathUtils.lerp(smoothedLook.current.x, targetLookX, 0.14)
     smoothedLook.current.y = THREE.MathUtils.lerp(smoothedLook.current.y, targetLookY, 0.14)
 
-    // 5. Apply Natural Head-Look Angular Offsets (Clamped inside cabin)
-    // Yaw: max +- 24 degrees (0.42 rad)
-    const yawAngle = -smoothedLook.current.x * 0.42
-    // Pitch: -12 to +8 degrees (-0.21 to +0.14 rad)
-    const pitchAngle = smoothedLook.current.y * 0.18
+    // 6. Apply Natural Head-Look Angular Offsets (Clamped comfortably inside cabin)
+    // Yaw: max +- 22 degrees
+    const yawAngle = smoothedLook.current.x * 0.38
+    // Pitch: -10 to +8 degrees
+    const pitchAngle = smoothedLook.current.y * 0.16
 
-    // Offset look target based on head turn
-    forwardTarget.addScaledVector(normal, yawAngle * 14)
-    forwardTarget.addScaledVector(up, pitchAngle * 9)
+    forwardTarget.addScaledVector(normal, yawAngle * 16)
+    forwardTarget.addScaledVector(up, pitchAngle * 10)
 
-    camera.lookAt(forwardTarget)
+    state.camera.lookAt(forwardTarget)
   })
 
   return null
