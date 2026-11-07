@@ -62,13 +62,13 @@ export const TrainLocomotive: React.FC<TrainLocomotiveProps> = ({
         <meshStandardMaterial color="#FACC15" roughness={0.4} />
       </mesh>
 
-      {/* Front Golden Headlight Housing */}
-      <mesh position={[0, 0.95, 3.0]} castShadow>
+      {/* Front Golden Headlight Housing (Positioned low below driver's windshield sightline) */}
+      <mesh position={[0, 0.65, 3.0]} castShadow>
         <cylinderGeometry args={[0.18, 0.22, 0.35, 16]} />
         <meshStandardMaterial color="#F59E0B" metalness={0.7} roughness={0.3} />
       </mesh>
       {/* Front Headlight Lens with Warm Glow */}
-      <mesh position={[0, 0.95, 3.18]}>
+      <mesh position={[0, 0.65, 3.18]}>
         <circleGeometry args={[0.16, 16]} />
         <meshStandardMaterial
           color="#FFFBEB"

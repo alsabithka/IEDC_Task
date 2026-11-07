@@ -94,14 +94,34 @@ export const TrainGamePage: React.FC<TrainGamePageProps> = ({
 
     window.addEventListener('webglcontextlost', handleContextLost)
     window.addEventListener('webglcontextrestored', handleContextRestored)
+
+    // Attempt native screen orientation lock to landscape on mobile devices
+    const lockLandscape = async () => {
+      try {
+        if (screen.orientation && 'lock' in screen.orientation) {
+          await screen.orientation.lock('landscape')
+        }
+      } catch {
+        // Fallback handled by GameHUD full-screen rotation lock screen
+      }
+    }
+    lockLandscape()
+
     return () => {
       window.removeEventListener('webglcontextlost', handleContextLost)
       window.removeEventListener('webglcontextrestored', handleContextRestored)
+      try {
+        if (screen.orientation && 'unlock' in screen.orientation) {
+          screen.orientation.unlock()
+        }
+      } catch {
+        // Ignored
+      }
     }
   }, [])
 
   return (
-    <div className="fixed inset-0 w-screen h-screen bg-[#60A5FA] text-white overflow-hidden select-none touch-none">
+    <div className="fixed inset-0 w-full h-[100dvh] max-h-[100dvh] bg-[#60A5FA] text-white overflow-hidden select-none touch-none">
       {/* Fallback for WebGL Context Loss */}
       {contextLost ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-slate-950/95 text-center">
