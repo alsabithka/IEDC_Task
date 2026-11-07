@@ -322,7 +322,7 @@ export const ScheduleRoadmapSection: React.FC<ScheduleRoadmapSectionProps> = ({
   return (
     <section
       id="schedule"
-      className="relative w-full min-h-screen scroll-mt-16 sm:scroll-mt-20 bg-[#000000] text-white pt-12 sm:pt-16 lg:pt-20 pb-4 sm:pb-6 px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20 border-t border-[#1a1a1a] select-none"
+      className="relative z-10 w-full min-h-screen scroll-mt-16 sm:scroll-mt-20 bg-transparent text-white pt-12 sm:pt-16 lg:pt-20 pb-4 sm:pb-6 px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20 border-t border-[#1a1a1a] select-none"
     >
       <div className="w-full max-w-[1720px] 2xl:max-w-[1800px] mx-auto">
         {/* ==================================================================

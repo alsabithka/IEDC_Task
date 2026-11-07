@@ -22,3 +22,5 @@ export type { ScrollLightBulbProps } from './ScrollLightBulb'
 export { BrandEmblem } from './BrandEmblem'
 export type { BrandEmblemProps } from './BrandEmblem'
 
+export { ParticleBackgroundLayer } from './ParticleBackgroundLayer'
+

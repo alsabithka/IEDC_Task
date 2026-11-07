@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback, Suspense } from 'react'
 import { Preloader } from './components/ui/Preloader'
+import { ParticleBackgroundLayer } from './components/ui/ParticleBackgroundLayer'
 import { Layout } from './components/layout/Layout'
 import { MainContentPanel } from './components/sections/MainContentPanel'
 import { ScheduleRoadmapSection } from './components/sections/ScheduleRoadmapSection'
@@ -136,9 +137,15 @@ export const App: React.FC = () => {
 
       {/* Main Website Flow: Hero Section, Event Schedule & Train Game Promo, Registration */}
       <Layout>
+        {/* 1. Hero Section (Strictly NO particle/grain texture applied) */}
         <MainContentPanel />
-        <ScheduleRoadmapSection onPlayGame={navigateToGame} />
-        <RegistrationSection />
+
+        {/* 2. Sub-Hero Website Sections with Shared Particle & Grain Texture Layer */}
+        <div className="relative w-full bg-[#000000]">
+          <ParticleBackgroundLayer />
+          <ScheduleRoadmapSection onPlayGame={navigateToGame} />
+          <RegistrationSection />
+        </div>
       </Layout>
     </>
   )
