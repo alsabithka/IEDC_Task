@@ -33,18 +33,18 @@ function SceneContent({
   isMobile = false,
 }: CountdownInstrumentSceneProps) {
   // Both Desktop and Mobile: Always Side-by-Side!
-  // Increased size on phone for maximum visual prominence
-  const calScale = isMobile ? 0.96 : 0.90
-  const stopScale = isMobile ? 0.88 : 0.82
+  // Clock (stopwatch) enlarged in mobile view as requested
+  const calScale = isMobile ? 0.88 : 0.90
+  const stopScale = isMobile ? 0.95 : 0.82
 
-  const calX = isMobile ? -1.45 : -1.42
-  const stopX = isMobile ? 1.35 : 1.32
+  const calX = isMobile ? -1.35 : -1.42
+  const stopX = isMobile ? 1.30 : 1.32
 
   const calendarPos: [number, number, number] = [calX, 0, 0]
   const stopwatchPos: [number, number, number] = [stopX, 0, 0]
 
   // Frame side-by-side instruments comfortably on all devices
-  const cameraZ = isMobile ? 7.15 : 7.9
+  const cameraZ = isMobile ? 7.3 : 7.9
   const cameraY = 0
 
   return (
@@ -166,7 +166,7 @@ export const CountdownInstrumentScene: React.FC<CountdownInstrumentSceneProps> =
     <div className={`relative w-full h-full ${props.className || ''}`}>
       <Canvas
         shadows
-        dpr={[1, props.isMobile ? 1.5 : 2]}
+        dpr={[1, 2]}
         gl={{
           antialias: true,
           alpha: true,

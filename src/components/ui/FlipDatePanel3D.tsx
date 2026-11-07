@@ -10,12 +10,12 @@ interface FlipDatePanel3DProps {
   position?: [number, number, number]
 }
 
-const CANVAS_W = 512
-const CANVAS_H = 256 // Each half has height 256; combined virtual height = 512
+const CANVAS_W = 1024
+const CANVAS_H = 512 // Each half has height 512; combined virtual height = 1024
 
 /**
- * Creates high-resolution canvas texture for upper or lower half of the split flap.
- * The number is rendered as ONE massive glyph centered at the crease (y=256 in virtual 512 space).
+ * Creates ultra-crisp canvas texture for upper or lower half of the split flap.
+ * The number is rendered as ONE massive glyph centered at the crease (y=512 in virtual 1024 space).
  */
 function createHalfTexture(
   text: string,
@@ -36,41 +36,45 @@ function createHalfTexture(
 
   // Outer border with subtle rounding inset
   ctx.strokeStyle = '#D4D4CE'
-  ctx.lineWidth = 8
-  ctx.strokeRect(4, 4, CANVAS_W - 8, CANVAS_H - 8)
+  ctx.lineWidth = 16
+  ctx.strokeRect(8, 8, CANVAS_W - 16, CANVAS_H - 16)
 
   // Giant bold black numeral
   ctx.fillStyle = '#111111'
-  ctx.font = '900 320px "Titan One", "Chakra Petch", "Arial Black", sans-serif'
+  ctx.font = '900 640px "Titan One", "Chakra Petch", "Arial Black", sans-serif'
   ctx.textAlign = 'center'
   ctx.textBaseline = 'middle'
 
   if (isTopHalf) {
     // Top canvas: crease is at the BOTTOM edge (y = CANVAS_H)
-    // In a 512 virtual height, center is at 256 (CANVAS_H).
+    // In a 1024 virtual height, center is at 512 (CANVAS_H).
     ctx.fillText(text, CANVAS_W / 2, CANVAS_H)
 
     // Crease shadow gradient at the bottom edge
-    const grad = ctx.createLinearGradient(0, CANVAS_H - 28, 0, CANVAS_H)
+    const grad = ctx.createLinearGradient(0, CANVAS_H - 56, 0, CANVAS_H)
     grad.addColorStop(0, 'rgba(0,0,0,0)')
     grad.addColorStop(1, 'rgba(0,0,0,0.22)')
     ctx.fillStyle = grad
-    ctx.fillRect(0, CANVAS_H - 28, CANVAS_W, 28)
+    ctx.fillRect(0, CANVAS_H - 56, CANVAS_W, 56)
   } else {
     // Bottom canvas: crease is at the TOP edge (y = 0)
-    // In a 512 virtual height, center is at 0.
+    // In a 1024 virtual height, center is at 0.
     ctx.fillText(text, CANVAS_W / 2, 0)
 
     // Crease shadow gradient at the top edge
-    const grad = ctx.createLinearGradient(0, 0, 0, 28)
+    const grad = ctx.createLinearGradient(0, 0, 0, 56)
     grad.addColorStop(0, 'rgba(0,0,0,0.25)')
     grad.addColorStop(1, 'rgba(0,0,0,0)')
     ctx.fillStyle = grad
-    ctx.fillRect(0, 0, CANVAS_W, 28)
+    ctx.fillRect(0, 0, CANVAS_W, 56)
   }
 
   const texture = new THREE.CanvasTexture(canvas)
   texture.colorSpace = THREE.SRGBColorSpace
+  texture.generateMipmaps = true
+  texture.minFilter = THREE.LinearMipmapLinearFilter
+  texture.magFilter = THREE.LinearFilter
+  texture.anisotropy = 16
   texture.needsUpdate = true
   return texture
 }
@@ -98,24 +102,28 @@ function createBackTexture(text: string): THREE.CanvasTexture {
   ctx.fillRect(0, 0, CANVAS_W, CANVAS_H)
 
   ctx.strokeStyle = '#D4D4CE'
-  ctx.lineWidth = 8
-  ctx.strokeRect(4, 4, CANVAS_W - 8, CANVAS_H - 8)
+  ctx.lineWidth = 16
+  ctx.strokeRect(8, 8, CANVAS_W - 16, CANVAS_H - 16)
 
   ctx.fillStyle = '#111111'
-  ctx.font = '900 320px "Titan One", "Chakra Petch", "Arial Black", sans-serif'
+  ctx.font = '900 640px "Titan One", "Chakra Petch", "Arial Black", sans-serif'
   ctx.textAlign = 'center'
   ctx.textBaseline = 'middle'
   // Center of bottom half is at y = 0
   ctx.fillText(text, CANVAS_W / 2, 0)
 
-  const grad = ctx.createLinearGradient(0, 0, 0, 28)
+  const grad = ctx.createLinearGradient(0, 0, 0, 56)
   grad.addColorStop(0, 'rgba(0,0,0,0.25)')
   grad.addColorStop(1, 'rgba(0,0,0,0)')
   ctx.fillStyle = grad
-  ctx.fillRect(0, 0, CANVAS_W, 28)
+  ctx.fillRect(0, 0, CANVAS_W, 56)
 
   const texture = new THREE.CanvasTexture(canvas)
   texture.colorSpace = THREE.SRGBColorSpace
+  texture.generateMipmaps = true
+  texture.minFilter = THREE.LinearMipmapLinearFilter
+  texture.magFilter = THREE.LinearFilter
+  texture.anisotropy = 16
   texture.needsUpdate = true
   return texture
 }

@@ -15,60 +15,68 @@ function pad2(n: number): string {
 }
 
 /**
- * Creates header canvas texture: "● CALENDAR / 01" and "EDITION 2026"
+ * Creates ultra-crisp header canvas texture: "● CALENDAR / 01" and "EDITION 2026"
  */
 function createHeaderTexture(): THREE.CanvasTexture {
   const canvas = document.createElement('canvas')
-  canvas.width = 600
-  canvas.height = 100
+  canvas.width = 1200
+  canvas.height = 200
   const ctx = canvas.getContext('2d')
   if (ctx) {
     ctx.fillStyle = '#1A1A1A'
-    ctx.fillRect(0, 0, 600, 100)
+    ctx.fillRect(0, 0, 1200, 200)
 
     // Left indicator dot + label
     ctx.fillStyle = '#FFFFFF'
     ctx.beginPath()
-    ctx.arc(32, 50, 7, 0, Math.PI * 2)
+    ctx.arc(64, 100, 14, 0, Math.PI * 2)
     ctx.fill()
 
-    ctx.font = 'bold 28px "Geist Mono", "Chakra Petch", monospace'
+    ctx.font = 'bold 56px "Geist Mono", "Chakra Petch", monospace'
     ctx.textAlign = 'left'
     ctx.textBaseline = 'middle'
-    ctx.fillText('CALENDAR / 01', 52, 50)
+    ctx.fillText('CALENDAR / 01', 104, 100)
 
     // Right label
     ctx.fillStyle = '#CCCCCC'
     ctx.textAlign = 'right'
-    ctx.fillText('EDITION 2026', 568, 50)
+    ctx.fillText('EDITION 2026', 1136, 100)
   }
   const tex = new THREE.CanvasTexture(canvas)
   tex.colorSpace = THREE.SRGBColorSpace
+  tex.generateMipmaps = true
+  tex.minFilter = THREE.LinearMipmapLinearFilter
+  tex.magFilter = THREE.LinearFilter
+  tex.anisotropy = 16
   tex.needsUpdate = true
   return tex
 }
 
 /**
- * Creates "DAYS LEFT" canvas texture with dark charcoal typography
+ * Creates ultra-crisp "DAYS LEFT" canvas texture with dark charcoal typography
  */
 function createDaysLeftTexture(): THREE.CanvasTexture {
   const canvas = document.createElement('canvas')
-  canvas.width = 500
-  canvas.height = 120
+  canvas.width = 1000
+  canvas.height = 240
   const ctx = canvas.getContext('2d')
   if (ctx) {
     ctx.fillStyle = '#F4F4F0'
-    ctx.fillRect(0, 0, 500, 120)
+    ctx.fillRect(0, 0, 1000, 240)
 
     ctx.fillStyle = '#2A2A2A'
-    ctx.font = '900 44px "Geist", "Inter", sans-serif'
+    ctx.font = '900 88px "Geist", "Inter", sans-serif'
     ctx.textAlign = 'center'
     ctx.textBaseline = 'middle'
-    ctx.letterSpacing = '10px'
-    ctx.fillText('DAYS LEFT', 250, 60)
+    ctx.letterSpacing = '20px'
+    ctx.fillText('DAYS LEFT', 500, 120)
   }
   const tex = new THREE.CanvasTexture(canvas)
   tex.colorSpace = THREE.SRGBColorSpace
+  tex.generateMipmaps = true
+  tex.minFilter = THREE.LinearMipmapLinearFilter
+  tex.magFilter = THREE.LinearFilter
+  tex.anisotropy = 16
   tex.needsUpdate = true
   return tex
 }

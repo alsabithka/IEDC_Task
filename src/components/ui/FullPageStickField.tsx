@@ -47,30 +47,62 @@ function FullPageStickScene({ isMobile = false }: { isMobile?: boolean }) {
   const pointerWorldRef = useRef(new THREE.Vector2(9999, 9999))
   const isPointerActiveRef = useRef(false)
 
-  const handlePointerMove = useCallback(
-    (e: MouseEvent) => {
-      if (isMobile) return
-      const nx = (e.clientX / window.innerWidth) * 2 - 1
-      const ny = -(e.clientY / window.innerHeight) * 2 + 1
+  const updatePointer = useCallback(
+    (clientX: number, clientY: number) => {
+      const nx = (clientX / window.innerWidth) * 2 - 1
+      const ny = -(clientY / window.innerHeight) * 2 + 1
       pointerWorldRef.current.set((nx * viewport.width) / 2, (ny * viewport.height) / 2)
       isPointerActiveRef.current = true
     },
-    [isMobile, viewport.width, viewport.height]
+    [viewport.width, viewport.height]
   )
 
-  const handlePointerLeave = useCallback(() => {
+  const handleMouseMove = useCallback(
+    (e: MouseEvent) => {
+      updatePointer(e.clientX, e.clientY)
+    },
+    [updatePointer]
+  )
+
+  const handleTouchMove = useCallback(
+    (e: TouchEvent) => {
+      if (e.touches && e.touches.length > 0) {
+        updatePointer(e.touches[0].clientX, e.touches[0].clientY)
+      }
+    },
+    [updatePointer]
+  )
+
+  const handleTouchStart = useCallback(
+    (e: TouchEvent) => {
+      if (e.touches && e.touches.length > 0) {
+        updatePointer(e.touches[0].clientX, e.touches[0].clientY)
+      }
+    },
+    [updatePointer]
+  )
+
+  const handlePointerEnd = useCallback(() => {
     isPointerActiveRef.current = false
     pointerWorldRef.current.set(9999, 9999)
   }, [])
 
   useEffect(() => {
-    window.addEventListener('mousemove', handlePointerMove, { passive: true })
-    window.addEventListener('mouseleave', handlePointerLeave, { passive: true })
+    window.addEventListener('mousemove', handleMouseMove, { passive: true })
+    window.addEventListener('mouseleave', handlePointerEnd, { passive: true })
+    window.addEventListener('touchstart', handleTouchStart, { passive: true })
+    window.addEventListener('touchmove', handleTouchMove, { passive: true })
+    window.addEventListener('touchend', handlePointerEnd, { passive: true })
+    window.addEventListener('touchcancel', handlePointerEnd, { passive: true })
     return () => {
-      window.removeEventListener('mousemove', handlePointerMove)
-      window.removeEventListener('mouseleave', handlePointerLeave)
+      window.removeEventListener('mousemove', handleMouseMove)
+      window.removeEventListener('mouseleave', handlePointerEnd)
+      window.removeEventListener('touchstart', handleTouchStart)
+      window.removeEventListener('touchmove', handleTouchMove)
+      window.removeEventListener('touchend', handlePointerEnd)
+      window.removeEventListener('touchcancel', handlePointerEnd)
     }
-  }, [handlePointerMove, handlePointerLeave])
+  }, [handleMouseMove, handlePointerEnd, handleTouchStart, handleTouchMove])
 
   // Distribute sticks across the entire viewport
   const segmentCount = isMobile ? 32 : 82
@@ -107,7 +139,8 @@ function FullPageStickScene({ isMobile = false }: { isMobile?: boolean }) {
       // Short length: 0.22 to 0.48 units
       const length = getSeed(seedIdx + 3, 0.22, 0.48)
       const phase = getSeed(seedIdx + 4, 0, Math.PI * 2)
-      const speed = getSeed(seedIdx + 5, 0.4, 1.1)
+      // Faster idle rhythm as requested
+      const speed = getSeed(seedIdx + 5, 0.9, 2.2)
       const baseOpacity = getSeed(seedIdx + 6, 0.38, 0.62)
 
       list.push({
@@ -181,10 +214,10 @@ function FullPageStickScene({ isMobile = false }: { isMobile?: boolean }) {
       const live = liveOffsets.current[i]
       if (!live) continue
 
-      // Subtle ambient drift
-      const idleX = Math.sin(elapsed * seg.speed + seg.phase) * 0.04
-      const idleY = Math.cos(elapsed * (seg.speed * 0.8) + seg.phase + 1) * 0.03
-      const idleRot = Math.sin(elapsed * (seg.speed * 0.6) + seg.phase) * 0.05
+      // Faster, more organic ambient drift in idle
+      const idleX = Math.sin(elapsed * (seg.speed * 1.5) + seg.phase) * 0.08
+      const idleY = Math.cos(elapsed * (seg.speed * 1.25) + seg.phase + 1) * 0.06
+      const idleRot = Math.sin(elapsed * (seg.speed * 1.0) + seg.phase) * 0.11
 
       let targetDx = idleX
       let targetDy = idleY
@@ -311,7 +344,7 @@ export const FullPageStickField: React.FC<FullPageStickFieldProps> = ({
       aria-hidden="true"
     >
       <Canvas
-        dpr={[1, isMobile ? 1.5 : 2]}
+        dpr={[1, 2]}
         gl={{
           antialias: true,
           alpha: true,

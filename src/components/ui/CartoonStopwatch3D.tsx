@@ -16,19 +16,19 @@ function pad2(n: number): string {
 }
 
 /**
- * Creates high-res 512x512 circular dial texture for the stopwatch face.
+ * Creates ultra-crisp 1024x1024 circular dial texture for the stopwatch face.
  * Features outer track, 12 radial tick marks, and subtle concentric technical guide rings.
  */
 function createStopwatchDialBackground(): THREE.CanvasTexture {
   const canvas = document.createElement('canvas')
-  canvas.width = 512
-  canvas.height = 512
+  canvas.width = 1024
+  canvas.height = 1024
   const ctx = canvas.getContext('2d')
 
   if (ctx) {
-    const cx = 256
-    const cy = 256
-    const r = 246
+    const cx = 512
+    const cy = 512
+    const r = 492
 
     // Fill circular white dial
     ctx.fillStyle = '#FFFFFF'
@@ -38,22 +38,22 @@ function createStopwatchDialBackground(): THREE.CanvasTexture {
 
     // Outer subtle bezel ring
     ctx.strokeStyle = '#DCDCD6'
-    ctx.lineWidth = 8
+    ctx.lineWidth = 16
     ctx.stroke()
 
     // Inner subtle guide ring
     ctx.strokeStyle = '#ECECE6'
-    ctx.lineWidth = 3
+    ctx.lineWidth = 6
     ctx.beginPath()
-    ctx.arc(cx, cy, r - 32, 0, Math.PI * 2)
+    ctx.arc(cx, cy, r - 64, 0, Math.PI * 2)
     ctx.stroke()
 
     // 12 Radial tick marks
     for (let i = 0; i < 12; i++) {
       const angle = (i / 12) * Math.PI * 2 - Math.PI / 2
       const isMajor = i % 3 === 0
-      const outerR = r - 12
-      const innerR = isMajor ? r - 40 : r - 26
+      const outerR = r - 24
+      const innerR = isMajor ? r - 80 : r - 52
 
       const x1 = cx + Math.cos(angle) * outerR
       const y1 = cy + Math.sin(angle) * outerR
@@ -61,7 +61,7 @@ function createStopwatchDialBackground(): THREE.CanvasTexture {
       const y2 = cy + Math.sin(angle) * innerR
 
       ctx.strokeStyle = isMajor ? '#111111' : '#888888'
-      ctx.lineWidth = isMajor ? 7 : 3.5
+      ctx.lineWidth = isMajor ? 14 : 7
       ctx.lineCap = 'round'
 
       ctx.beginPath()
@@ -73,12 +73,16 @@ function createStopwatchDialBackground(): THREE.CanvasTexture {
 
   const texture = new THREE.CanvasTexture(canvas)
   texture.colorSpace = THREE.SRGBColorSpace
+  texture.generateMipmaps = true
+  texture.minFilter = THREE.LinearMipmapLinearFilter
+  texture.magFilter = THREE.LinearFilter
+  texture.anisotropy = 16
   texture.needsUpdate = true
   return texture
 }
 
 /**
- * Creates high-res digital readout plate texture: HH : MM : SS and HRS · MIN · SEC
+ * Creates ultra-crisp digital readout plate texture: HH : MM : SS and HRS · MIN · SEC
  */
 function createDigitalTimePlateTexture(
   hours: number,
@@ -86,38 +90,42 @@ function createDigitalTimePlateTexture(
   seconds: number
 ): THREE.CanvasTexture {
   const canvas = document.createElement('canvas')
-  canvas.width = 512
-  canvas.height = 240
+  canvas.width = 1024
+  canvas.height = 480
   const ctx = canvas.getContext('2d')
 
   if (ctx) {
     // Fill plate background with warm white and soft cartoon outline
     ctx.fillStyle = '#FFFFFF'
     ctx.beginPath()
-    ctx.roundRect(6, 6, 500, 228, 28)
+    ctx.roundRect(12, 12, 1000, 456, 56)
     ctx.fill()
 
     ctx.strokeStyle = '#D6D6CE'
-    ctx.lineWidth = 6
+    ctx.lineWidth = 12
     ctx.stroke()
 
     // Digital time readout (HH : MM : SS)
     const timeStr = `${pad2(hours)} : ${pad2(minutes)} : ${pad2(seconds)}`
     ctx.fillStyle = '#0F0F0F'
-    ctx.font = '900 74px "Chakra Petch", "Geist Mono", monospace'
+    ctx.font = '900 148px "Chakra Petch", "Geist Mono", monospace'
     ctx.textAlign = 'center'
     ctx.textBaseline = 'middle'
-    ctx.fillText(timeStr, 256, 92)
+    ctx.fillText(timeStr, 512, 184)
 
     // Sub-labels: HRS · MIN · SEC
     ctx.fillStyle = '#777777'
-    ctx.font = 'bold 22px "Geist", sans-serif'
-    ctx.letterSpacing = '5px'
-    ctx.fillText('HRS   ·   MIN   ·   SEC', 256, 172)
+    ctx.font = 'bold 44px "Geist", sans-serif'
+    ctx.letterSpacing = '10px'
+    ctx.fillText('HRS   ·   MIN   ·   SEC', 512, 344)
   }
 
   const texture = new THREE.CanvasTexture(canvas)
   texture.colorSpace = THREE.SRGBColorSpace
+  texture.generateMipmaps = true
+  texture.minFilter = THREE.LinearMipmapLinearFilter
+  texture.magFilter = THREE.LinearFilter
+  texture.anisotropy = 16
   texture.needsUpdate = true
   return texture
 }
