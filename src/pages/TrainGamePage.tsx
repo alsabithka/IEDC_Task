@@ -101,7 +101,7 @@ export const TrainGamePage: React.FC<TrainGamePageProps> = ({
   }, [])
 
   return (
-    <div className="fixed inset-0 w-full h-[100dvh] max-h-[100dvh] bg-[#60A5FA] text-white overflow-hidden select-none touch-none">
+    <div className="fixed inset-0 w-screen h-screen bg-[#60A5FA] text-white overflow-hidden select-none touch-none">
       {/* Fallback for WebGL Context Loss */}
       {contextLost ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-slate-950/95 text-center">
