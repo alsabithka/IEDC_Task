@@ -11,7 +11,7 @@ export const DOMAIN_TRACKS: Record<string, TrackDefinition> = {
     name: 'Healthcare & Well-being',
     code: 'TRACK_01 // HEALTH',
     tagline: 'Enhance clinical accessibility, assistive devices, and patient care diagnostics.',
-    badgeColor: 'border-rose-500/40 text-rose-400 bg-rose-500/10',
+    badgeColor: 'border-white/20 text-white bg-white/5',
     description:
       'Empower health workers and patients by bridging diagnostic gaps, creating assistive tactile technologies, and streamlining emergency care response in underserved communities.',
     idealFor: ['Bio-Engineers', 'Mobile App Builders', 'Accessibility Designers'],
@@ -27,7 +27,7 @@ export const DOMAIN_TRACKS: Record<string, TrackDefinition> = {
     name: 'Education & Learning Access',
     code: 'TRACK_02 // EDU',
     tagline: 'Democratize quality learning tools, interactive labs, and regional literacy.',
-    badgeColor: 'border-amber-500/40 text-amber-400 bg-amber-500/10',
+    badgeColor: 'border-white/20 text-white bg-white/5',
     description:
       'Create adaptive learning companions, hands-on virtual lab environments, and accessible multilingual educational resources to bridge regional learning divides.',
     idealFor: ['UI/UX Designers', 'Fullstack Developers', 'Pedagogy Enthusiasts'],
@@ -43,7 +43,7 @@ export const DOMAIN_TRACKS: Record<string, TrackDefinition> = {
     name: 'Agriculture & Rural Tech',
     code: 'TRACK_03 // AGRI',
     tagline: 'Optimize precision farming, soil intelligence, and fair farmer market linkages.',
-    badgeColor: 'border-emerald-500/40 text-emerald-400 bg-emerald-500/10',
+    badgeColor: 'border-white/20 text-white bg-white/5',
     description:
       'Deploy smart sensors, weather predictive insights, and direct-to-consumer farm produce exchanges that protect smallholder farmers against market volatility and crop diseases.',
     idealFor: ['IoT & Embedded Hackers', 'Data Analysts', 'Agri-Tech Explorers'],
@@ -59,7 +59,7 @@ export const DOMAIN_TRACKS: Record<string, TrackDefinition> = {
     name: 'Environment & Sustainability',
     code: 'TRACK_04 // ECO',
     tagline: 'Accelerate waste recycling loops, carbon tracking, and clean water preservation.',
-    badgeColor: 'border-teal-500/40 text-teal-400 bg-teal-500/10',
+    badgeColor: 'border-white/20 text-white bg-white/5',
     description:
       'Tackle climate resilience, decentralized solar monitoring, community waste audit networks, and aquatic ecosystem cleanup through measurable technological interventions.',
     idealFor: ['Environmental Strategists', 'Hardware Engineers', 'Civic Tech Builders'],
@@ -75,7 +75,7 @@ export const DOMAIN_TRACKS: Record<string, TrackDefinition> = {
     name: 'Transportation & Smart Mobility',
     code: 'TRACK_05 // TRANS',
     tagline: 'Improve urban transit safety, route optimization, and clean electric commuting.',
-    badgeColor: 'border-blue-500/40 text-blue-400 bg-blue-500/10',
+    badgeColor: 'border-white/20 text-white bg-white/5',
     description:
       'Eliminate transit bottlenecks, enhance last-mile pedestrian safety, optimize multi-modal public bus routing, and build charging station sharing for electric vehicles.',
     idealFor: ['Spatial Data Analysts', 'System Architects', 'Mobile Developers'],
@@ -91,7 +91,7 @@ export const DOMAIN_TRACKS: Record<string, TrackDefinition> = {
     name: 'Deep Technology & Intelligent Systems',
     code: 'TRACK_06 // TECH',
     tagline: 'Pioneer foundation models, automated workflows, and cybersecurity infrastructure.',
-    badgeColor: 'border-purple-500/40 text-purple-400 bg-purple-500/10',
+    badgeColor: 'border-white/20 text-white bg-white/5',
     description:
       'Harness modern artificial intelligence, agentic workflows, embedded hardware, and cryptography to solve complex engineering and operational bottlenecks.',
     idealFor: ['Algorithm Developers', 'ML Engineers', 'Security Researchers'],
@@ -107,7 +107,7 @@ export const DOMAIN_TRACKS: Record<string, TrackDefinition> = {
     name: 'Community Development & Civic Impact',
     code: 'TRACK_07 // CIVIC',
     tagline: 'Empower public transparency, citizen grievances, and local social safety nets.',
-    badgeColor: 'border-cyan-500/40 text-cyan-400 bg-cyan-500/10',
+    badgeColor: 'border-white/20 text-white bg-white/5',
     description:
       'Harness citizen participation, disaster relief coordination, localized volunteer matching, and transparent public utility reporting to build stronger grassroots resilience.',
     idealFor: ['Product Strategists', 'Community Leaders', 'Frontend Craftsmen'],

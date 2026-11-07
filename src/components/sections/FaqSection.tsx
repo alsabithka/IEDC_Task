@@ -14,22 +14,22 @@ export const FaqSection: React.FC = () => {
   }
 
   return (
-    <section id="faq" className="relative z-10 w-full border-t border-white/10 bg-[#241C1D]">
+    <section id="faq" className="relative z-10 w-full border-t border-white/10 bg-[#000000]">
       <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-12 py-16 sm:py-24">
         {/* Section Header */}
         <div className="max-w-3xl mb-12 sm:mb-16">
-          <span className="font-mono text-xs font-semibold uppercase tracking-[0.2em] text-[#F0444D] mb-3 block">
+          <span className="font-mono text-xs font-semibold uppercase tracking-[0.2em] text-[#D0D0D0] mb-3 block">
             {siteConfig.faq.badge}
           </span>
           <h2 className="font-sans text-2xl sm:text-4xl lg:text-5xl font-black uppercase tracking-tight text-white leading-tight">
             {siteConfig.faq.heading}
           </h2>
-          <p className="mt-4 text-sm sm:text-base text-[#C5C0C0] leading-relaxed">
+          <p className="mt-4 text-sm sm:text-base text-[#D0D0D0] leading-relaxed">
             {siteConfig.faq.subtitle}
           </p>
 
-          <div className="mt-4 inline-flex items-center gap-2 rounded-lg border border-white/15 bg-white/5 px-3.5 py-1.5 text-xs font-mono text-[#C5C0C0]">
-            <HelpCircle className="h-3.5 w-3.5 text-[#F0444D] shrink-0" />
+          <div className="mt-4 inline-flex items-center gap-2 rounded-lg border border-white/20 bg-white/5 px-3.5 py-1.5 text-xs font-mono text-[#D0D0D0]">
+            <HelpCircle className="h-3.5 w-3.5 text-white shrink-0" />
             <span>{siteConfig.faq.disclaimer}</span>
           </div>
         </div>
@@ -44,18 +44,18 @@ export const FaqSection: React.FC = () => {
                 className={cn(
                   'rounded-2xl border transition-all duration-150 overflow-hidden',
                   isOpen
-                    ? 'border-[#F0444D]/40 bg-[#1D1617]'
-                    : 'border-white/10 bg-[#1D1617]/70 hover:border-white/20 hover:bg-[#1D1617]',
+                    ? 'border-white/30 bg-[#171717]'
+                    : 'border-white/10 bg-[#090909] hover:border-white/20 hover:bg-[#171717]',
                 )}
               >
                 <button
                   type="button"
                   onClick={() => toggleFaq(item.id)}
-                  className="w-full p-5 sm:p-6 text-left flex items-center justify-between gap-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F0444D]"
+                  className="w-full p-5 sm:p-6 text-left flex items-center justify-between gap-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
                   aria-expanded={isOpen}
                 >
                   <div className="flex items-center gap-3.5">
-                    <span className="font-mono text-xs font-bold text-[#F0444D] shrink-0">
+                    <span className="font-mono text-xs font-bold text-[#D0D0D0] shrink-0">
                       {String(index + 1).padStart(2, '0')}.
                     </span>
                     <h3 className="font-sans text-base sm:text-lg font-bold text-white">
@@ -65,8 +65,8 @@ export const FaqSection: React.FC = () => {
 
                   <div
                     className={cn(
-                      'h-7 w-7 rounded-full border border-white/15 flex items-center justify-center text-[#C5C0C0] shrink-0 transition-transform duration-200',
-                      isOpen && 'rotate-180 text-[#F0444D] border-[#F0444D]/40',
+                      'h-7 w-7 rounded-full border border-white/15 flex items-center justify-center text-[#D0D0D0] shrink-0 transition-transform duration-200',
+                      isOpen && 'rotate-180 text-white border-white/40',
                     )}
                   >
                     <ChevronDown className="h-4 w-4" />
@@ -75,13 +75,13 @@ export const FaqSection: React.FC = () => {
 
                 {isOpen && (
                   <div className="px-5 sm:px-6 pb-6 pt-1 border-t border-white/5">
-                    <p className="text-xs sm:text-sm text-[#C5C0C0] leading-relaxed">
+                    <p className="text-xs sm:text-sm text-[#D0D0D0] leading-relaxed">
                       {item.answer}
                     </p>
 
                     {item.statusNotice && (
-                      <div className="mt-3.5 inline-flex items-center gap-2 rounded-lg border border-amber-500/20 bg-amber-500/10 px-3 py-1 text-[11px] font-mono text-amber-300">
-                        <AlertCircle className="h-3 w-3 shrink-0" />
+                      <div className="mt-3.5 inline-flex items-center gap-2 rounded-lg border border-white/20 bg-white/5 px-3 py-1 text-[11px] font-mono text-[#D0D0D0]">
+                        <AlertCircle className="h-3 w-3 text-white shrink-0" />
                         <span>{item.statusNotice}</span>
                       </div>
                     )}
@@ -97,4 +97,3 @@ export const FaqSection: React.FC = () => {
 }
 
 export default FaqSection
-

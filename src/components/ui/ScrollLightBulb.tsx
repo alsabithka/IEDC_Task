@@ -40,7 +40,7 @@ export const ScrollLightBulb: React.FC<ScrollLightBulbProps> = ({ className = ''
         window.matchMedia('(prefers-reduced-motion: reduce)').matches
       ) {
         if (glassRef.current) gsap.set(glassRef.current, { fillOpacity: 0.45 })
-        if (filamentRef.current) gsap.set(filamentRef.current, { stroke: '#FFA726' })
+        if (filamentRef.current) gsap.set(filamentRef.current, { stroke: '#FFFFFF' })
         if (haloRef.current) gsap.set(haloRef.current, { opacity: 0.35, scale: 0.9 })
         if (raysGroupRef.current) gsap.set(raysGroupRef.current, { opacity: 0.5, scale: 0.85 })
         return
@@ -57,23 +57,23 @@ export const ScrollLightBulb: React.FC<ScrollLightBulbProps> = ({ className = ''
 
       // Initial OFF State
       gsap.set(glass, {
-        fill: '#FFB300',
+        fill: '#FFFFFF',
         fillOpacity: 0.03,
         stroke: 'rgba(255, 255, 255, 0.22)',
       })
       if (glassGlow) {
         gsap.set(glassGlow, {
-          fill: '#FFD54F',
+          fill: '#FFFFFF',
           fillOpacity: 0,
         })
       }
       gsap.set(filament, {
-        stroke: '#4A4545',
+        stroke: '#4A4A4A',
         strokeWidth: 2,
       })
       if (filamentCore) {
         gsap.set(filamentCore, {
-          fill: '#FFFDE7',
+          fill: '#FFFFFF',
           opacity: 0,
           scale: 0.4,
           transformOrigin: 'center center',
@@ -102,12 +102,12 @@ export const ScrollLightBulb: React.FC<ScrollLightBulbProps> = ({ className = ''
       })
 
       // ======================================================================
-      // 0% -> 25% SCROLL: Filament begins glowing warm amber
+      // 0% -> 25% SCROLL: Filament begins glowing subtle grey
       // ======================================================================
       tl.to(
         filament,
         {
-          stroke: '#FF7A00',
+          stroke: '#777777',
           duration: 0.25,
           ease: 'power1.in',
         },
@@ -116,8 +116,8 @@ export const ScrollLightBulb: React.FC<ScrollLightBulbProps> = ({ className = ''
         .to(
           glass,
           {
-            fillOpacity: 0.14,
-            stroke: 'rgba(255, 200, 80, 0.4)',
+            fillOpacity: 0.12,
+            stroke: 'rgba(255, 255, 255, 0.35)',
             duration: 0.25,
             ease: 'power1.in',
           },
@@ -135,12 +135,12 @@ export const ScrollLightBulb: React.FC<ScrollLightBulbProps> = ({ className = ''
         )
 
       // ======================================================================
-      // 25% -> 50% SCROLL: Bulb is partially illuminated with warm tungsten glow
+      // 25% -> 50% SCROLL: Bulb is partially illuminated with monochrome glow
       // ======================================================================
       tl.to(
         filament,
         {
-          stroke: '#FFA726',
+          stroke: '#A0A0A0',
           duration: 0.25,
           ease: 'none',
         },
@@ -149,8 +149,8 @@ export const ScrollLightBulb: React.FC<ScrollLightBulbProps> = ({ className = ''
         .to(
           glass,
           {
-            fillOpacity: 0.38,
-            stroke: 'rgba(255, 215, 64, 0.6)',
+            fillOpacity: 0.35,
+            stroke: 'rgba(255, 255, 255, 0.55)',
             duration: 0.25,
             ease: 'none',
           },
@@ -183,7 +183,7 @@ export const ScrollLightBulb: React.FC<ScrollLightBulbProps> = ({ className = ''
       tl.to(
         filament,
         {
-          stroke: '#FFEE58',
+          stroke: '#D0D0D0',
           duration: 0.25,
           ease: 'none',
         },
@@ -193,7 +193,7 @@ export const ScrollLightBulb: React.FC<ScrollLightBulbProps> = ({ className = ''
           glass,
           {
             fillOpacity: 0.65,
-            stroke: 'rgba(255, 235, 120, 0.85)',
+            stroke: 'rgba(255, 255, 255, 0.8)',
             duration: 0.25,
             ease: 'none',
           },
@@ -243,12 +243,12 @@ export const ScrollLightBulb: React.FC<ScrollLightBulbProps> = ({ className = ''
       )
 
       // ======================================================================
-      // 75% -> 100% SCROLL: Full incandescent brilliance, white-hot filament core
+      // 75% -> 100% SCROLL: Full brilliance, white-hot filament core
       // ======================================================================
       tl.to(
         filament,
         {
-          stroke: '#FFFDE7',
+          stroke: '#FFFFFF',
           duration: 0.25,
           ease: 'power1.out',
         },
@@ -314,7 +314,7 @@ export const ScrollLightBulb: React.FC<ScrollLightBulbProps> = ({ className = ''
     <aside
       ref={containerRef}
       aria-label="Idea Illumination Indicator"
-      className={`fixed top-0 right-3 sm:right-6 lg:right-10 z-40 pointer-events-none select-none flex flex-col items-center ${className}`}
+      className={`hidden md:flex fixed top-0 right-4 sm:right-6 lg:right-10 z-40 pointer-events-none select-none flex-col items-center ${className}`}
     >
       {/* 
         ======================================================================
@@ -327,7 +327,7 @@ export const ScrollLightBulb: React.FC<ScrollLightBulbProps> = ({ className = ''
         className="absolute top-[28px] sm:top-[34px] w-24 h-24 sm:w-32 sm:h-32 rounded-full pointer-events-none blur-xl will-change-transform"
         style={{
           background:
-            'radial-gradient(circle, rgba(255, 180, 0, 0.45) 0%, rgba(255, 140, 0, 0.22) 42%, rgba(240, 68, 77, 0.08) 65%, transparent 75%)',
+            'radial-gradient(circle, rgba(255, 255, 255, 0.4) 0%, rgba(200, 200, 200, 0.15) 42%, transparent 70%)',
         }}
       />
 
@@ -393,7 +393,7 @@ export const ScrollLightBulb: React.FC<ScrollLightBulbProps> = ({ className = ''
         {/* 
           Outer Radial Light Rays (Animated independently)
         */}
-        <g ref={raysGroupRef} stroke="#FFD54F" strokeWidth="2.2" strokeLinecap="round">
+        <g ref={raysGroupRef} stroke="#FFFFFF" strokeWidth="2.2" strokeLinecap="round">
           {/* Top Left */}
           <line x1="22" y1="46" x2="13" y2="40" />
           {/* Mid Left */}
@@ -477,7 +477,7 @@ export const ScrollLightBulb: React.FC<ScrollLightBulbProps> = ({ className = ''
           cx="50"
           cy="53"
           r="2.5"
-          fill="#FFFDE7"
+          fill="#FFFFFF"
           className="will-change-[opacity,transform]"
         />
       </svg>

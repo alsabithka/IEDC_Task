@@ -1,25 +1,27 @@
 :root {
   /* ==========================================================================
-     PHASE 2 DESIGN SYSTEM TOKENS — Unified Full-Page Palette
+     MONOCHROME DESIGN SYSTEM TOKENS — Pure Black & White Palette
      ========================================================================== */
 
-  /* Unified Background Foundation — No dual-tone separation */
-  --color-page-bg: #241c1d;
-  --color-panel-bg: #241c1d;
+  /* Foundations */
+  --color-page-bg: #000000;
+  --color-near-black: #090909;
+  --color-charcoal: #171717;
+  --color-grey-medium: #777777;
+  --color-grey-light: #D0D0D0;
+  --color-pure-white: #FFFFFF;
 
-  /* Red Accents */
-  --color-primary-red: #f0444d;
-  --color-secondary-red: #c92e39;
-  --color-red-glow: rgba(240, 68, 77, 0.25);
+  --color-panel-bg: #000000;
+  --color-card-bg: #171717;
 
   /* Typography */
-  --color-text-primary: #ffffff;
-  --color-text-secondary: #c5c0c0;
-  --color-text-muted: #8e8989;
+  --color-text-primary: #FFFFFF;
+  --color-text-secondary: #D0D0D0;
+  --color-text-muted: #777777;
 
   /* Borders & Dividers */
-  --color-panel-border: rgba(255, 255, 255, 0.10);
-  --color-panel-border-hover: rgba(255, 255, 255, 0.20);
+  --color-panel-border: rgba(255, 255, 255, 0.12);
+  --color-panel-border-hover: rgba(255, 255, 255, 0.25);
 
   /* Typography Families */
   --font-display: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;

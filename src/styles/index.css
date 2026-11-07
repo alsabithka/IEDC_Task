@@ -31,23 +31,23 @@
 
   /* Accessible visible focus outline */
   :focus-visible {
-    outline: 2px solid var(--color-primary-red);
+    outline: 2px solid #FFFFFF;
     outline-offset: 3px;
   }
 
-  /* Minimal custom scrollbar matching #241C1D */
+  /* Minimal custom scrollbar matching monochrome theme */
   ::-webkit-scrollbar {
     width: 6px;
     height: 6px;
   }
   ::-webkit-scrollbar-track {
-    background: var(--color-page-bg);
+    background: #000000;
   }
   ::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.2);
     border-radius: 9999px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.4);
   }
 }

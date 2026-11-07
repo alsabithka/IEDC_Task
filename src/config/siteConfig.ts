@@ -181,16 +181,7 @@ export const siteConfig: SiteConfig = {
     campusTag: 'CEC Campus, Chengannur, Kerala',
   },
 
-  panelNav: [
-    { label: 'ABOUT', href: '#about' },
-    { label: 'OBJECTIVES', href: '#objectives' },
-    { label: 'JOURNEY', href: '#journey' },
-    { label: 'SCHEDULE', href: '#schedule' },
-    { label: 'TRACK MATCHER', href: '#matcher' },
-    { label: 'REGISTER', href: '#register' },
-    { label: 'FAQ', href: '#faq' },
-    { label: 'CONTACT', href: '#contact' },
-  ],
+  panelNav: [],
 
   hero: {
     eyebrow: '24-HOUR STUDENT IDEATHON // IEDC BOOTCAMP CEC',

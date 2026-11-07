@@ -32,12 +32,12 @@ export const Button: React.FC<ButtonProps> = ({
   }[size]
 
   const variantClasses = {
-    primary: 'bg-btn-primary-bg text-btn-primary-text hover:bg-btn-primary-hover shadow-sm',
+    primary: 'bg-white text-black border border-white hover:bg-black hover:text-white shadow-sm',
     secondary:
-      'bg-btn-secondary-bg text-btn-secondary-text border border-border-default hover:bg-btn-secondary-hover',
+      'bg-transparent text-white border border-white/20 hover:border-white hover:bg-white/5',
     outline:
-      'bg-transparent text-text-primary border border-border-default hover:bg-bg-muted hover:border-border-strong',
-    ghost: 'bg-transparent text-text-secondary hover:text-text-primary hover:bg-bg-muted',
+      'bg-transparent text-white border border-white/20 hover:bg-white/10 hover:border-white',
+    ghost: 'bg-transparent text-[#D0D0D0] hover:text-white hover:bg-white/5',
   }[variant]
 
   const classes = cn(

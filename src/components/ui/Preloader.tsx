@@ -15,9 +15,9 @@ export interface PreloaderProps {
  * 1. Initial State: Centered "IDEA SPRINT" appears in white.
  * 2. Physical Rearrangement:
  *    - SPRINT and the letter A naturally fade out and drift downward.
- *    - I, E, D physically travel and rearrange (E crosses over D, turning #F0444D).
+ *    - I, E, D physically travel and rearrange (E crosses over D, remaining pure white).
  *    - The letter C appears from nowhere in slot 4, entering in sync with IDE.
- * 3. Final State: Centered, large, bold "IEDC" in accent red (#F0444D) holds briefly.
+ * 3. Final State: Centered, large, bold "IEDC" in pure white holds briefly.
  * 4. Curtain Lift Reveal: The entire full-screen overlay animates upwards (yPercent: -100)
  *    to reveal the already rendered website underneath.
  */
@@ -166,14 +166,14 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
         )
 
         // 3. PHYSICAL LETTER REARRANGEMENT
-        // Letter I travels to slot 1 and turns red
+        // Letter I travels to slot 1 and stays pure white
         .to(
           letterI,
           {
             x: deltaI.x,
             y: deltaI.y,
             scale: deltaI.scale,
-            color: '#F0444D',
+            color: '#FFFFFF',
             duration: 1.15,
             ease: 'power3.inOut',
             transformOrigin: 'center center',
@@ -181,14 +181,14 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
           'rearrange+=0.1',
         )
 
-        // Letter E physically moves to slot 2 (crosses over D) and turns red
+        // Letter E physically moves to slot 2 (crosses over D) and stays pure white
         .to(
           letterE,
           {
             x: deltaE.x,
             y: deltaE.y,
             scale: deltaE.scale,
-            color: '#F0444D',
+            color: '#FFFFFF',
             duration: 1.15,
             ease: 'power3.inOut',
             transformOrigin: 'center center',
@@ -196,14 +196,14 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
           'rearrange+=0.1',
         )
 
-        // Letter D physically moves to slot 3 (crosses behind E) and turns red
+        // Letter D physically moves to slot 3 (crosses behind E) and stays pure white
         .to(
           letterD,
           {
             x: deltaD.x,
             y: deltaD.y,
             scale: deltaD.scale,
-            color: '#F0444D',
+            color: '#FFFFFF',
             duration: 1.15,
             ease: 'power3.inOut',
             transformOrigin: 'center center',
@@ -253,7 +253,7 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
   return (
     <div
       ref={containerRef}
-      className="fixed inset-0 z-[9999] flex items-center justify-center bg-[#241C1D] text-white select-none overflow-hidden"
+      className="fixed inset-0 z-[9999] flex items-center justify-center bg-[#000000] text-white select-none overflow-hidden"
       aria-label="Loading Screen"
       aria-live="polite"
     >
@@ -265,7 +265,7 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 flex items-center justify-center select-none"
       >
-        <div className="font-sans font-black tracking-tight text-6xl sm:text-8xl md:text-9xl lg:text-[140px] xl:text-[170px] leading-none text-[#F0444D] flex items-center justify-center whitespace-nowrap">
+        <div className="font-sans font-black tracking-tight text-6xl sm:text-8xl md:text-9xl lg:text-[140px] xl:text-[170px] leading-none text-white flex items-center justify-center whitespace-nowrap">
           <span ref={targetSlotI} className="inline-block opacity-0">
             I
           </span>
@@ -278,7 +278,7 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
           {/* Letter C enters from nowhere into slot 4 in sync with IDE */}
           <span
             ref={letterCRef}
-            className="inline-block opacity-0 will-change-transform text-[#F0444D]"
+            className="inline-block opacity-0 will-change-transform text-white"
           >
             C
           </span>

@@ -56,33 +56,33 @@ export const TrackMatcherSection: React.FC = () => {
   }
 
   return (
-    <section id="matcher" className="relative z-10 w-full border-t border-white/10 bg-[#241C1D]">
+    <section id="matcher" className="relative z-10 w-full border-t border-white/10 bg-[#000000]">
       <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-12 py-16 sm:py-24">
         {/* Section Header */}
         <div className="max-w-3xl mb-12 sm:mb-16">
-          <span className="font-mono text-xs font-semibold uppercase tracking-[0.2em] text-[#F0444D] mb-3 block">
+          <span className="font-mono text-xs font-semibold uppercase tracking-[0.2em] text-[#D0D0D0] mb-3 block">
             INTERACTIVE TOOL // SPRINT TRACK MATCHER
           </span>
           <h2 className="font-sans text-2xl sm:text-4xl lg:text-5xl font-black uppercase tracking-tight text-white leading-tight">
             Find Your Problem Domain
           </h2>
-          <p className="mt-4 text-sm sm:text-base text-[#C5C0C0] leading-relaxed">
+          <p className="mt-4 text-sm sm:text-base text-[#D0D0D0] leading-relaxed">
             Answer three quick questions about your team’s curiosity, engineering strengths, and intended impact to discover your highest-synergy challenge track among the 7 official sprint domains.
           </p>
         </div>
 
-        {/* Interactive Container */}
-        <div className="rounded-3xl border border-white/10 bg-[#1D1617] p-6 sm:p-10 lg:p-12 relative overflow-hidden">
+        {/* Interactive Container (Dark Charcoal #171717) */}
+        <div className="rounded-3xl border border-white/10 bg-[#171717] p-6 sm:p-10 lg:p-12 relative overflow-hidden">
           {!result ? (
             <div>
               {/* Progress Header */}
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-8 pb-5 border-b border-white/10">
                 <div className="flex items-center gap-3">
-                  <div className="h-8 w-8 rounded-lg bg-[#F0444D]/20 text-[#F0444D] flex items-center justify-center font-mono text-xs font-bold">
+                  <div className="h-8 w-8 rounded-lg bg-white/10 text-white flex items-center justify-center font-mono text-xs font-bold border border-white/15">
                     0{currentStep + 1}
                   </div>
                   <div>
-                    <span className="font-mono text-xs uppercase tracking-wider text-[#8e8989] block">
+                    <span className="font-mono text-xs uppercase tracking-wider text-[#777777] block">
                       Step {currentStep + 1} of {MATCHER_QUESTIONS.length}
                     </span>
                     <span className="font-sans text-sm font-bold text-white">
@@ -98,7 +98,7 @@ export const TrackMatcherSection: React.FC = () => {
                       key={idx}
                       className={cn(
                         'h-1.5 w-12 rounded-full transition-all duration-200',
-                        idx <= currentStep ? 'bg-[#F0444D]' : 'bg-white/10',
+                        idx <= currentStep ? 'bg-white' : 'bg-white/15',
                       )}
                     />
                   ))}
@@ -106,7 +106,7 @@ export const TrackMatcherSection: React.FC = () => {
               </div>
 
               {/* Subtitle */}
-              <p className="text-xs sm:text-sm text-[#C5C0C0] mb-6">
+              <p className="text-xs sm:text-sm text-[#D0D0D0] mb-6">
                 {activeQuestion.subtitle}
               </p>
 
@@ -120,10 +120,10 @@ export const TrackMatcherSection: React.FC = () => {
                       type="button"
                       onClick={() => handleSelectOption(activeQuestion.id, option.id)}
                       className={cn(
-                        'group text-left p-5 rounded-2xl border transition-all duration-150 flex flex-col justify-between focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F0444D]',
+                        'group text-left p-5 rounded-2xl border transition-all duration-150 flex flex-col justify-between focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white',
                         isSelected
-                          ? 'border-[#F0444D] bg-[#F0444D]/10'
-                          : 'border-white/10 bg-[#241C1D] hover:border-white/25 hover:bg-white/[0.03]',
+                          ? 'border-white bg-white/10'
+                          : 'border-white/10 bg-[#090909] hover:border-white/30 hover:bg-white/[0.04]',
                       )}
                     >
                       <div>
@@ -135,7 +135,7 @@ export const TrackMatcherSection: React.FC = () => {
                             className={cn(
                               'h-5 w-5 rounded-full border flex items-center justify-center transition-colors',
                               isSelected
-                                ? 'border-[#F0444D] bg-[#F0444D] text-white'
+                                ? 'border-white bg-white text-black'
                                 : 'border-white/20 text-transparent group-hover:border-white/40',
                             )}
                           >
@@ -144,7 +144,7 @@ export const TrackMatcherSection: React.FC = () => {
                         </div>
 
                         {option.description && (
-                          <p className="text-xs text-[#C5C0C0] leading-relaxed">
+                          <p className="text-xs text-[#D0D0D0] leading-relaxed">
                             {option.description}
                           </p>
                         )}
@@ -160,7 +160,7 @@ export const TrackMatcherSection: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setCurrentStep((prev) => prev - 1)}
-                    className="font-mono text-xs uppercase tracking-wider text-[#C5C0C0] hover:text-white"
+                    className="font-mono text-xs uppercase tracking-wider text-[#D0D0D0] hover:text-white"
                   >
                     ← Back to Previous Question
                   </button>
@@ -174,11 +174,11 @@ export const TrackMatcherSection: React.FC = () => {
             <div className="space-y-8 animate-fadeIn">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-white/10">
                 <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-xl bg-[#F0444D]/20 text-[#F0444D] flex items-center justify-center">
-                    <Sparkles className="h-5 w-5" />
+                  <div className="h-10 w-10 rounded-xl bg-white/10 text-white flex items-center justify-center border border-white/15">
+                    <Sparkles className="h-5 w-5 text-white" />
                   </div>
                   <div>
-                    <span className="font-mono text-xs uppercase tracking-wider text-[#F0444D] font-bold">
+                    <span className="font-mono text-xs uppercase tracking-wider text-[#D0D0D0] font-bold">
                       Domain Recommendation
                     </span>
                     <h3 className="font-sans text-xl sm:text-2xl font-black text-white">
@@ -187,8 +187,8 @@ export const TrackMatcherSection: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="inline-flex items-center gap-2 rounded-full border border-[#F0444D]/40 bg-[#F0444D]/10 px-4 py-1.5 font-mono text-xs font-bold text-[#F0444D]">
-                  <CheckCircle2 className="h-4 w-4" />
+                <div className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-4 py-1.5 font-mono text-xs font-bold text-white">
+                  <CheckCircle2 className="h-4 w-4 text-white" />
                   <span>{result.matchScore}% Synergy Match</span>
                 </div>
               </div>
@@ -199,12 +199,12 @@ export const TrackMatcherSection: React.FC = () => {
                   <p className="font-sans text-base sm:text-lg font-medium text-white leading-relaxed">
                     {result.track.tagline}
                   </p>
-                  <p className="text-sm text-[#C5C0C0] leading-relaxed">
+                  <p className="text-sm text-[#D0D0D0] leading-relaxed">
                     {result.track.description}
                   </p>
 
-                  <div className="p-4 rounded-xl border border-white/10 bg-[#241C1D]">
-                    <span className="font-mono text-xs uppercase tracking-wider text-[#8e8989] block mb-1">
+                  <div className="p-4 rounded-xl border border-white/10 bg-[#090909]">
+                    <span className="font-mono text-xs uppercase tracking-wider text-[#777777] block mb-1">
                       Why this track fits you:
                     </span>
                     <p className="text-xs sm:text-sm text-white/90 leading-relaxed">
@@ -216,16 +216,16 @@ export const TrackMatcherSection: React.FC = () => {
                 {/* Right side: Tools & Challenges */}
                 <div className="lg:col-span-5 space-y-4">
                   {/* Recommended tools */}
-                  <div className="rounded-xl border border-white/10 bg-[#241C1D] p-4">
-                    <span className="font-mono text-xs uppercase tracking-wider text-[#F0444D] font-bold flex items-center gap-1.5 mb-2">
-                      <Wrench className="h-3.5 w-3.5" />
+                  <div className="rounded-xl border border-white/10 bg-[#090909] p-4">
+                    <span className="font-mono text-xs uppercase tracking-wider text-white font-bold flex items-center gap-1.5 mb-2">
+                      <Wrench className="h-3.5 w-3.5 text-white" />
                       Recommended Tooling
                     </span>
                     <div className="flex flex-wrap gap-1.5">
                       {result.track.recommendedTools.map((tool, idx) => (
                         <span
                           key={idx}
-                          className="rounded-md border border-white/10 bg-white/5 px-2.5 py-1 text-[11px] font-mono text-white/80"
+                          className="rounded-md border border-white/15 bg-white/5 px-2.5 py-1 text-[11px] font-mono text-[#D0D0D0]"
                         >
                           {tool}
                         </span>
@@ -234,15 +234,15 @@ export const TrackMatcherSection: React.FC = () => {
                   </div>
 
                   {/* Sample challenge */}
-                  <div className="rounded-xl border border-white/10 bg-[#241C1D] p-4">
-                    <span className="font-mono text-xs uppercase tracking-wider text-[#8e8989] font-bold flex items-center gap-1.5 mb-2">
-                      <HelpCircle className="h-3.5 w-3.5" />
+                  <div className="rounded-xl border border-white/10 bg-[#090909] p-4">
+                    <span className="font-mono text-xs uppercase tracking-wider text-[#777777] font-bold flex items-center gap-1.5 mb-2">
+                      <HelpCircle className="h-3.5 w-3.5 text-white" />
                       Sample Challenge Ideas
                     </span>
-                    <ul className="space-y-1.5 text-xs text-[#C5C0C0]">
+                    <ul className="space-y-1.5 text-xs text-[#D0D0D0]">
                       {result.track.sampleChallenges.map((challenge, idx) => (
                         <li key={idx} className="flex items-start gap-2">
-                          <span className="text-[#F0444D] font-mono">•</span>
+                          <span className="text-white font-mono">•</span>
                           <span>{challenge}</span>
                         </li>
                       ))}
@@ -256,7 +256,7 @@ export const TrackMatcherSection: React.FC = () => {
                 <button
                   type="button"
                   onClick={handleReset}
-                  className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-5 py-2.5 font-sans text-xs font-bold uppercase tracking-wider text-[#C5C0C0] hover:text-white hover:border-white/30 transition-colors"
+                  className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-transparent px-5 py-2.5 font-sans text-xs font-bold uppercase tracking-wider text-[#D0D0D0] hover:text-white hover:border-white transition-colors"
                 >
                   <RotateCcw className="h-3.5 w-3.5" />
                   <span>Retake Matcher</span>
@@ -265,10 +265,10 @@ export const TrackMatcherSection: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => handleSelectTrackForRegistration(result.track.id)}
-                  className="inline-flex items-center gap-2 rounded-full bg-[#F0444D] px-6 py-2.5 font-sans text-xs font-bold uppercase tracking-wider text-white shadow-lg shadow-[#F0444D]/25 hover:bg-[#C92E39] transition-all"
+                  className="inline-flex items-center gap-2 rounded-full bg-white text-black px-6 py-2.5 font-sans text-xs font-bold uppercase tracking-wider border border-white hover:bg-black hover:text-white transition-all duration-150 shadow-md"
                 >
                   <span>Select Track for Registration</span>
-                  <ArrowRight className="h-3.5 w-3.5" />
+                  <ArrowRight className="h-4 w-4" />
                 </button>
               </div>
             </div>

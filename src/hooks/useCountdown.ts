@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { EVENT_CONFIG } from '../data/eventConfig'
 
 export interface CountdownTime {
   days: string
@@ -42,9 +43,9 @@ function computeTimeRemaining(targetDateISO: string): CountdownTime {
 
 /**
  * High-precision countdown timer hook that recalculates time difference every second.
- * Supports timezone-aware ISO string formats and ensures leading zeros.
+ * Reads the authoritative event timestamp from src/data/eventConfig.ts by default.
  */
-export function useCountdown(targetDateISO: string): CountdownTime {
+export function useCountdown(targetDateISO: string = EVENT_CONFIG.dates.targetCountdownISO): CountdownTime {
   const [timeRemaining, setTimeRemaining] = useState<CountdownTime>(() =>
     computeTimeRemaining(targetDateISO)
   )
@@ -54,7 +55,18 @@ export function useCountdown(targetDateISO: string): CountdownTime {
       setTimeRemaining(computeTimeRemaining(targetDateISO))
     }, 1000)
 
-    return () => clearInterval(intervalId)
+    // Sync on tab visibility change (e.g. user returns to tab)
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        setTimeRemaining(computeTimeRemaining(targetDateISO))
+      }
+    }
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+
+    return () => {
+      clearInterval(intervalId)
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+    }
   }, [targetDateISO])
 
   return timeRemaining

@@ -299,8 +299,8 @@ export const FallingPagesLayout: React.FC<FallingPagesLayoutProps> = ({ children
               }}
               className={
                 isDesktop
-                  ? 'page-sheet absolute inset-0 w-full h-full overflow-y-auto overflow-x-hidden flex flex-col justify-center bg-[#241C1D] shadow-[0_-20px_50px_rgba(0,0,0,0.7)] border-t border-white/5 will-change-transform'
-                  : 'page-sheet relative w-full h-auto bg-[#241C1D] border-t border-white/10'
+                  ? 'page-sheet absolute inset-0 w-full h-full overflow-y-auto overflow-x-hidden flex flex-col justify-center bg-[#000000] shadow-[0_-20px_50px_rgba(0,0,0,0.7)] border-t border-white/5 will-change-transform'
+                  : 'page-sheet relative w-full h-auto bg-[#000000] border-t border-white/10'
               }
               style={{
                 zIndex,

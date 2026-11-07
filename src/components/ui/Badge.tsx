@@ -38,7 +38,7 @@ export const Badge: React.FC<BadgeProps> = ({
     >
       {dot && (
         <span
-          className="h-1.5 w-1.5 rounded-full bg-emerald-500 shrink-0"
+          className="h-1.5 w-1.5 rounded-full bg-white shrink-0"
           aria-hidden="true"
         />
       )}
