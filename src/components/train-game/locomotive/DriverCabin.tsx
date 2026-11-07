@@ -71,8 +71,8 @@ export const DriverCabin: React.FC<DriverCabinProps> = ({
         <meshStandardMaterial color="#2E180D" roughness={0.7} />
       </mesh>
 
-      {/* Angled Upper Instrument Console (Polished Midnight Charcoal) */}
-      <mesh position={[0, 0.78, 0.58]} rotation={[-0.42, 0, 0]} receiveShadow>
+      {/* Angled Upper Instrument Console (Polished Midnight Charcoal, angled toward driver) */}
+      <mesh position={[0, 0.78, 0.52]} rotation={[0.42, 0, 0]} receiveShadow>
         <boxGeometry args={[3.1, 0.24, 0.42]} />
         <meshStandardMaterial color="#0F172A" roughness={0.5} metalness={0.2} />
       </mesh>
@@ -116,9 +116,9 @@ export const DriverCabin: React.FC<DriverCabinProps> = ({
       </group>
 
       {/* ==================================================================
-          3. MECHANICAL DASHBOARD CONTROLS & GAUGES (Compact Height)
+          3. MECHANICAL DASHBOARD CONTROLS & GAUGES (Angled Toward Driver)
           ================================================================== */}
-      <group position={[0, 0.85, 0.55]} rotation={[-0.40, 0, 0]}>
+      <group position={[0, 0.85, 0.52]} rotation={[0.42, 0, 0]}>
         {/* Speedometer Dial Plate (Left Console — Ivory Face & Gold Bezel) */}
         <group position={[-0.55, 0.02, 0]}>
           {/* Dial Face */}
