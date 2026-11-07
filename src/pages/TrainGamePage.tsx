@@ -89,7 +89,7 @@ export const TrainGamePage: React.FC<TrainGamePageProps> = ({
       </Canvas>
 
       {/* 2. In-Game HUD (Visible during active gameplay) */}
-      {isStarted && (
+      {isStarted && !isJourneyCompleted && (
         <GameHUD
           dynamics={dynamics}
           nextStation={nextStation}

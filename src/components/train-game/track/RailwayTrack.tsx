@@ -12,9 +12,11 @@ export const RailwayTrack: React.FC = () => {
     sleeperMatrices,
     bridgePillars,
     bridgeGuardrails,
+    terminusBufferStop,
+    startTrackStop,
   } = useMemo(() => {
     const curve = getGameRailwayCurve()
-    const samples = 480 // 1 sample per ~0.94 meters
+    const samples = 480 // 1 sample per ~0.91 meters
     const railOffset = 0.48 // Standard model railway gauge
     const railHeight = 0.12 // Height above ballast
     const up = new THREE.Vector3(0, 1, 0)
@@ -25,7 +27,7 @@ export const RailwayTrack: React.FC = () => {
     const pillars: { position: [number, number, number]; height: number }[] = []
     const guardrails: { position: [number, number, number]; rotationY: number }[] = []
 
-    for (let i = 0; i < samples; i++) {
+    for (let i = 0; i <= samples; i++) {
       const t = i / samples
       const pt = curve.getPointAt(t)
       const tangent = curve.getTangentAt(t).normalize()
@@ -60,20 +62,21 @@ export const RailwayTrack: React.FC = () => {
       }
     }
 
-    const leftCurve = new THREE.CatmullRomCurve3(leftPoints, true, 'centripetal', 0.5)
-    const rightCurve = new THREE.CatmullRomCurve3(rightPoints, true, 'centripetal', 0.5)
-    const ballastCurve = new THREE.CatmullRomCurve3(ballastPoints, true, 'centripetal', 0.5)
+    // Open curves (closed = false) - track physically terminates at endpoints
+    const leftCurve = new THREE.CatmullRomCurve3(leftPoints, false, 'centripetal', 0.5)
+    const rightCurve = new THREE.CatmullRomCurve3(rightPoints, false, 'centripetal', 0.5)
+    const ballastCurve = new THREE.CatmullRomCurve3(ballastPoints, false, 'centripetal', 0.5)
 
-    const leftGeom = new THREE.TubeGeometry(leftCurve, 420, 0.052, 10, true)
-    const rightGeom = new THREE.TubeGeometry(rightCurve, 420, 0.052, 10, true)
-    const ballastGeom = new THREE.TubeGeometry(ballastCurve, 380, 0.72, 8, true)
+    const leftGeom = new THREE.TubeGeometry(leftCurve, 440, 0.052, 10, false)
+    const rightGeom = new THREE.TubeGeometry(rightCurve, 440, 0.052, 10, false)
+    const ballastGeom = new THREE.TubeGeometry(ballastCurve, 380, 0.72, 8, false)
 
-    // Calculate Sleepers (Ties) Matrices (310 sleepers along 451m circuit)
-    const sleeperCount = 310
+    // Calculate Sleepers (Ties) Matrices (300 sleepers along open route)
+    const sleeperCount = 300
     const dummy = new THREE.Object3D()
     const matrices: THREE.Matrix4[] = []
 
-    for (let i = 0; i < sleeperCount; i++) {
+    for (let i = 0; i <= sleeperCount; i++) {
       const t = i / sleeperCount
       const pt = curve.getPointAt(t)
       const tangent = curve.getTangentAt(t).normalize()
@@ -85,6 +88,16 @@ export const RailwayTrack: React.FC = () => {
       matrices.push(dummy.matrix.clone())
     }
 
+    // Terminal Buffer Stop at t = 1.0 (End of line)
+    const endPt = curve.getPointAt(1.0)
+    const endTangent = curve.getTangentAt(1.0).normalize()
+    const endAngle = Math.atan2(endTangent.x, endTangent.z)
+
+    // Start Track Stop at t = 0.0 (Track origin behind Station 1)
+    const startPt = curve.getPointAt(0.0)
+    const startTangent = curve.getTangentAt(0.0).normalize()
+    const startAngle = Math.atan2(startTangent.x, startTangent.z)
+
     return {
       leftRailGeometry: leftGeom,
       rightRailGeometry: rightGeom,
@@ -92,6 +105,14 @@ export const RailwayTrack: React.FC = () => {
       sleeperMatrices: matrices,
       bridgePillars: pillars,
       bridgeGuardrails: guardrails,
+      terminusBufferStop: {
+        position: [endPt.x, endPt.y, endPt.z] as [number, number, number],
+        rotationY: endAngle,
+      },
+      startTrackStop: {
+        position: [startPt.x, startPt.y, startPt.z] as [number, number, number],
+        rotationY: startAngle,
+      },
     }
   }, [])
 
@@ -121,7 +142,7 @@ export const RailwayTrack: React.FC = () => {
         <meshStandardMaterial color="#5C3D28" roughness={0.7} />
       </instancedMesh>
 
-      {/* 3. Left Continuous Steel Rail (Polished Chrome with Subtle Specular Highlight) */}
+      {/* 3. Left Continuous Steel Rail */}
       <mesh geometry={leftRailGeometry} castShadow receiveShadow>
         <meshStandardMaterial color="#F8FAFC" roughness={0.18} metalness={0.85} />
       </mesh>
@@ -131,15 +152,88 @@ export const RailwayTrack: React.FC = () => {
         <meshStandardMaterial color="#F8FAFC" roughness={0.18} metalness={0.85} />
       </mesh>
 
-      {/* 5. Bridge Rustic Masonry Pillars with Coping Caps */}
+      {/* 5. Start of Track Buffer Stop (t = 0.0) */}
+      <group
+        position={startTrackStop.position}
+        rotation={[0, startTrackStop.rotationY, 0]}
+      >
+        <mesh position={[0, 0.45, 0]} castShadow>
+          <boxGeometry args={[1.5, 0.35, 0.2]} />
+          <meshStandardMaterial color="#475569" roughness={0.6} />
+        </mesh>
+      </group>
+
+      {/* 6. Grand Terminus Hydraulic Buffer Stop at End of Line (t = 1.0) */}
+      <group
+        position={terminusBufferStop.position}
+        rotation={[0, terminusBufferStop.rotationY, 0]}
+      >
+        {/* Steel A-Frame Heavy Support Posts */}
+        <mesh position={[-0.48, 0.55, 0]} castShadow>
+          <boxGeometry args={[0.16, 1.1, 0.16]} />
+          <meshStandardMaterial color="#1E293B" metalness={0.8} />
+        </mesh>
+        <mesh position={[0.48, 0.55, 0]} castShadow>
+          <boxGeometry args={[0.16, 1.1, 0.16]} />
+          <meshStandardMaterial color="#1E293B" metalness={0.8} />
+        </mesh>
+
+        {/* Diagonal Steel Buttresses */}
+        <mesh position={[-0.48, 0.45, 0.35]} rotation={[0.45, 0, 0]} castShadow>
+          <boxGeometry args={[0.12, 0.95, 0.12]} />
+          <meshStandardMaterial color="#334155" metalness={0.7} />
+        </mesh>
+        <mesh position={[0.48, 0.45, 0.35]} rotation={[0.45, 0, 0]} castShadow>
+          <boxGeometry args={[0.12, 0.95, 0.12]} />
+          <meshStandardMaterial color="#334155" metalness={0.7} />
+        </mesh>
+
+        {/* Hydraulic Pistons Aligned with Train Buffers */}
+        <mesh position={[-0.48, 0.65, -0.22]} rotation={[Math.PI / 2, 0, 0]} castShadow>
+          <cylinderGeometry args={[0.09, 0.09, 0.45, 16]} />
+          <meshStandardMaterial color="#F59E0B" metalness={0.8} roughness={0.2} />
+        </mesh>
+        <mesh position={[0.48, 0.65, -0.22]} rotation={[Math.PI / 2, 0, 0]} castShadow>
+          <cylinderGeometry args={[0.09, 0.09, 0.45, 16]} />
+          <meshStandardMaterial color="#F59E0B" metalness={0.8} roughness={0.2} />
+        </mesh>
+
+        {/* Heavy Wooden Buffer Beam with Yellow/Black Hazard Pattern */}
+        <mesh position={[0, 0.65, -0.42]} castShadow>
+          <boxGeometry args={[1.56, 0.38, 0.18]} />
+          <meshStandardMaterial color="#FACC15" roughness={0.4} />
+        </mesh>
+        <mesh position={[-0.45, 0.65, -0.52]} rotation={[0, 0, 0.4]}>
+          <boxGeometry args={[0.12, 0.36, 0.02]} />
+          <meshStandardMaterial color="#0F172A" />
+        </mesh>
+        <mesh position={[0, 0.65, -0.52]} rotation={[0, 0, 0.4]}>
+          <boxGeometry args={[0.12, 0.36, 0.02]} />
+          <meshStandardMaterial color="#0F172A" />
+        </mesh>
+        <mesh position={[0.45, 0.65, -0.52]} rotation={[0, 0, 0.4]}>
+          <boxGeometry args={[0.12, 0.36, 0.02]} />
+          <meshStandardMaterial color="#0F172A" />
+        </mesh>
+
+        {/* Red Terminal Lamp on Top */}
+        <mesh position={[0, 1.25, -0.35]}>
+          <sphereGeometry args={[0.14, 16, 16]} />
+          <meshStandardMaterial
+            color="#EF4444"
+            emissive="#EF4444"
+            emissiveIntensity={3.0}
+          />
+        </mesh>
+      </group>
+
+      {/* 7. Bridge Rustic Masonry Pillars with Coping Caps */}
       {bridgePillars.map((pillar, idx) => (
         <group key={`pillar-${idx}`} position={pillar.position}>
-          {/* Main Masonry Pillar */}
           <mesh castShadow receiveShadow>
             <boxGeometry args={[2.0, pillar.height, 2.0]} />
             <meshStandardMaterial color="#991B1B" roughness={0.75} />
           </mesh>
-          {/* Stone Coping Cap */}
           <mesh position={[0, pillar.height / 2 + 0.06, 0]}>
             <boxGeometry args={[2.2, 0.14, 2.2]} />
             <meshStandardMaterial color="#F1F5F9" roughness={0.4} />
@@ -147,20 +241,17 @@ export const RailwayTrack: React.FC = () => {
         </group>
       ))}
 
-      {/* 6. Elevated Bridge Side Safety Guardrails */}
+      {/* 8. Elevated Bridge Side Safety Guardrails */}
       {bridgeGuardrails.map((gr, idx) => (
         <group key={`guard-${idx}`} position={gr.position} rotation={[0, gr.rotationY, 0]}>
-          {/* Left Railing Post */}
           <mesh position={[-0.95, 0, 0]} castShadow>
             <boxGeometry args={[0.08, 0.55, 0.08]} />
             <meshStandardMaterial color="#FACC15" roughness={0.4} />
           </mesh>
-          {/* Right Railing Post */}
           <mesh position={[0.95, 0, 0]} castShadow>
             <boxGeometry args={[0.08, 0.55, 0.08]} />
             <meshStandardMaterial color="#FACC15" roughness={0.4} />
           </mesh>
-          {/* Top Railing Bars */}
           <mesh position={[-0.95, 0.25, 0]}>
             <boxGeometry args={[0.06, 0.06, 0.95]} />
             <meshStandardMaterial color="#FACC15" roughness={0.4} />

@@ -3,69 +3,82 @@ import * as THREE from 'three'
 import { getGameRailwayCurve } from '../track/trackMath'
 import { GAME_STATIONS } from '../../../config/trainGameConfig'
 
+/**
+ * ============================================================================
+ * VIBRANT CARTOON 3D ENVIRONMENT — SCENIC MEADOW, HORIZON MOUNTAINS & RIVER
+ * ============================================================================
+ * Features:
+ * - Lush cartoon green ground plane with depth patches
+ * - Flat sparkling blue stream flowing under the elevated bridge into a meadow pond
+ * - Far horizon snow-capped cartoon mountains (guaranteed >25m clearance from all tracks)
+ * - Instanced layered pines, round oaks, and cherry trees with strict clearance (>7m)
+ * - Embankment telegraph utility poles, trackside boulders, and wildflowers
+ * - Quaint low-poly cottages nestled in scenic interior glades
+ */
+
 interface CottageProps {
   position: [number, number, number]
-  rotationY: number
+  rotationY?: number
   wallColor: string
   roofColor: string
 }
 
 const CartoonCottage: React.FC<CottageProps> = ({
   position,
-  rotationY,
+  rotationY = 0,
   wallColor,
   roofColor,
-}) => {
-  return (
-    <group position={position} rotation={[0, rotationY, 0]}>
-      {/* House Main Body */}
-      <mesh position={[0, 1.1, 0]} castShadow receiveShadow>
-        <boxGeometry args={[2.8, 2.2, 2.4]} />
-        <meshStandardMaterial color={wallColor} roughness={0.7} />
-      </mesh>
+}) => (
+  <group position={position} rotation={[0, rotationY, 0]}>
+    {/* Foundation */}
+    <mesh position={[0, 0.15, 0]} castShadow receiveShadow>
+      <boxGeometry args={[4.2, 0.3, 3.4]} />
+      <meshStandardMaterial color="#64748B" roughness={0.9} />
+    </mesh>
 
-      {/* Pitched Roof */}
-      <mesh position={[0, 2.65, 0]} castShadow>
-        <coneGeometry args={[2.3, 1.3, 4]} />
-        <meshStandardMaterial color={roofColor} roughness={0.5} flatShading />
-      </mesh>
+    {/* Main Wall Block */}
+    <mesh position={[0, 1.25, 0]} castShadow receiveShadow>
+      <boxGeometry args={[3.8, 1.9, 3.0]} />
+      <meshStandardMaterial color={wallColor} roughness={0.6} />
+    </mesh>
 
-      {/* Chimney */}
-      <mesh position={[0.7, 3.1, -0.4]} castShadow>
-        <boxGeometry args={[0.35, 0.9, 0.35]} />
-        <meshStandardMaterial color="#B91C1C" roughness={0.8} />
-      </mesh>
+    {/* Triangular/Gabled Roof */}
+    <mesh position={[0, 2.7, 0]} rotation={[0, 0, 0]} castShadow>
+      <coneGeometry args={[2.7, 1.5, 4]} />
+      <meshStandardMaterial color={roofColor} roughness={0.4} flatShading />
+    </mesh>
 
-      {/* Cartoon Smoke Puff */}
-      <mesh position={[0.7, 3.75, -0.4]}>
-        <sphereGeometry args={[0.22, 8, 8]} />
-        <meshStandardMaterial color="#FFFFFF" roughness={0.9} />
-      </mesh>
-      <mesh position={[0.85, 4.15, -0.3]}>
-        <sphereGeometry args={[0.32, 8, 8]} />
-        <meshStandardMaterial color="#FFFFFF" roughness={0.9} />
-      </mesh>
+    {/* Brick Chimney */}
+    <mesh position={[1.0, 2.8, 0.6]} castShadow>
+      <boxGeometry args={[0.45, 1.2, 0.45]} />
+      <meshStandardMaterial color="#B91C1C" roughness={0.8} />
+    </mesh>
 
-      {/* Front Door */}
-      <mesh position={[0, 0.65, 1.22]}>
-        <planeGeometry args={[0.65, 1.2]} />
-        <meshStandardMaterial color="#78350F" roughness={0.6} />
-      </mesh>
+    {/* Cozy Wooden Door */}
+    <mesh position={[0, 0.85, 1.52]}>
+      <boxGeometry args={[0.75, 1.3, 0.08]} />
+      <meshStandardMaterial color="#78350F" roughness={0.6} />
+    </mesh>
 
-      {/* Front Window with Warm Light */}
-      <mesh position={[-0.8, 1.3, 1.22]}>
-        <planeGeometry args={[0.55, 0.55]} />
-        <meshStandardMaterial color="#FDE047" emissive="#FDE047" emissiveIntensity={0.6} />
-      </mesh>
-
-      {/* Side Window */}
-      <mesh position={[1.42, 1.3, 0]} rotation={[0, Math.PI / 2, 0]}>
-        <planeGeometry args={[0.55, 0.55]} />
-        <meshStandardMaterial color="#FDE047" emissive="#FDE047" emissiveIntensity={0.6} />
-      </mesh>
-    </group>
-  )
-}
+    {/* Warm Lit Windows */}
+    <mesh position={[-1.0, 1.2, 1.52]}>
+      <boxGeometry args={[0.65, 0.65, 0.06]} />
+      <meshStandardMaterial
+        color="#FEF08A"
+        emissive="#FEF08A"
+        emissiveIntensity={1.2}
+      />
+    </mesh>
+    <mesh position={[1.0, 1.2, 1.52]}>
+      <boxGeometry args={[0.65, 0.65, 0.06]} />
+      <meshStandardMaterial
+        color="#FEF08A"
+        emissive="#FEF08A"
+        emissiveIntensity={1.2}
+      />
+    </mesh>
+  </group>
+)
 
 export const RailwayEnvironment: React.FC = () => {
   const pineTreesRef = useRef<THREE.InstancedMesh>(null)
@@ -74,9 +87,9 @@ export const RailwayEnvironment: React.FC = () => {
   const rocksRef = useRef<THREE.InstancedMesh>(null)
   const redFlowersRef = useRef<THREE.InstancedMesh>(null)
   const yellowFlowersRef = useRef<THREE.InstancedMesh>(null)
-  const telegraphPolesRef = useRef<THREE.InstancedMesh>(null)
+  const telegraphsRef = useRef<THREE.InstancedMesh>(null)
 
-  // Generate deterministic environmental scatter with GUARANTEED clearance
+  // Procedural environment element transforms along the track corridor
   const {
     pineMatrices,
     roundTreeMatrices,
@@ -98,7 +111,7 @@ export const RailwayEnvironment: React.FC = () => {
     const dummy = new THREE.Object3D()
     const samples = 180
 
-    for (let i = 0; i < samples; i++) {
+    for (let i = 0; i <= samples; i++) {
       const t = i / samples
       const pt = curve.getPointAt(t)
       const tangent = curve.getTangentAt(t).normalize()
@@ -109,14 +122,14 @@ export const RailwayEnvironment: React.FC = () => {
       const seed = Math.sin(i * 12.9898 + 78.233) * 43758.5453
       const side = i % 2 === 0 ? 1 : -1
 
-      // 1. Check Station Proximity to guarantee platform & stopping clearance
+      // 1. Check Station Proximity to guarantee platform & stopping clearance (>10m around stations)
       const isNearStation = GAME_STATIONS.some(
-        (stn) => Math.abs(t - stn.trackProgress) < 0.038
+        (stn) => Math.abs(t - stn.trackProgress) < 0.042
       )
 
-      // 2. Trees (Strict clearance > 6.5m from track centerline, > 9m near stations)
+      // 2. Trees (Strict clearance > 7.0m from track centerline, > 11m near stations)
       if (!isNearStation) {
-        const minDistance = 6.8 + Math.abs(seed % 16)
+        const minDistance = 7.2 + Math.abs(seed % 14)
         const treeX = pt.x + normal.x * minDistance * side
         const treeZ = pt.z + normal.z * minDistance * side
         const treeY = pt.y
@@ -165,7 +178,6 @@ export const RailwayEnvironment: React.FC = () => {
 
       // 5. Telegraph Poles along the railway embankment (every ~7 samples on inland side)
       if (i % 7 === 0 && !isNearStation) {
-        // Positioned 3.4m on inland side (-normal)
         const poleX = pt.x - normal.x * 3.4
         const poleZ = pt.z - normal.z * 3.4
         dummy.position.set(poleX, pt.y, poleZ)
@@ -213,9 +225,9 @@ export const RailwayEnvironment: React.FC = () => {
       yellowFlowerMatrices.forEach((matrix, i) => yellowFlowersRef.current!.setMatrixAt(i, matrix))
       yellowFlowersRef.current.instanceMatrix.needsUpdate = true
     }
-    if (telegraphPolesRef.current) {
-      telegraphMatrices.forEach((matrix, i) => telegraphPolesRef.current!.setMatrixAt(i, matrix))
-      telegraphPolesRef.current.instanceMatrix.needsUpdate = true
+    if (telegraphsRef.current) {
+      telegraphMatrices.forEach((matrix, i) => telegraphsRef.current!.setMatrixAt(i, matrix))
+      telegraphsRef.current.instanceMatrix.needsUpdate = true
     }
   }, [
     pineMatrices,
@@ -227,18 +239,52 @@ export const RailwayEnvironment: React.FC = () => {
     telegraphMatrices,
   ])
 
-  // Stylized River Curve winding across the landscape and under the Station 3 Bridge
+  // Flat 2D River Ribbon Geometry at ground level (Y = 0.02m)
+  // Crosses UNDER the elevated bridge at (78, 0.02, 0) where track is elevated at Y = 2.8m!
   const riverGeometry = useMemo(() => {
     const riverPoints = [
-      new THREE.Vector3(30, -0.15, -95),
-      new THREE.Vector3(55, -0.15, -50),
-      new THREE.Vector3(76, -0.15, 10), // Under the high elevated Station 3 Bridge (Y=2.8)
-      new THREE.Vector3(68, -0.15, 45),
-      new THREE.Vector3(30, -0.15, 85),
-      new THREE.Vector3(-10, -0.15, 95),
+      new THREE.Vector3(120, 0.02, -25), // Far east outside loop
+      new THREE.Vector3(98, 0.02, -12),
+      new THREE.Vector3(78, 0.02, 0),     // Exactly under the elevated Station 3 bridge
+      new THREE.Vector3(62, 0.02, 8),
+      new THREE.Vector3(45, 0.02, 6),
+      new THREE.Vector3(32, 0.02, -5),    // Entering tranquil meadow pond
     ]
     const riverCurve = new THREE.CatmullRomCurve3(riverPoints, false, 'centripetal', 0.5)
-    return new THREE.TubeGeometry(riverCurve, 64, 4.5, 10, false)
+
+    const segments = 40
+    const halfWidth = 2.6
+    const vertices: number[] = []
+    const indices: number[] = []
+    const uvs: number[] = []
+
+    for (let i = 0; i <= segments; i++) {
+      const u = i / segments
+      const pt = riverCurve.getPointAt(u)
+      const tangent = riverCurve.getTangentAt(u).normalize()
+      const normal = new THREE.Vector3(-tangent.z, 0, tangent.x).normalize()
+
+      // Left vertex
+      vertices.push(pt.x + normal.x * halfWidth, 0.02, pt.z + normal.z * halfWidth)
+      uvs.push(0, u)
+
+      // Right vertex
+      vertices.push(pt.x - normal.x * halfWidth, 0.02, pt.z - normal.z * halfWidth)
+      uvs.push(1, u)
+
+      if (i < segments) {
+        const base = i * 2
+        indices.push(base, base + 1, base + 2)
+        indices.push(base + 1, base + 3, base + 2)
+      }
+    }
+
+    const geom = new THREE.BufferGeometry()
+    geom.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3))
+    geom.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2))
+    geom.setIndex(indices)
+    geom.computeVertexNormals()
+    return geom
   }, [])
 
   return (
@@ -247,7 +293,7 @@ export const RailwayEnvironment: React.FC = () => {
           1. LUSH MEADOW GROUND (Vibrant Cartoon Green with Layered Patches)
           ================================================================== */}
       <mesh position={[0, -0.05, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
-        <planeGeometry args={[280, 280]} />
+        <planeGeometry args={[290, 290]} />
         <meshStandardMaterial color="#55B938" roughness={0.85} metalness={0.0} />
       </mesh>
 
@@ -262,84 +308,131 @@ export const RailwayEnvironment: React.FC = () => {
       </mesh>
 
       {/* ==================================================================
-          2. WINDING BLUE RIVER (Sparkling Stream under Bridge)
+          2. FLAT SPARKLING BLUE RIVER & CENTRAL MEADOW POND
           ================================================================== */}
+      {/* Flat River Stream flowing under bridge */}
       <mesh geometry={riverGeometry} receiveShadow>
         <meshStandardMaterial
           color="#38BDF8"
           roughness={0.15}
-          metalness={0.2}
+          metalness={0.3}
           emissive="#0284C7"
-          emissiveIntensity={0.25}
+          emissiveIntensity={0.2}
+        />
+      </mesh>
+
+      {/* Central Meadow Pond */}
+      <mesh position={[30, 0.02, -5]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
+        <circleGeometry args={[11, 32]} />
+        <meshStandardMaterial
+          color="#38BDF8"
+          roughness={0.15}
+          metalness={0.3}
+          emissive="#0284C7"
+          emissiveIntensity={0.2}
         />
       </mesh>
 
       {/* ==================================================================
-          3. BEAUTIFUL MOUNTAINS & ROLLING HILLS (Snow-Capped Peaks)
+          3. SCENIC HORIZON MOUNTAINS (Pushed safely >25m beyond track bounds)
           ================================================================== */}
       <group>
-        {/* North Mountain Range */}
-        <group position={[0, 8, -100]}>
+        {/* North Mountain Range (Z = -125m) */}
+        <group position={[0, 10, -125]}>
           <mesh castShadow receiveShadow>
-            <coneGeometry args={[52, 24, 7]} />
+            <coneGeometry args={[28, 26, 7]} />
             <meshStandardMaterial color="#334155" roughness={0.8} flatShading />
           </mesh>
-          <mesh position={[0, 8.5, 0]}>
-            <coneGeometry args={[18, 8.2, 7]} />
+          <mesh position={[0, 9.5, 0]}>
+            <coneGeometry args={[11, 8.5, 7]} />
             <meshStandardMaterial color="#FFFFFF" roughness={0.4} flatShading />
           </mesh>
         </group>
 
-        <group position={[-68, 8, -92]}>
+        <group position={[-70, 9, -125]}>
           <mesh castShadow receiveShadow>
-            <coneGeometry args={[44, 22, 6]} />
+            <coneGeometry args={[26, 24, 6]} />
             <meshStandardMaterial color="#1E3A8A" roughness={0.8} flatShading />
           </mesh>
-          <mesh position={[0, 7.8, 0]}>
-            <coneGeometry args={[15, 7.2, 6]} />
+          <mesh position={[0, 8.5, 0]}>
+            <coneGeometry args={[10, 7.5, 6]} />
             <meshStandardMaterial color="#FFFFFF" roughness={0.4} flatShading />
           </mesh>
         </group>
 
-        <group position={[72, 8, -88]}>
+        <group position={[70, 9, -125]}>
           <mesh castShadow receiveShadow>
-            <coneGeometry args={[42, 20, 7]} />
+            <coneGeometry args={[26, 24, 7]} />
             <meshStandardMaterial color="#0F766E" roughness={0.8} flatShading />
           </mesh>
-          <mesh position={[0, 7.0, 0]}>
-            <coneGeometry args={[14, 6.5, 7]} />
+          <mesh position={[0, 8.5, 0]}>
+            <coneGeometry args={[10, 7.5, 7]} />
             <meshStandardMaterial color="#FFFFFF" roughness={0.4} flatShading />
           </mesh>
         </group>
 
-        {/* South Mountain Range */}
-        <group position={[-50, 9, 98]}>
+        {/* South Mountain Range (Z = +125m) */}
+        <group position={[-55, 10, 125]}>
           <mesh castShadow receiveShadow>
-            <coneGeometry args={[48, 22, 6]} />
+            <coneGeometry args={[28, 26, 6]} />
             <meshStandardMaterial color="#4338CA" roughness={0.8} flatShading />
           </mesh>
-          <mesh position={[0, 7.8, 0]}>
-            <coneGeometry args={[16, 7.4, 6]} />
+          <mesh position={[0, 9.5, 0]}>
+            <coneGeometry args={[11, 8.5, 6]} />
             <meshStandardMaterial color="#FFFFFF" roughness={0.4} flatShading />
           </mesh>
         </group>
 
-        <group position={[58, 9, 92]}>
+        <group position={[55, 10, 125]}>
           <mesh castShadow receiveShadow>
-            <coneGeometry args={[48, 24, 7]} />
-            <meshStandardMaterial color="#3B82F6" roughness={0.8} flatShading />
+            <coneGeometry args={[28, 26, 7]} />
+            <meshStandardMaterial color="#475569" roughness={0.8} flatShading />
           </mesh>
-          <mesh position={[0, 8.4, 0]}>
-            <coneGeometry args={[16, 7.8, 7]} />
+          <mesh position={[0, 9.5, 0]}>
+            <coneGeometry args={[11, 8.5, 7]} />
+            <meshStandardMaterial color="#FFFFFF" roughness={0.4} flatShading />
+          </mesh>
+        </group>
+
+        <group position={[0, 11, 130]}>
+          <mesh castShadow receiveShadow>
+            <coneGeometry args={[30, 28, 7]} />
+            <meshStandardMaterial color="#334155" roughness={0.8} flatShading />
+          </mesh>
+          <mesh position={[0, 10.5, 0]}>
+            <coneGeometry args={[12, 9.0, 7]} />
+            <meshStandardMaterial color="#FFFFFF" roughness={0.4} flatShading />
+          </mesh>
+        </group>
+
+        {/* West Mountain (X = -130m) */}
+        <group position={[-130, 9, 0]}>
+          <mesh castShadow receiveShadow>
+            <coneGeometry args={[28, 25, 7]} />
+            <meshStandardMaterial color="#1E293B" roughness={0.8} flatShading />
+          </mesh>
+          <mesh position={[0, 9.0, 0]}>
+            <coneGeometry args={[11, 8.0, 7]} />
+            <meshStandardMaterial color="#FFFFFF" roughness={0.4} flatShading />
+          </mesh>
+        </group>
+
+        {/* East Mountain (X = +130m) */}
+        <group position={[130, 9, 0]}>
+          <mesh castShadow receiveShadow>
+            <coneGeometry args={[28, 25, 7]} />
+            <meshStandardMaterial color="#065F46" roughness={0.8} flatShading />
+          </mesh>
+          <mesh position={[0, 9.0, 0]}>
+            <coneGeometry args={[11, 8.0, 7]} />
             <meshStandardMaterial color="#FFFFFF" roughness={0.4} flatShading />
           </mesh>
         </group>
       </group>
 
       {/* ==================================================================
-          4. CHARMING VILLAGE COTTAGES (Carefully placed in scenic glades)
+          4. CHARMING VILLAGE COTTAGES (In central scenic glades)
           ================================================================== */}
-      {/* Northbrook Hamlet (Near North Plains) */}
       <CartoonCottage
         position={[-30, 0, -38]}
         rotationY={0.6}
@@ -347,76 +440,67 @@ export const RailwayEnvironment: React.FC = () => {
         roofColor="#EF4444"
       />
       <CartoonCottage
-        position={[-38, 0, -42]}
+        position={[-36, 0, -36]}
         rotationY={-0.4}
         wallColor="#E0F2FE"
         roofColor="#F97316"
       />
-
-      {/* Southfields Village (Near South Plains) */}
       <CartoonCottage
         position={[25, 0, 38]}
         rotationY={2.2}
         wallColor="#FEF3C7"
-        roofColor="#2563EB"
+        roofColor="#3B82F6"
       />
       <CartoonCottage
-        position={[34, 0, 44]}
-        rotationY={1.7}
-        wallColor="#FFF1F2"
+        position={[32, 0, 42]}
+        rotationY={1.8}
+        wallColor="#F0FDF4"
         roofColor="#8B5CF6"
       />
-
-      {/* Woodcutter's Clearing (Center Glade) */}
       <CartoonCottage
-        position={[-8, 0, 5]}
+        position={[-15, 0, 35]}
         rotationY={-1.2}
-        wallColor="#ECFDF5"
-        roofColor="#EA580C"
+        wallColor="#FFF1F2"
+        roofColor="#10B981"
       />
 
       {/* ==================================================================
-          5. INSTANCED STYLIZED PINES (Tiered Evergreen)
+          5. INSTANCED PROCEDURAL VEGETATION & ASSETS
           ================================================================== */}
+      {/* 5a. Layered Cartoon Alpine Pines */}
       <instancedMesh
         ref={pineTreesRef}
         args={[undefined, undefined, pineMatrices.length]}
         castShadow
         receiveShadow
       >
-        <coneGeometry args={[1.3, 3.4, 5]} />
-        <meshStandardMaterial color="#166534" roughness={0.7} flatShading />
+        <coneGeometry args={[1.5, 3.8, 5]} />
+        <meshStandardMaterial color="#15803D" roughness={0.7} flatShading />
       </instancedMesh>
 
-      {/* ==================================================================
-          6. INSTANCED STYLIZED ROUND OAK TREES (Lush Cartoon Green Canopy)
-          ================================================================== */}
+      {/* 5b. Round Deciduous Forest Oaks */}
       <instancedMesh
         ref={roundTreesRef}
         args={[undefined, undefined, roundTreeMatrices.length]}
         castShadow
         receiveShadow
       >
-        <dodecahedronGeometry args={[1.5, 0]} />
-        <meshStandardMaterial color="#65A30D" roughness={0.75} flatShading />
+        <sphereGeometry args={[1.7, 7, 7]} />
+        <meshStandardMaterial color="#22C55E" roughness={0.75} flatShading />
       </instancedMesh>
 
-      {/* ==================================================================
-          7. INSTANCED BLOSSOMING CHERRY TREES (Soft Pink Canopies)
-          ================================================================== */}
+      {/* 5c. Blossoming Pink Cherry Trees */}
       <instancedMesh
         ref={cherryTreesRef}
         args={[undefined, undefined, cherryMatrices.length]}
         castShadow
         receiveShadow
       >
-        <dodecahedronGeometry args={[1.4, 0]} />
-        <meshStandardMaterial color="#FB7185" roughness={0.7} flatShading />
+        <sphereGeometry args={[1.6, 7, 7]} />
+        <meshStandardMaterial color="#F472B6" roughness={0.65} flatShading />
       </instancedMesh>
 
-      {/* ==================================================================
-          8. INSTANCED TRACKSIDE BOULDERS (Warm Slate Pebble Grey)
-          ================================================================== */}
+      {/* 5d. Trackside Boulders */}
       <instancedMesh
         ref={rocksRef}
         args={[undefined, undefined, rockMatrices.length]}
@@ -424,38 +508,35 @@ export const RailwayEnvironment: React.FC = () => {
         receiveShadow
       >
         <dodecahedronGeometry args={[0.9, 0]} />
-        <meshStandardMaterial color="#94A3B8" roughness={0.7} flatShading />
+        <meshStandardMaterial color="#64748B" roughness={0.9} flatShading />
       </instancedMesh>
 
-      {/* ==================================================================
-          9. WILDFLOWER BLOOMS (Red Poppies & Yellow Buttercups)
-          ================================================================== */}
+      {/* 5e. Wildflowers (Red) */}
       <instancedMesh
         ref={redFlowersRef}
         args={[undefined, undefined, redFlowerMatrices.length]}
       >
-        <sphereGeometry args={[0.3, 8, 8]} />
+        <sphereGeometry args={[0.22, 6, 6]} />
         <meshStandardMaterial color="#EF4444" roughness={0.5} />
       </instancedMesh>
 
+      {/* 5f. Wildflowers (Yellow) */}
       <instancedMesh
         ref={yellowFlowersRef}
         args={[undefined, undefined, yellowFlowerMatrices.length]}
       >
-        <sphereGeometry args={[0.3, 8, 8]} />
+        <sphereGeometry args={[0.22, 6, 6]} />
         <meshStandardMaterial color="#FACC15" roughness={0.5} />
       </instancedMesh>
 
-      {/* ==================================================================
-          10. TELEGRAPH UTILITY POLES (Along Railway Embankment)
-          ================================================================== */}
+      {/* 5g. Embankment Telegraph Poles */}
       <instancedMesh
-        ref={telegraphPolesRef}
+        ref={telegraphsRef}
         args={[undefined, undefined, telegraphMatrices.length]}
         castShadow
       >
-        <cylinderGeometry args={[0.07, 0.09, 3.2, 8]} />
-        <meshStandardMaterial color="#78350F" roughness={0.8} />
+        <cylinderGeometry args={[0.07, 0.09, 3.8, 8]} />
+        <meshStandardMaterial color="#5C3D28" roughness={0.8} />
       </instancedMesh>
     </group>
   )

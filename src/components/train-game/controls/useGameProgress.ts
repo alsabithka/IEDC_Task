@@ -1,84 +1,65 @@
 import { useState, useRef, useCallback, useEffect } from 'react'
+import type { TrainInputState } from './useTrainControls'
 import {
   GAME_STATIONS,
   TRAIN_PHYSICS_CONFIG,
+  type GameStationConfig,
 } from '../../../config/trainGameConfig'
-import type { GameStationConfig } from '../../../config/trainGameConfig'
 
 export interface TrainDynamics {
   speedKmh: number
   throttlePercent: number
   brakePercent: number
-  trackProgress: number
+  trackProgress: number // 0 to 1
   distanceTraveledMeters: number
 }
 
-export function useGameProgress(inputRef: React.RefObject<{
-  throttleUp: boolean
-  throttleDown: boolean
-  brake: boolean
-  interact: boolean
-  pause: boolean
-}>) {
-  // Game lifecycle states
-  const [isStarted, setIsStarted] = useState(false)
-  const [isPaused, setIsPaused] = useState(false)
-  const [isSessionModalOpen, setIsSessionModalOpen] = useState(false)
-  const [isJourneyCompleted, setIsJourneyCompleted] = useState(false)
+const INITIAL_DYNAMICS: TrainDynamics = {
+  speedKmh: 0,
+  throttlePercent: 0,
+  brakePercent: 0,
+  trackProgress: GAME_STATIONS[0].trackProgress, // Start at Station 1 (Departure Station)
+  distanceTraveledMeters: 0,
+}
 
-  // Train physical dynamics state (synced for UI at 20Hz, physics runs on frame)
-  const [dynamics, setDynamics] = useState<TrainDynamics>({
-    speedKmh: 0,
-    throttlePercent: 0,
-    brakePercent: 0,
-    trackProgress: GAME_STATIONS[0].trackProgress,
-    distanceTraveledMeters: 0,
-  })
+export function useGameProgress(inputRef: React.RefObject<TrainInputState>) {
+  // Master Game State
+  const [isStarted, setIsStarted] = useState<boolean>(false)
+  const [isPaused, setIsPaused] = useState<boolean>(false)
+  const [isSessionModalOpen, setIsSessionModalOpen] = useState<boolean>(false)
+  const [isJourneyCompleted, setIsJourneyCompleted] = useState<boolean>(false)
 
-  // Station proximity state
+  // Train Physics & Position Dynamics
+  const simRef = useRef<TrainDynamics>({ ...INITIAL_DYNAMICS })
+
+  // Reactive state for UI HUD sync
+  const [dynamics, setDynamics] = useState<TrainDynamics>(INITIAL_DYNAMICS)
+
+  // Station tracking state
   const [nextStation, setNextStation] = useState<GameStationConfig>(GAME_STATIONS[1])
-  const [distanceToNextStation, setDistanceToNextStation] = useState<number>(56)
+  const [distanceToNextStation, setDistanceToNextStation] = useState<number>(55)
   const [activeStation, setActiveStation] = useState<GameStationConfig | null>(GAME_STATIONS[0])
-  const [isAtStation, setIsAtStation] = useState(true)
-  const [isOvershot, setIsOvershot] = useState(false)
-  const [overshotStation, setOvershotStation] = useState<GameStationConfig | null>(null)
-  const [overshotDistanceMeters, setOvershotDistanceMeters] = useState(0)
+  const [isAtStation, setIsAtStation] = useState<boolean>(true)
   const [visitedStationIds, setVisitedStationIds] = useState<string[]>(['stn-1'])
 
-  // Mutable physics simulation values (avoids React re-renders every 16ms)
-  const simRef = useRef<TrainDynamics>({
-    speedKmh: 0,
-    throttlePercent: 0,
-    brakePercent: 0,
-    trackProgress: GAME_STATIONS[0].trackProgress,
-    distanceTraveledMeters: 0,
-  })
+  // Overshoot recovery tracking
+  const [isOvershot, setIsOvershot] = useState<boolean>(false)
+  const [overshotStation, setOvershotStation] = useState<GameStationConfig | null>(null)
+  const [overshotDistanceMeters, setOvershotDistanceMeters] = useState<number>(0)
 
-  // Direct event-based triggers (called from key/touch handlers)
-  const handleTogglePause = useCallback(() => {
-    setIsPaused((p) => !p)
-  }, [])
-
-  const handleInteract = useCallback(() => {
-    if (isAtStation && activeStation && !isPaused) {
-      setIsSessionModalOpen(true)
-    }
-  }, [isAtStation, activeStation, isPaused])
-
-  // One-click recovery mechanism to reverse back into designated platform stopping zone
+  /**
+   * 1-Click Reverse Recovery: Repositions the locomotive directly into the safe stopping zone
+   */
   const reverseToPlatform = useCallback(() => {
-    const target = overshotStation || activeStation
-    if (!target) return
-    simRef.current = {
-      speedKmh: 0,
-      throttlePercent: 0,
-      brakePercent: 0,
-      trackProgress: target.trackProgress,
-      distanceTraveledMeters: simRef.current.distanceTraveledMeters,
-    }
+    const target = overshotStation || activeStation || GAME_STATIONS[0]
+    simRef.current.trackProgress = target.trackProgress
+    simRef.current.speedKmh = 0
+    simRef.current.throttlePercent = 0
+    simRef.current.brakePercent = 100
     setDynamics({ ...simRef.current })
     setIsAtStation(true)
     setIsOvershot(false)
+    setOvershotStation(null)
     setActiveStation(target)
   }, [overshotStation, activeStation])
 
@@ -169,16 +150,27 @@ export function useGameProgress(inputRef: React.RefObject<{
         )
       }
 
-      // 4. Position Progression along Track
+      // 4. Position Progression along Open Track Route
       const speedMs = (sim.speedKmh * 1000) / 3600
       const distanceStepMeters = speedMs * dt
       sim.distanceTraveledMeters += distanceStepMeters
 
       const progressStep = distanceStepMeters / TRAIN_PHYSICS_CONFIG.trackLengthMeters
-      sim.trackProgress = ((sim.trackProgress + progressStep) % 1 + 1) % 1
+      // Clamp progress between track origin (0.015) and terminal buffer stop (0.985)
+      sim.trackProgress = Math.max(0.015, Math.min(0.985, sim.trackProgress + progressStep))
+
+      // Terminal Buffer Stop Collision at End of Track: halt forward motion immediately
+      if (sim.trackProgress >= 0.984 && sim.speedKmh > 0) {
+        sim.speedKmh = 0
+        sim.throttlePercent = 0
+      }
+      // Start of Track Buffer Collision: halt backward motion
+      if (sim.trackProgress <= 0.016 && sim.speedKmh < 0) {
+        sim.speedKmh = 0
+      }
 
       // 5. Station Proximity, Stopping Zone & Overshoot Detection
-      let closestStation: GameStationConfig = GAME_STATIONS[0]
+      let closestStation: GameStationConfig = GAME_STATIONS[GAME_STATIONS.length - 1]
       let minAheadDistMeters = 99999
       let stoppedStation: GameStationConfig | null = null
       let missedStation: GameStationConfig | null = null
@@ -186,15 +178,11 @@ export function useGameProgress(inputRef: React.RefObject<{
 
       for (let i = 0; i < GAME_STATIONS.length; i++) {
         const stn = GAME_STATIONS[i]
-        // Shortest signed angular delta on the closed loop
-        let deltaT = stn.trackProgress - sim.trackProgress
-        if (deltaT < -0.5) deltaT += 1.0
-        if (deltaT > 0.5) deltaT -= 1.0
-
-        const distMeters = deltaT * TRAIN_PHYSICS_CONFIG.trackLengthMeters
+        // Distance along open track to this station (positive = ahead, negative = behind)
+        const distMeters = (stn.trackProgress - sim.trackProgress) * TRAIN_PHYSICS_CONFIG.trackLengthMeters
 
         // Ahead station
-        if (distMeters >= -1.0 && distMeters < minAheadDistMeters) {
+        if (distMeters >= -TRAIN_PHYSICS_CONFIG.stoppingZoneToleranceMeters && distMeters < minAheadDistMeters) {
           minAheadDistMeters = Math.max(0, distMeters)
           closestStation = stn
         }
@@ -204,8 +192,8 @@ export function useGameProgress(inputRef: React.RefObject<{
           stoppedStation = stn
         }
 
-        // Overshoot detection: train drove past platform stopping zone by 8.5m - 32m
-        if (distMeters < -TRAIN_PHYSICS_CONFIG.stoppingZoneToleranceMeters && distMeters > -32) {
+        // Overshoot detection: train drove past platform stopping zone by 8.5m - 28m
+        if (distMeters < -TRAIN_PHYSICS_CONFIG.stoppingZoneToleranceMeters && distMeters > -28) {
           missedStation = stn
           missedMeters = Math.round(Math.abs(distMeters))
         }
@@ -227,7 +215,10 @@ export function useGameProgress(inputRef: React.RefObject<{
         )
 
         // FINAL STATION ARRIVAL CHECK: Station 8 and speed is stopped
-        if (stoppedStation.number === 8 && Math.abs(sim.speedKmh) < 0.8 && !isJourneyCompleted) {
+        if (stoppedStation.number === 8 && Math.abs(sim.speedKmh) < 1.0 && !isJourneyCompleted) {
+          sim.speedKmh = 0
+          sim.throttlePercent = 0
+          sim.brakePercent = 100
           setIsJourneyCompleted(true)
           setIsSessionModalOpen(false)
         }
@@ -299,9 +290,21 @@ export function useGameProgress(inputRef: React.RefObject<{
     setOvershotStation(null)
     setActiveStation(target)
 
-    const nextIdx = target.number % GAME_STATIONS.length
+    const nextIdx = Math.min(GAME_STATIONS.length - 1, target.number)
     setNextStation(GAME_STATIONS[nextIdx])
   }, [])
+
+  const handleTogglePause = useCallback(() => {
+    if (!isStarted || isJourneyCompleted) return
+    setIsPaused((prev) => !prev)
+  }, [isStarted, isJourneyCompleted])
+
+  const handleInteract = useCallback(() => {
+    if (!isStarted || isPaused || isJourneyCompleted) return
+    if (isAtStation && activeStation) {
+      setIsSessionModalOpen((prev) => !prev)
+    }
+  }, [isStarted, isPaused, isJourneyCompleted, isAtStation, activeStation])
 
   return {
     isStarted,
@@ -328,3 +331,5 @@ export function useGameProgress(inputRef: React.RefObject<{
     setIsSessionModalOpen,
   }
 }
+
+export default useGameProgress

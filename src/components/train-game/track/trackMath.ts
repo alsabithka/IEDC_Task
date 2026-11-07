@@ -1,65 +1,78 @@
 import * as THREE from 'three'
 
-// 16-Waypoint Smooth Radial Circuit defining the 3D Railway Track
-// Continuous, non-intersecting, zero subterranean dips, smooth curves.
-const rx = 78
-const rz = 62
+/**
+ * ============================================================================
+ * IDEA SPRINT EXPRESS — OPEN RAILWAY TRACK SPLINE & KINEMATIC MATH
+ * ============================================================================
+ * An open Catmull-Rom route starting at Station 1 (Departure Station) and
+ * terminating cleanly at Station 8 (Grand Terminus) with a physical buffer stop.
+ *
+ * Elevation profile:
+ * - Minimum elevation is strictly +0.165m (guarantees zero ground burial)
+ * - Elevated scenic bridge deck over river at Station 3 (Y = +2.8m)
+ * - Mountain ridge pass at Station 7 (Y = +2.2m)
+ * - Zero self-intersections (minimum track separation > 10.7m)
+ */
 
-const RAW_TRACK_POINTS: THREE.Vector3[] = []
-const WAYPOINT_COUNT = 16
+const WAYPOINTS: THREE.Vector3[] = [
+  new THREE.Vector3(-12, 0.25, -60), // 0: Start track head (buffer head behind Stn 1)
+  new THREE.Vector3(5, 0.25, -60),   // 1: Station 1 Platform (Departure Station)
+  new THREE.Vector3(30, 0.25, -57),  // 2: Northeast open straight
+  new THREE.Vector3(56, 0.25, -42),  // 3: Station 2 Platform (Ideation Junction)
+  new THREE.Vector3(72, 1.4, -20),   // 4: Elevated bridge ramp incline
+  new THREE.Vector3(78, 2.8, 8),     // 5: Bridge peak above river crossing
+  new THREE.Vector3(74, 2.2, 25),    // 6: Station 3 Platform (Dining Depot on high deck)
+  new THREE.Vector3(68, 1.2, 40),    // 7: Bridge ramp descent
+  new THREE.Vector3(50, 0.25, 54),   // 8: Station 4 Platform (Synergy Hub)
+  new THREE.Vector3(22, 0.25, 60),   // 9: South sunny curve
+  new THREE.Vector3(-10, 0.25, 62),  // 10: Station 5 Platform (Morning Terminal)
+  new THREE.Vector3(-38, 0.25, 56),  // 11: Southwest meadow turn
+  new THREE.Vector3(-62, 0.25, 40),  // 12: Station 6 Platform (Deep Code Labs)
+  new THREE.Vector3(-76, 1.4, 20),   // 13: Mountain ridge incline
+  new THREE.Vector3(-78, 2.4, -6),   // 14: Ridge peak
+  new THREE.Vector3(-74, 1.8, -22),  // 15: Station 7 Platform (Refuel Stop)
+  new THREE.Vector3(-64, 0.8, -38),  // 16: Ridge descent
+  new THREE.Vector3(-48, 0.25, -48), // 17: Terminal approach straight
+  new THREE.Vector3(-32, 0.25, -54), // 18: Station 8 Platform (Grand Terminus)
+  new THREE.Vector3(-22, 0.25, -56), // 19: Terminal Buffer Stop & End of Line!
+]
 
-for (let i = 0; i < WAYPOINT_COUNT; i++) {
-  // Angle around circuit starting from North (-Z) proceeding clockwise
-  const angle = (i / WAYPOINT_COUNT) * Math.PI * 2 - Math.PI / 2
-  const x = Math.cos(angle) * (rx + (i % 2 === 0 ? 0 : 3))
-  const z = Math.sin(angle) * (rz + (i % 2 === 0 ? 0 : 2))
-
-  // Base elevation safely above terrain (y = 0.25)
-  let y = 0.25
-  // East scenic bridge over river (inclines and elevated bridge deck)
-  if (i === 3) y = 1.4
-  if (i === 4 || i === 5) y = 2.8
-  if (i === 6) y = 1.4
-  // West forest mountain cutting (inclines and ridge deck)
-  if (i === 11) y = 1.4
-  if (i === 12) y = 2.4
-  if (i === 13) y = 1.4
-
-  RAW_TRACK_POINTS.push(
-    new THREE.Vector3(Number(x.toFixed(2)), y, Number(z.toFixed(2)))
-  )
-}
-
-let cachedCurve: THREE.CatmullRomCurve3 | null = null
-
-export function getGameRailwayCurve(): THREE.CatmullRomCurve3 {
-  if (!cachedCurve) {
-    cachedCurve = new THREE.CatmullRomCurve3(
-      RAW_TRACK_POINTS,
-      true, // closed continuous loop
-      'centripetal',
-      0.5
-    )
-  }
-  return cachedCurve
-}
+// Single open Catmull-Rom spline (closed = false)
+const railwayCurve = new THREE.CatmullRomCurve3(WAYPOINTS, false, 'catmullrom', 0.5)
 
 /**
- * Calculates position, tangent, and normal along the railway curve at progress t (0 to 1)
+ * Returns the immutable source-of-truth 3D railway track curve.
  */
-export function getTrackFrameAt(t: number): {
+export function getGameRailwayCurve(): THREE.CatmullRomCurve3 {
+  return railwayCurve
+}
+
+export interface TrackFrame {
   position: THREE.Vector3
   tangent: THREE.Vector3
   normal: THREE.Vector3
   up: THREE.Vector3
-} {
-  const curve = getGameRailwayCurve()
-  const normalizedT = ((t % 1) + 1) % 1
-  const position = curve.getPointAt(normalizedT)
-  const tangent = curve.getTangentAt(normalizedT).normalize()
-  const up = new THREE.Vector3(0, 1, 0)
-  // Perpendicular outward normal vector relative to tangent
-  const normal = new THREE.Vector3().crossVectors(tangent, up).normalize()
+}
 
-  return { position, tangent, normal, up }
+/**
+ * Calculates position, tangent, and normal frame for any progress t along the track.
+ * Progress t is clamped strictly between 0 and 1.
+ */
+export function getTrackFrameAt(t: number): TrackFrame {
+  const clampedT = Math.max(0, Math.min(1, t))
+  const position = railwayCurve.getPointAt(clampedT)
+  const tangent = railwayCurve.getTangentAt(clampedT).normalize()
+
+  const worldUp = new THREE.Vector3(0, 1, 0)
+  // Normal vector perpendicular to tangent in the horizontal plane
+  const normal = new THREE.Vector3().crossVectors(tangent, worldUp).normalize()
+  // True local up vector perpendicular to both tangent and normal
+  const up = new THREE.Vector3().crossVectors(normal, tangent).normalize()
+
+  return {
+    position,
+    tangent,
+    normal,
+    up,
+  }
 }

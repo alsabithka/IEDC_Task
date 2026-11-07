@@ -16,9 +16,11 @@ export const RailwayStation: React.FC<RailwayStationProps> = ({
   const { position, rotation } = useMemo(() => {
     const { position: trackPos, tangent, normal } = getTrackFrameAt(station.trackProgress)
 
-    // Platform positioned on outside of track (2.18m offset)
-    // Platform half-width is 1.35m -> platform edge is at 2.18 - 1.35 = 0.83m from track center.
-    // Train half-width is 0.75m -> smooth 8cm boarding gap with zero clipping!
+    // Platform positioned on outside of track (2.18m offset along normal)
+    // In local space rotated by atan2(tangent.x, tangent.z):
+    // - Local +Z points along tangent (forward driving direction)
+    // - Local +X points toward the track centerline (+2.18m)
+    // - Local -X points away from the track into the meadow
     const platformPos = new THREE.Vector3()
       .copy(trackPos)
       .addScaledVector(normal, 2.18)
@@ -37,18 +39,18 @@ export const RailwayStation: React.FC<RailwayStationProps> = ({
   return (
     <group position={position} rotation={rotation}>
       {/* ==================================================================
-          1. PASSENGER PLATFORM (Defined Beginning, Deck & Endpoint)
+          1. PASSENGER PLATFORM DECK & ACCESS RAMPS
           ================================================================== */}
-      {/* Main Platform Deck (14 meters long) */}
+      {/* Main Platform Deck (14m long, 2.7m wide: X in [-1.35, +1.35]) */}
       <mesh position={[0, 0.22, 0]} castShadow receiveShadow>
         <boxGeometry args={[2.7, 0.44, 14]} />
         <meshStandardMaterial
           color={isTrainStoppedHere ? '#F8FAFC' : '#E2E8F0'}
-          roughness={0.7}
+          roughness={0.65}
         />
       </mesh>
 
-      {/* Platform Beginning Entry Ramp (Z = -7.7) */}
+      {/* Platform Beginning Entry Ramp (Z = -7.6) */}
       <mesh position={[0, 0.11, -7.6]} rotation={[0.22, 0, 0]} receiveShadow>
         <boxGeometry args={[2.7, 0.24, 1.4]} />
         <meshStandardMaterial color="#CBD5E1" roughness={0.7} />
@@ -60,9 +62,9 @@ export const RailwayStation: React.FC<RailwayStationProps> = ({
         <meshStandardMaterial color="#CBD5E1" roughness={0.7} />
       </mesh>
 
-      {/* Safety Edge Warning Strip (Canary Yellow running along trackside) */}
-      <mesh position={[-1.3, 0.45, 0]}>
-        <boxGeometry args={[0.12, 0.02, 14]} />
+      {/* Safety Edge Warning Strip (Canary Yellow running along trackside edge at X = +1.30) */}
+      <mesh position={[1.30, 0.45, 0]}>
+        <boxGeometry args={[0.10, 0.02, 14]} />
         <meshStandardMaterial
           color="#FACC15"
           emissive="#EAB308"
@@ -71,20 +73,20 @@ export const RailwayStation: React.FC<RailwayStationProps> = ({
       </mesh>
 
       {/* ==================================================================
-          2. PHYSICAL STOPPING LINE & STOP MARKERS
+          2. PHYSICAL STOPPING TARGET LINE & STOP MARKERS
           ================================================================== */}
-      {/* Painted STOP Bar across Platform at Target Stopping Center (Z = 0) */}
-      <mesh position={[-0.7, 0.46, 0]}>
-        <boxGeometry args={[1.2, 0.02, 0.45]} />
+      {/* Red Painted STOP Bar on Platform Deck at Target Stopping Center (Z = 0) */}
+      <mesh position={[0.72, 0.46, 0]}>
+        <boxGeometry args={[1.16, 0.02, 0.45]} />
         <meshStandardMaterial
           color="#DC2626"
           emissive="#DC2626"
-          emissiveIntensity={isTrainStoppedHere ? 2.0 : 0.8}
+          emissiveIntensity={isTrainStoppedHere ? 2.2 : 0.9}
         />
       </mesh>
 
-      {/* Painted Center Track Stop Marker Bar on Railway Ballast */}
-      <mesh position={[-2.18, 0.25, 0]}>
+      {/* Painted Center Track Stop Marker Bar on Railway Ballast (X = +2.18, Z = 0) */}
+      <mesh position={[2.18, 0.02, 0]}>
         <boxGeometry args={[0.9, 0.02, 0.4]} />
         <meshStandardMaterial
           color="#FACC15"
@@ -93,14 +95,14 @@ export const RailwayStation: React.FC<RailwayStationProps> = ({
         />
       </mesh>
 
-      {/* Station Octagonal Red STOP Sign Post on Platform */}
-      <group position={[-1.15, 0.44, 0]}>
+      {/* Octagonal Red STOP Sign Post on Platform Trackside Edge (X = +1.15, Z = 0) */}
+      <group position={[1.15, 0.44, 0]}>
         <mesh position={[0, 0.9, 0]} castShadow>
           <cylinderGeometry args={[0.04, 0.04, 1.8, 12]} />
           <meshStandardMaterial color="#475569" metalness={0.7} />
         </mesh>
         {/* Octagonal STOP Sign Facing Arriving Train (Looking from -Z) */}
-        <mesh position={[0, 1.7, 0]} rotation={[0, 0, 0]} castShadow>
+        <mesh position={[0, 1.7, 0]} castShadow>
           <cylinderGeometry args={[0.26, 0.26, 0.04, 8]} />
           <meshStandardMaterial color="#DC2626" roughness={0.3} />
         </mesh>
@@ -111,93 +113,10 @@ export const RailwayStation: React.FC<RailwayStationProps> = ({
       </group>
 
       {/* ==================================================================
-          3. PLATFORM END STRUCTURES
+          3. PLATFORM EXIT SIGNALS & END INDICATORS
           ================================================================== */}
-      {/* Intermediate Stations: Platform End Warning Board at Z = +7.2 */}
-      {!isTerminus && (
-        <group position={[-0.8, 0.44, 7.2]}>
-          <mesh position={[0, 0.6, 0]} castShadow>
-            <cylinderGeometry args={[0.04, 0.04, 1.2, 12]} />
-            <meshStandardMaterial color="#334155" />
-          </mesh>
-          <mesh position={[0, 1.1, 0]} rotation={[0, 0, 0]} castShadow>
-            <boxGeometry args={[0.6, 0.35, 0.05]} />
-            <meshStandardMaterial color="#FACC15" roughness={0.4} />
-          </mesh>
-          <mesh position={[0, 1.1, -0.03]}>
-            <planeGeometry args={[0.5, 0.25]} />
-            <meshStandardMaterial color="#0F172A" />
-          </mesh>
-        </group>
-      )}
-
-      {/* Station 8 (Grand Terminus): Physical Railway Buffer Stop over Track! */}
-      {isTerminus && (
-        <group position={[-2.18, 0.25, 4.2]}>
-          {/* Heavy Steel Frame Posts */}
-          <mesh position={[-0.45, 0.6, 0]} castShadow>
-            <boxGeometry args={[0.16, 1.2, 0.16]} />
-            <meshStandardMaterial color="#334155" metalness={0.8} />
-          </mesh>
-          <mesh position={[0.45, 0.6, 0]} castShadow>
-            <boxGeometry args={[0.16, 1.2, 0.16]} />
-            <meshStandardMaterial color="#334155" metalness={0.8} />
-          </mesh>
-          {/* Hydraulic Buffer Dampers */}
-          <mesh position={[-0.45, 0.7, -0.25]} rotation={[Math.PI / 2, 0, 0]}>
-            <cylinderGeometry args={[0.09, 0.09, 0.4, 16]} />
-            <meshStandardMaterial color="#F59E0B" metalness={0.7} />
-          </mesh>
-          <mesh position={[0.45, 0.7, -0.25]} rotation={[Math.PI / 2, 0, 0]}>
-            <cylinderGeometry args={[0.09, 0.09, 0.4, 16]} />
-            <meshStandardMaterial color="#F59E0B" metalness={0.7} />
-          </mesh>
-          {/* Heavy Wooden/Steel Buffer Beam (Yellow/Black Hazard) */}
-          <mesh position={[0, 0.7, -0.45]} castShadow>
-            <boxGeometry args={[1.5, 0.35, 0.15]} />
-            <meshStandardMaterial color="#FACC15" roughness={0.4} />
-          </mesh>
-          {/* Terminal Red Stop Lamp on Top */}
-          <mesh position={[0, 1.25, -0.4]}>
-            <sphereGeometry args={[0.14, 16, 16]} />
-            <meshStandardMaterial
-              color="#EF4444"
-              emissive="#EF4444"
-              emissiveIntensity={2.5}
-            />
-          </mesh>
-        </group>
-      )}
-
-      {/* ==================================================================
-          4. PLATFORM LIGHTING & DEPARTURE RAILWAY SIGNAL
-          ================================================================== */}
-      {/* Platform Lamp Posts (Z = -5.0, Z = 0.0, Z = +5.0) */}
-      {[-5.0, 0.0, 5.0].map((zPos, idx) => (
-        <group key={`lamp-${idx}`} position={[1.15, 0.44, zPos]}>
-          <mesh position={[0, 1.4, 0]} castShadow>
-            <cylinderGeometry args={[0.05, 0.06, 2.8, 12]} />
-            <meshStandardMaterial color="#1E293B" metalness={0.6} />
-          </mesh>
-          {/* Lamp Arm */}
-          <mesh position={[-0.2, 2.75, 0]} rotation={[0, 0, 0.4]}>
-            <cylinderGeometry args={[0.04, 0.04, 0.5, 8]} />
-            <meshStandardMaterial color="#1E293B" />
-          </mesh>
-          {/* Warm Glowing Lantern */}
-          <mesh position={[-0.35, 2.8, 0]}>
-            <cylinderGeometry args={[0.14, 0.08, 0.22, 12]} />
-            <meshStandardMaterial
-              color="#FEF08A"
-              emissive="#FEF08A"
-              emissiveIntensity={1.8}
-            />
-          </mesh>
-        </group>
-      ))}
-
-      {/* Departure Railway Signal at Platform Exit (Z = +6.8, facing train) */}
-      <group position={[-1.15, 0.44, 6.6]}>
+      {/* Departure Railway Signal Post at Platform Exit (X = +1.15, Z = +6.6, facing train) */}
+      <group position={[1.15, 0.44, 6.6]}>
         <mesh position={[0, 1.3, 0]} castShadow>
           <cylinderGeometry args={[0.05, 0.05, 2.6, 12]} />
           <meshStandardMaterial color="#334155" metalness={0.7} />
@@ -207,7 +126,7 @@ export const RailwayStation: React.FC<RailwayStationProps> = ({
           <boxGeometry args={[0.26, 0.65, 0.22]} />
           <meshStandardMaterial color="#0F172A" />
         </mesh>
-        {/* Signal Lenses: Green turns on when stopped, Amber when moving */}
+        {/* Signal Lenses: Emerald Green when stopped, Amber when moving */}
         <mesh position={[0, 2.55, -0.12]}>
           <circleGeometry args={[0.07, 16]} />
           <meshStandardMaterial
@@ -226,47 +145,105 @@ export const RailwayStation: React.FC<RailwayStationProps> = ({
         </mesh>
       </group>
 
+      {/* Intermediate Stations: Platform End Warning Board at Z = +7.2 */}
+      {!isTerminus && (
+        <group position={[1.15, 0.44, 7.2]}>
+          <mesh position={[0, 0.6, 0]} castShadow>
+            <cylinderGeometry args={[0.04, 0.04, 1.2, 12]} />
+            <meshStandardMaterial color="#334155" />
+          </mesh>
+          <mesh position={[0, 1.1, 0]} castShadow>
+            <boxGeometry args={[0.6, 0.35, 0.05]} />
+            <meshStandardMaterial color="#FACC15" roughness={0.4} />
+          </mesh>
+          <mesh position={[0, 1.1, -0.03]}>
+            <planeGeometry args={[0.5, 0.25]} />
+            <meshStandardMaterial color="#0F172A" />
+          </mesh>
+        </group>
+      )}
+
+      {/* Terminal Station Banner Post at Z = +7.2 */}
+      {isTerminus && (
+        <group position={[0, 0.44, 7.2]}>
+          <mesh position={[0, 1.1, 0]} castShadow>
+            <boxGeometry args={[2.2, 0.5, 0.08]} />
+            <meshStandardMaterial color="#DC2626" roughness={0.3} />
+          </mesh>
+          <mesh position={[0, 1.1, -0.05]}>
+            <planeGeometry args={[2.0, 0.36]} />
+            <meshStandardMaterial color="#FFFFFF" />
+          </mesh>
+        </group>
+      )}
+
+      {/* ==================================================================
+          4. PLATFORM LIGHTING LANTERN POSTS (Rear Edge at X = -1.15)
+          ================================================================== */}
+      {[-5.0, 0.0, 5.0].map((zPos, idx) => (
+        <group key={`lamp-${idx}`} position={[-1.15, 0.44, zPos]}>
+          <mesh position={[0, 1.4, 0]} castShadow>
+            <cylinderGeometry args={[0.05, 0.06, 2.8, 12]} />
+            <meshStandardMaterial color="#1E293B" metalness={0.6} />
+          </mesh>
+          {/* Lamp Arm towards platform center */}
+          <mesh position={[0.2, 2.75, 0]} rotation={[0, 0, -0.4]}>
+            <cylinderGeometry args={[0.04, 0.04, 0.5, 8]} />
+            <meshStandardMaterial color="#1E293B" />
+          </mesh>
+          {/* Warm Glowing Lantern */}
+          <mesh position={[0.35, 2.8, 0]}>
+            <cylinderGeometry args={[0.14, 0.08, 0.22, 12]} />
+            <meshStandardMaterial
+              color="#FEF08A"
+              emissive="#FEF08A"
+              emissiveIntensity={1.8}
+            />
+          </mesh>
+        </group>
+      ))}
+
       {/* ==================================================================
           5. COLOURFUL CANOPY, WAITING BENCHES & FLOWER PLANTERS
           ================================================================== */}
-      <group position={[0.5, 0.44, 0]}>
-        {/* Support Columns */}
+      <group position={[-0.3, 0.44, 0]}>
+        {/* Support Columns along rear */}
         {[-4.0, 0, 4.0].map((z, idx) => (
-          <mesh key={`col-${idx}`} position={[0, 1.4, z]} castShadow>
+          <mesh key={`col-${idx}`} position={[-0.5, 1.4, z]} castShadow>
             <cylinderGeometry args={[0.08, 0.08, 2.8, 12]} />
             <meshStandardMaterial color="#FFFFFF" roughness={0.3} />
           </mesh>
         ))}
 
-        {/* Slanted Canopy Roof (Station Signature Roof Color) */}
-        <mesh position={[-0.35, 2.85, 0]} rotation={[0, 0, -0.1]} castShadow>
+        {/* Slanted Canopy Roof */}
+        <mesh position={[0.2, 2.85, 0]} rotation={[0, 0, 0.1]} castShadow>
           <boxGeometry args={[2.3, 0.12, 10.5]} />
           <meshStandardMaterial color={station.roofColor} roughness={0.4} />
         </mesh>
 
         {/* Decorative Roof Trim */}
-        <mesh position={[-1.5, 2.73, 0]} rotation={[0, 0, -0.1]}>
+        <mesh position={[1.35, 2.73, 0]} rotation={[0, 0, 0.1]}>
           <boxGeometry args={[0.06, 0.16, 10.5]} />
           <meshStandardMaterial color={station.bannerColor} roughness={0.4} />
         </mesh>
 
-        {/* Waiting Benches */}
-        <group position={[0.2, 0.25, -2.0]}>
+        {/* Waiting Benches on rear deck */}
+        <group position={[-0.5, 0.25, -2.0]}>
           <mesh castShadow>
             <boxGeometry args={[0.6, 0.4, 1.6]} />
             <meshStandardMaterial color="#78350F" roughness={0.6} />
           </mesh>
         </group>
-        <group position={[0.2, 0.25, 2.0]}>
+        <group position={[-0.5, 0.25, 2.0]}>
           <mesh castShadow>
             <boxGeometry args={[0.6, 0.4, 1.6]} />
             <meshStandardMaterial color="#78350F" roughness={0.6} />
           </mesh>
         </group>
 
-        {/* Flower Planter Boxes along back edge */}
+        {/* Flower Planter Boxes along rear edge */}
         {[-3.0, 3.0].map((zPos, bIdx) => (
-          <group key={`planter-${bIdx}`} position={[0.7, 0.2, zPos]}>
+          <group key={`planter-${bIdx}`} position={[-0.8, 0.2, zPos]}>
             <mesh castShadow>
               <boxGeometry args={[0.5, 0.35, 1.4]} />
               <meshStandardMaterial color="#854D0E" roughness={0.7} />
@@ -287,9 +264,9 @@ export const RailwayStation: React.FC<RailwayStationProps> = ({
       {/* ==================================================================
           6. LARGE READABLE STATION NAMEBOARD (Facing Arriving Train at Z = -5.8)
           ================================================================== */}
-      <group position={[0.2, 0.5, -5.8]}>
+      <group position={[-0.2, 0.5, -5.8]}>
         <Billboard follow={true}>
-          {/* Main Board Plate (Ivory with Station Colored Border) */}
+          {/* Main Board Plate */}
           <mesh castShadow>
             <boxGeometry args={[3.8, 1.4, 0.08]} />
             <meshStandardMaterial color="#FFFFFF" roughness={0.2} />
@@ -298,51 +275,90 @@ export const RailwayStation: React.FC<RailwayStationProps> = ({
           {/* Color Header Banner */}
           <mesh position={[0, 0.52, 0.045]}>
             <boxGeometry args={[3.72, 0.28, 0.02]} />
-            <meshStandardMaterial color={station.roofColor} roughness={0.3} />
+            <meshStandardMaterial color={station.accentColor} />
           </mesh>
 
-          {/* Time & Station Code */}
+          {/* Station Number Badge */}
+          <mesh position={[-1.4, 0.52, 0.06]}>
+            <boxGeometry args={[0.6, 0.22, 0.02]} />
+            <meshStandardMaterial color="#0F172A" />
+          </mesh>
+
           <Text
-            fontSize={0.2}
+            position={[-1.4, 0.52, 0.08]}
+            fontSize={0.13}
             color="#FFFFFF"
             anchorX="center"
             anchorY="middle"
-            position={[0, 0.52, 0.06]}
+            font={undefined}
           >
-            {`${station.time} · ${station.code}`}
+            {`STN 0${station.number}`}
+          </Text>
+
+          <Text
+            position={[0.2, 0.52, 0.08]}
+            fontSize={0.14}
+            color="#0F172A"
+            anchorX="center"
+            anchorY="middle"
+            font={undefined}
+          >
+            {`${station.time} · ${station.day}`}
+          </Text>
+
+          {/* Station Name */}
+          <Text
+            position={[0, 0.16, 0.05]}
+            fontSize={0.28}
+            color="#0F172A"
+            anchorX="center"
+            anchorY="middle"
+            font={undefined}
+          >
+            {station.name.toUpperCase()}
           </Text>
 
           {/* Session Title */}
           <Text
-            fontSize={0.22}
-            color="#0F172A"
+            position={[0, -0.22, 0.05]}
+            fontSize={0.17}
+            color="#334155"
             anchorX="center"
             anchorY="middle"
-            position={[0, 0.08, 0.05]}
             maxWidth={3.5}
+            font={undefined}
           >
             {station.sessionTitle}
           </Text>
 
-          {/* Station Subtitle */}
-          <Text
-            fontSize={0.16}
-            color="#475569"
-            anchorX="center"
-            anchorY="middle"
-            position={[0, -0.36, 0.05]}
-          >
-            {`STATION 0${station.number} — ${station.day.toUpperCase()} (${station.name})`}
-          </Text>
+          {/* Terminal Station Eyebrow Tag */}
+          {isTerminus && (
+            <mesh position={[0, -0.52, 0.045]}>
+              <boxGeometry args={[3.72, 0.22, 0.02]} />
+              <meshStandardMaterial color="#DC2626" />
+            </mesh>
+          )}
+          {isTerminus && (
+            <Text
+              position={[0, -0.52, 0.08]}
+              fontSize={0.13}
+              color="#FFFFFF"
+              anchorX="center"
+              anchorY="middle"
+              font={undefined}
+            >
+              FINAL DESTINATION · GRAND TERMINUS
+            </Text>
+          )}
         </Billboard>
       </group>
 
       {/* ==================================================================
-          7. DISTINCTIVE CARTOON LANDMARKS PER STATION
+          7. DISTINCTIVE CARTOON LANDMARKS PER STATION (Rear deck at X = -0.6)
           ================================================================== */}
       {/* Station 1: Welcome Festival Arch */}
       {station.landmark === 'welcome_arch' && (
-        <group position={[0.5, 0.44, 4.2]}>
+        <group position={[-0.6, 0.44, 4.2]}>
           <mesh position={[0, 1.4, 0]} castShadow>
             <cylinderGeometry args={[0.08, 0.08, 2.2, 12]} />
             <meshStandardMaterial color="#EF4444" />
@@ -360,7 +376,7 @@ export const RailwayStation: React.FC<RailwayStationProps> = ({
 
       {/* Station 2: Workshop Gears */}
       {station.landmark === 'workshop_gear' && (
-        <group position={[0.5, 0.44, 4.2]}>
+        <group position={[-0.6, 0.44, 4.2]}>
           <mesh position={[0, 1.2, 0]} castShadow>
             <cylinderGeometry args={[0.08, 0.08, 2.0, 12]} />
             <meshStandardMaterial color="#3A86FF" />
@@ -380,7 +396,7 @@ export const RailwayStation: React.FC<RailwayStationProps> = ({
 
       {/* Station 3: Dining Depot (Striped Cafe Umbrella) */}
       {station.landmark === 'dining_depot' && (
-        <group position={[0.5, 0.44, 4.2]}>
+        <group position={[-0.6, 0.44, 4.2]}>
           <mesh position={[0, 1.8, 0]} castShadow>
             <coneGeometry args={[1.2, 0.65, 16]} />
             <meshStandardMaterial color="#2EC4B6" roughness={0.3} />
@@ -394,7 +410,7 @@ export const RailwayStation: React.FC<RailwayStationProps> = ({
 
       {/* Station 4: Synergy Hub (Glowing Violet Crystal) */}
       {station.landmark === 'synergy_hub' && (
-        <group position={[0.5, 0.44, 4.2]}>
+        <group position={[-0.6, 0.44, 4.2]}>
           <mesh position={[0, 1.3, 0]} castShadow>
             <cylinderGeometry args={[0.07, 0.07, 2.2, 12]} />
             <meshStandardMaterial color="#8338EC" />
@@ -413,12 +429,11 @@ export const RailwayStation: React.FC<RailwayStationProps> = ({
 
       {/* Station 5: Morning Beacon (Lighthouse Beacon Tower) */}
       {station.landmark === 'morning_beacon' && (
-        <group position={[0.5, 0.44, 4.2]}>
+        <group position={[-0.6, 0.44, 4.2]}>
           <mesh position={[0, 1.2, 0]} castShadow>
             <cylinderGeometry args={[0.25, 0.35, 2.4, 16]} />
             <meshStandardMaterial color="#FF7B00" roughness={0.4} />
           </mesh>
-          {/* Beacon Lantern Light */}
           <mesh position={[0, 2.5, 0]}>
             <sphereGeometry args={[0.3, 16, 16]} />
             <meshStandardMaterial
@@ -432,7 +447,7 @@ export const RailwayStation: React.FC<RailwayStationProps> = ({
 
       {/* Station 6: Deep Code Labs (Retro Cyber Cube) */}
       {station.landmark === 'code_lab' && (
-        <group position={[0.5, 0.44, 4.2]}>
+        <group position={[-0.6, 0.44, 4.2]}>
           <mesh position={[0, 1.2, 0]} castShadow>
             <cylinderGeometry args={[0.08, 0.08, 2.0, 12]} />
             <meshStandardMaterial color="#00B4D8" />
@@ -454,7 +469,7 @@ export const RailwayStation: React.FC<RailwayStationProps> = ({
 
       {/* Station 7: Refuel Stop (Water / Steam Tower) */}
       {station.landmark === 'refuel_pavilion' && (
-        <group position={[0.5, 0.44, 4.2]}>
+        <group position={[-0.6, 0.44, 4.2]}>
           <mesh position={[0, 1.4, 0]} castShadow>
             <cylinderGeometry args={[0.42, 0.42, 1.2, 16]} />
             <meshStandardMaterial color="#E76F51" roughness={0.4} />
@@ -468,7 +483,7 @@ export const RailwayStation: React.FC<RailwayStationProps> = ({
 
       {/* Station 8: Grand Terminus (Golden Trophy Podium) */}
       {station.landmark === 'grand_podium' && (
-        <group position={[0.5, 0.44, -1.8]}>
+        <group position={[-0.6, 0.44, 4.2]}>
           <mesh position={[0, 0.8, 0]} castShadow>
             <cylinderGeometry args={[0.55, 0.75, 1.6, 16]} />
             <meshStandardMaterial color="#800020" roughness={0.3} />
@@ -481,26 +496,6 @@ export const RailwayStation: React.FC<RailwayStationProps> = ({
               roughness={0.15}
               emissive="#FFB703"
               emissiveIntensity={isTrainStoppedHere ? 2.0 : 0.6}
-            />
-          </mesh>
-          <mesh position={[0, 2.1, 0]}>
-            <sphereGeometry args={[0.18, 12, 12]} />
-            <meshStandardMaterial color="#FFB703" metalness={0.9} roughness={0.15} />
-          </mesh>
-        </group>
-      )}
-
-      {/* ==================================================================
-          8. ACTIVE ARRIVAL HIGHLIGHT (Glowing Platform Rim when Train Stopped)
-          ================================================================== */}
-      {isTrainStoppedHere && (
-        <group position={[0, 0.46, 0]}>
-          <mesh position={[0, 0.01, 0]}>
-            <boxGeometry args={[2.8, 0.03, 14.2]} />
-            <meshStandardMaterial
-              color={station.accentColor}
-              emissive={station.accentColor}
-              emissiveIntensity={2.5}
             />
           </mesh>
         </group>
