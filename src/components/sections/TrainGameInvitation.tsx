@@ -3,13 +3,15 @@ import { Play, Sparkles, Navigation, Gauge } from 'lucide-react'
 
 interface TrainGameInvitationProps {
   onPlayGame: () => void
+  className?: string
 }
 
 export const TrainGameInvitation: React.FC<TrainGameInvitationProps> = ({
   onPlayGame,
+  className = '',
 }) => {
   return (
-    <div className="w-full mt-12 sm:mt-16 rounded-3xl border border-white/20 bg-gradient-to-b from-[#111111] to-[#080808] p-6 sm:p-10 text-white shadow-2xl relative overflow-hidden">
+    <div className={`w-full rounded-3xl border border-white/20 bg-gradient-to-b from-[#111111] to-[#080808] p-6 sm:p-10 text-white shadow-2xl relative overflow-hidden ${className}`}>
       {/* Decorative Background Tech Lines */}
       <div
         className="absolute inset-0 pointer-events-none opacity-10 bg-[linear-gradient(to_right,#ffffff_1px,transparent_1px),linear-gradient(to_bottom,#ffffff_1px,transparent_1px)] bg-[size:3rem_3rem]"

@@ -167,14 +167,31 @@ export const ScheduleRoadmapSection: React.FC<ScheduleRoadmapSectionProps> = ({
 
   return (
     <section
-      id="schedule"
-      className="relative w-full min-h-screen scroll-mt-16 sm:scroll-mt-20 bg-[#000000] text-white py-16 sm:py-24 lg:py-28 px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20 border-t border-[#1a1a1a] select-none"
+      id="schedule-roadmap"
+      className="relative w-full min-h-screen bg-[#000000] text-white py-16 sm:py-24 lg:py-28 px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20 border-t border-[#1a1a1a] select-none"
     >
       <div className="w-full max-w-[1720px] 2xl:max-w-[1800px] mx-auto">
         {/* ==================================================================
-            1. SECTION HEADER (High-Impact Editorial Header)
+            1. IDEA SPRINT EXPRESS — 3D TRAIN GAME MENU (ABOVE THE SCHEDULE)
             ================================================================== */}
-        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 sm:gap-8 mb-12 sm:mb-16 lg:mb-20">
+        <div id="game-menu" className="mb-14 sm:mb-20 scroll-mt-20">
+          <TrainGameInvitation
+            onPlayGame={
+              onPlayGame ||
+              (() => {
+                window.location.hash = '#/train-game'
+              })
+            }
+          />
+        </div>
+
+        {/* ==================================================================
+            2. SECTION HEADER (High-Impact Editorial Header)
+            ================================================================== */}
+        <div
+          id="schedule"
+          className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 sm:gap-8 mb-12 sm:mb-16 lg:mb-20 scroll-mt-20"
+        >
           <div className="max-w-2xl">
             {/* Identification Label */}
             <div className="flex items-center gap-2.5 mb-3 sm:mb-4">
@@ -385,19 +402,7 @@ export const ScheduleRoadmapSection: React.FC<ScheduleRoadmapSectionProps> = ({
         </div>
 
         {/* ==================================================================
-            3. IDEA SPRINT EXPRESS — 3D TRAIN GAME INVITATION AREA
-            ================================================================== */}
-        <TrainGameInvitation
-          onPlayGame={
-            onPlayGame ||
-            (() => {
-              window.location.hash = '#/train-game'
-            })
-          }
-        />
-
-        {/* ==================================================================
-            4. ROADMAP FOOTER SUMMARY (Clean, Static Technical Footer)
+            3. ROADMAP FOOTER SUMMARY (Clean, Static Technical Footer)
             ================================================================== */}
         <div className="mt-12 sm:mt-16 lg:mt-20 rounded-2xl border border-[#202020] bg-[#080808] p-5 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-4">
