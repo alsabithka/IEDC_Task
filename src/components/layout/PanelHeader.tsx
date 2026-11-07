@@ -25,13 +25,13 @@ export const PanelHeader: React.FC = () => {
           <BrandEmblem className="h-8 sm:h-9 md:h-10 w-auto object-contain shrink-0 transition-transform duration-200 group-hover:scale-105" />
         </a>
 
-        {/* Right: Game & Schedule Shortcut & Compact Hamburger Menu Button */}
+        {/* Right: Loco Game & Schedule Shortcuts & Hamburger Menu Button */}
         <div className="flex items-center gap-3">
           <a
-            href="#game-menu"
-            className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-amber-400/30 bg-amber-400/10 text-xs font-mono uppercase tracking-wider text-amber-300 hover:text-white hover:bg-amber-400/20 transition-all cursor-pointer"
+            href="#/train-game"
+            className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-white/20 bg-white/5 text-xs font-mono uppercase tracking-wider text-white hover:bg-white/10 hover:border-white/40 transition-all cursor-pointer"
           >
-            3D Game
+            Loco Game
           </a>
 
           <a
@@ -67,11 +67,11 @@ export const PanelHeader: React.FC = () => {
             </div>
             <div className="flex items-center gap-2.5">
               <a
-                href="#game-menu"
+                href="#/train-game"
                 onClick={() => setMenuOpen(false)}
-                className="inline-flex items-center justify-center rounded-full border border-amber-400/40 bg-amber-400/10 text-amber-300 px-4 py-2 font-sans text-xs font-bold uppercase tracking-wider hover:bg-amber-400/20 transition-all cursor-pointer"
+                className="inline-flex items-center justify-center rounded-full border border-white/20 bg-white/5 text-white px-4 py-2 font-sans text-xs font-bold uppercase tracking-wider hover:bg-white/10 transition-all cursor-pointer"
               >
-                3D Game
+                Loco Game
               </a>
               <a
                 href="#schedule"
