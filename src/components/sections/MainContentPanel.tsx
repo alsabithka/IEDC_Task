@@ -34,45 +34,45 @@ export const MainContentPanel: React.FC = () => {
   return (
     <section
       id="home"
-      className="relative w-full min-h-[100dvh] flex flex-col justify-center bg-[#000000] text-white pt-16 sm:pt-20 lg:pt-[clamp(4.25rem,8vh,5.5rem)] pb-6 sm:pb-8 lg:pb-[clamp(1rem,2.5vh,2rem)] px-5 sm:px-8 lg:px-12 xl:px-16 overflow-hidden select-none"
+      className="relative w-full min-h-screen flex flex-col justify-center bg-[#000000] text-white pt-16 sm:pt-20 lg:pt-20 xl:pt-24 pb-8 sm:pb-10 lg:pb-12 px-6 sm:px-10 lg:px-12 xl:px-16 2xl:px-20 overflow-hidden select-none"
     >
-      <div className="w-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 xl:gap-12 items-center">
+      <div className="w-full max-w-[1720px] 2xl:max-w-[1800px] mx-auto grid grid-cols-1 lg:grid-cols-[minmax(0,45fr)_minmax(0,55fr)] gap-8 lg:gap-10 xl:gap-14 items-center">
         {/* ==================================================================
-            LEFT COLUMN: IDENTIFICATION LABEL, EDITORIAL STATEMENT, DESCRIPTION, CTA
+            LEFT COLUMN: IDENTIFICATION LABEL, EDITORIAL STATEMENT, DESCRIPTION, CTA (45%)
             ================================================================== */}
         <div
           ref={leftColRef}
-          className="lg:col-span-6 xl:col-span-6 flex flex-col items-start text-left z-10"
+          className="flex flex-col items-start text-left z-10 w-full"
         >
           {/* 1. Identification Label with white bar accent */}
-          <div className="flex items-center gap-2.5 mb-2.5 sm:mb-3.5 lg:mb-[clamp(0.6rem,1.4vh,1.1rem)]">
+          <div className="flex items-center gap-2.5 mb-3 sm:mb-4 lg:mb-5">
             <span
-              className="w-[3px] h-3.5 sm:h-4 bg-white shrink-0 rounded-xs"
+              className="w-[3px] h-4 sm:h-5 bg-white shrink-0 rounded-xs"
               aria-hidden="true"
             />
-            <span className="font-mono text-xs sm:text-sm font-bold uppercase tracking-[0.22em] text-[#D0D0D0]">
+            <span className="font-mono text-xs sm:text-sm md:text-base font-bold uppercase tracking-[0.24em] text-[#D0D0D0]">
               IDEA SPRINT 2026
             </span>
           </div>
 
-          {/* 2. Main Three-Line Editorial Statement */}
-          <h1 className="font-display font-normal uppercase text-white tracking-[-0.01em] leading-[0.96] text-[clamp(2.75rem,10vw,4.2rem)] lg:text-[clamp(2.6rem,min(5vw,9.2vh),5.4rem)] text-left">
+          {/* 2. Main Three-Line Editorial Statement (Large, Bold, High-Impact) */}
+          <h1 className="font-display font-normal uppercase text-white tracking-[-0.015em] leading-[0.93] text-[clamp(3.2rem,8.5vw,4.8rem)] lg:text-[clamp(4.2rem,5.8vw+0.4rem,8.2rem)] text-left">
             <span className="block">IDEAS</span>
             <span className="block">BUILD</span>
             <span className="block">REALITY</span>
           </h1>
 
           {/* 3. Short Event Description */}
-          <p className="mt-3 sm:mt-4 lg:mt-[clamp(0.6rem,1.8vh,1.25rem)] text-sm sm:text-base md:text-lg text-[#D0D0D0] font-sans font-medium leading-relaxed max-w-md sm:max-w-xl text-left">
+          <p className="mt-4 sm:mt-5 lg:mt-6 text-sm sm:text-base md:text-lg lg:text-xl text-[#D0D0D0] font-sans font-medium leading-relaxed max-w-md sm:max-w-xl text-left">
             A 24-hour student ideathon by IEDC BOOTCAMP CEC.
           </p>
 
           {/* 4. Desktop Registration CTA Button */}
-          <div className="mt-5 sm:mt-6 lg:mt-[clamp(1.2rem,2.8vh,2.25rem)] hidden lg:block">
+          <div className="mt-6 sm:mt-8 lg:mt-9 hidden lg:block">
             <a
               href={siteConfig.hero.ctaPrimary.href || '#register'}
               onClick={handleRegisterClick}
-              className="min-w-[240px] sm:min-w-[260px] inline-flex items-center justify-center rounded-full bg-white text-black py-3.5 sm:py-4 px-8 font-sans text-sm sm:text-base font-black uppercase tracking-wider shadow-lg transition-all duration-150 hover:bg-[#EAEAEA] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white text-center cursor-pointer"
+              className="min-w-[240px] sm:min-w-[270px] inline-flex items-center justify-center rounded-full bg-white text-black py-4 px-9 font-sans text-sm sm:text-base font-black uppercase tracking-wider shadow-xl transition-all duration-150 hover:bg-[#EAEAEA] hover:scale-[1.02] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white text-center cursor-pointer"
             >
               REGISTER NOW
             </a>
@@ -80,10 +80,10 @@ export const MainContentPanel: React.FC = () => {
         </div>
 
         {/* ==================================================================
-            RIGHT COLUMN: PLAYFUL CARTOON 3D CALENDAR & STOPWATCH SCENE
+            RIGHT COLUMN: PLAYFUL CARTOON 3D CALENDAR & STOPWATCH SCENE (55%)
             ================================================================== */}
-        <div className="lg:col-span-6 xl:col-span-6 flex flex-col items-center justify-center w-full relative">
-          <div className="w-full h-[380px] sm:h-[440px] lg:h-[clamp(340px,58vh,520px)] flex items-center justify-center relative">
+        <div className="flex flex-col items-center justify-center w-full relative">
+          <div className="w-full h-[400px] sm:h-[480px] lg:h-[min(550px,calc(100vh-160px))] xl:h-[min(630px,calc(100vh-180px))] 2xl:h-[700px] flex items-center justify-center relative">
             <CountdownInstrumentScene
               days={countdown.days}
               hours={countdown.hours}
@@ -95,11 +95,11 @@ export const MainContentPanel: React.FC = () => {
           </div>
 
           {/* Mobile Registration CTA Button (Natural responsive flow beneath 3D scene) */}
-          <div className="mt-4 w-full flex justify-center lg:hidden">
+          <div className="mt-5 w-full flex justify-center lg:hidden">
             <a
               href={siteConfig.hero.ctaPrimary.href || '#register'}
               onClick={handleRegisterClick}
-              className="w-full max-w-[300px] inline-flex items-center justify-center rounded-full bg-white text-black py-3.5 sm:py-4 px-8 font-sans text-sm sm:text-base font-black uppercase tracking-wider shadow-lg transition-all duration-150 hover:bg-[#EAEAEA] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white text-center cursor-pointer"
+              className="w-full max-w-[320px] inline-flex items-center justify-center rounded-full bg-white text-black py-4 px-8 font-sans text-sm sm:text-base font-black uppercase tracking-wider shadow-lg transition-all duration-150 hover:bg-[#EAEAEA] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white text-center cursor-pointer"
             >
               REGISTER NOW
             </a>

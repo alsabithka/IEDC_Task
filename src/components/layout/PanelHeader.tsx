@@ -15,14 +15,14 @@ export const PanelHeader: React.FC = () => {
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 w-full h-14 sm:h-16 bg-[#000000]/95 backdrop-blur-md border-b border-[#222222] transition-colors duration-200 flex items-center">
-      <div className="w-full max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 flex items-center justify-between">
+      <div className="w-full max-w-[1720px] 2xl:max-w-[1800px] mx-auto px-6 sm:px-10 lg:px-12 xl:px-16 2xl:px-20 flex items-center justify-between">
         {/* Left: White IEDC BOOTCAMP Logo */}
         <a
           href="#home"
           className="flex items-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white rounded-sm group py-1"
           aria-label={`${siteConfig.brand.fullName} Home`}
         >
-          <BrandEmblem className="h-7 sm:h-8 md:h-9 w-auto object-contain shrink-0 transition-transform duration-200 group-hover:scale-105" />
+          <BrandEmblem className="h-8 sm:h-9 md:h-10 w-auto object-contain shrink-0 transition-transform duration-200 group-hover:scale-105" />
         </a>
 
         {/* Right: Compact Hamburger Menu Button with subtle border */}
@@ -46,7 +46,7 @@ export const PanelHeader: React.FC = () => {
       {/* Minimal Drawer / Dropdown when Hamburger is Toggled */}
       {menuOpen && (
         <div className="absolute top-full left-0 right-0 w-full bg-[#000000] border-b border-[#222222] animate-in fade-in duration-150">
-          <div className="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <div className="max-w-[1720px] 2xl:max-w-[1800px] mx-auto px-6 sm:px-10 lg:px-12 xl:px-16 2xl:px-20 py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
             <div>
               <p className="font-sans font-bold text-sm text-white">IDEA SPRINT 2026</p>
               <p className="text-xs text-[#777777] mt-0.5">A 24-hour student ideathon by IEDC BOOTCAMP CEC.</p>

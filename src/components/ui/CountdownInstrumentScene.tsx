@@ -39,26 +39,30 @@ function SceneContent({
   // Mobile phones (< 768px): Stacked
   const isStacked = Boolean(isMobile)
 
-  // Side-by-Side: Calendar on LEFT (x = -1.85), Stopwatch on RIGHT (x = 1.85), both centered at y = 0
-  // Stacked: Calendar at y = 1.45, Stopwatch at y = -1.95
+  // Dynamic camera framing and instrument placement based on canvas aspect ratio
+  const aspect = size.width / Math.max(1, size.height)
+
+  const calX = isStacked ? 0 : aspect < 1.3 ? -1.82 : -2.02
+  const stopX = isStacked ? 0 : aspect < 1.3 ? 1.82 : 1.95
+
+  // Side-by-Side: Large dominant Calendar on LEFT, Stopwatch on RIGHT, both centered at y = 0
+  // Stacked: Calendar at y = 1.6, Stopwatch at y = -2.0
   const calendarPos: [number, number, number] = isStacked
-    ? [0, 1.45, 0]
-    : [-1.85, 0, 0]
+    ? [0, 1.6, 0]
+    : [calX, 0, 0]
 
   const stopwatchPos: [number, number, number] = isStacked
-    ? [0, -1.95, 0]
-    : [1.85, 0, 0]
+    ? [0, -2.0, 0]
+    : [stopX, 0, 0]
 
-  // Dynamic camera framing based on canvas aspect ratio
-  const aspect = size.width / Math.max(1, size.height)
   const cameraZ = isStacked
-    ? 9.8
+    ? 9.5
     : aspect < 1.15
-      ? 9.35
-      : aspect < 1.35
-        ? 8.95
-        : 8.65
-  const cameraY = isStacked ? -0.25 : 0
+      ? 8.75
+      : aspect < 1.3
+        ? 8.35
+        : 7.85
+  const cameraY = isStacked ? -0.2 : 0
 
   return (
     <>
@@ -103,18 +107,20 @@ function SceneContent({
         stopwatchY={stopwatchPos[1]}
       />
 
-      {/* ── 1. CARTOON CALENDAR (LEFT in side-by-side, stationary) ── */}
+      {/* ── 1. CARTOON CALENDAR (Dominant instrument on LEFT) ── */}
       <CartoonCalendar3D
         days={days}
         position={calendarPos}
+        scale={isStacked ? 1 : 1.12}
       />
 
-      {/* ── 2. CARTOON STOPWATCH (RIGHT in side-by-side, stationary) ── */}
+      {/* ── 2. CARTOON STOPWATCH (Large, clearly legible on RIGHT) ── */}
       <CartoonStopwatch3D
         hours={hours}
         minutes={minutes}
         seconds={seconds}
         position={stopwatchPos}
+        scale={isStacked ? 0.96 : 1.06}
       />
     </>
   )

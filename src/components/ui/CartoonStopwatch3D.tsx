@@ -8,6 +8,7 @@ interface CartoonStopwatch3DProps {
   minutes: number
   seconds: number
   position?: [number, number, number]
+  scale?: number
 }
 
 function pad2(n: number): string {
@@ -126,6 +127,7 @@ export const CartoonStopwatch3D: React.FC<CartoonStopwatch3DProps> = ({
   minutes,
   seconds,
   position = [0, -2.45, 0],
+  scale = 1,
 }) => {
   const groupRef = useRef<THREE.Group>(null)
   const handRef = useRef<THREE.Group>(null)
@@ -147,15 +149,16 @@ export const CartoonStopwatch3D: React.FC<CartoonStopwatch3DProps> = ({
 
     groupRef.current.scale.set(0.001, 0.001, 0.001)
 
+    const targetScale = scale
     gsap.to(groupRef.current.scale, {
-      x: 1,
-      y: 1,
-      z: 1,
+      x: targetScale,
+      y: targetScale,
+      z: targetScale,
       duration: 0.8,
       ease: 'back.out(1.5)',
       delay: 0.35,
     })
-  }, [])
+  }, [scale])
 
   // Smooth ticking animation for the stylized second hand
   const targetAngleRef = useRef(0)

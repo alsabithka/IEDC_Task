@@ -196,8 +196,8 @@ export const ReactiveSegmentField: React.FC<ReactiveSegmentFieldProps> = ({
   // Perimeter corner brackets
   const decorativeBrackets = useMemo(() => {
     const list: THREE.BufferGeometry[] = []
-    const spanW = isSideBySide ? 4.5 : 2.4
-    const spanH = isSideBySide ? 2.5 : 3.6
+    const spanW = isSideBySide ? 4.7 : 2.4
+    const spanH = isSideBySide ? 2.8 : 3.6
     const cornerSize = 0.28
 
     const corners = [
@@ -331,22 +331,22 @@ export const ReactiveSegmentField: React.FC<ReactiveSegmentFieldProps> = ({
   })
 
   const lineMaterial = useMemo(
-    () => new THREE.LineBasicMaterial({ color: '#FFFFFF', transparent: true, opacity: 0.45 }),
+    () => new THREE.LineBasicMaterial({ color: '#FFFFFF', transparent: true, opacity: 0.58 }),
     []
   )
   const nodeMaterial = useMemo(
     () =>
       new THREE.PointsMaterial({
         color: '#FFFFFF',
-        size: 0.055,
+        size: 0.065,
         transparent: true,
-        opacity: 0.7,
+        opacity: 0.8,
         sizeAttenuation: true,
       }),
     []
   )
   const accentMaterial = useMemo(
-    () => new THREE.LineBasicMaterial({ color: '#777777', transparent: true, opacity: 0.38 }),
+    () => new THREE.LineBasicMaterial({ color: '#888888', transparent: true, opacity: 0.46 }),
     []
   )
 

@@ -7,6 +7,7 @@ import { FlipDatePanel3D } from './FlipDatePanel3D'
 interface CartoonCalendar3DProps {
   days: number
   position?: [number, number, number]
+  scale?: number
 }
 
 function pad2(n: number): string {
@@ -75,6 +76,7 @@ function createDaysLeftTexture(): THREE.CanvasTexture {
 export const CartoonCalendar3D: React.FC<CartoonCalendar3DProps> = ({
   days,
   position = [0, 0.7, 0],
+  scale = 1,
 }) => {
   const groupRef = useRef<THREE.Group>(null)
 
@@ -94,15 +96,16 @@ export const CartoonCalendar3D: React.FC<CartoonCalendar3DProps> = ({
     // Set initial scale
     groupRef.current.scale.set(0.001, 0.001, 0.001)
 
+    const targetScale = scale
     gsap.to(groupRef.current.scale, {
-      x: 1,
-      y: 1,
-      z: 1,
+      x: targetScale,
+      y: targetScale,
+      z: targetScale,
       duration: 0.85,
       ease: 'back.out(1.6)',
       delay: 0.15,
     })
-  }, [])
+  }, [scale])
 
   const daysStr = pad2(days)
 
