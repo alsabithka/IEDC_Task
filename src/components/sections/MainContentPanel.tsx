@@ -3,6 +3,7 @@ import { siteConfig } from '../../config/siteConfig'
 import { scrollToSheet } from '../../lib/scrollUtils'
 import { useEventCountdown } from '../../hooks/useEventCountdown'
 import { CountdownInstrumentScene } from '../ui/CountdownInstrumentScene'
+import { FullPageStickField } from '../ui/FullPageStickField'
 
 function subscribeMobile(callback: () => void) {
   const mq = window.matchMedia('(max-width: 1023px)')
@@ -36,7 +37,10 @@ export const MainContentPanel: React.FC = () => {
       id="home"
       className="relative w-full min-h-screen flex flex-col justify-center bg-[#000000] text-white pt-16 sm:pt-20 lg:pt-20 xl:pt-24 pb-8 sm:pb-10 lg:pb-12 px-6 sm:px-10 lg:px-12 xl:px-16 2xl:px-20 overflow-hidden select-none"
     >
-      <div className="w-full max-w-[1720px] 2xl:max-w-[1800px] mx-auto grid grid-cols-1 lg:grid-cols-[minmax(0,45fr)_minmax(0,55fr)] gap-8 lg:gap-10 xl:gap-14 items-center">
+      {/* ── INTERACTIVE STICK EFFECT ON THE BACKSIDE OF THE WHOLE PAGE ── */}
+      <FullPageStickField isMobile={isMobile} />
+
+      <div className="w-full max-w-[1720px] 2xl:max-w-[1800px] mx-auto grid grid-cols-1 lg:grid-cols-[minmax(0,45fr)_minmax(0,55fr)] gap-8 lg:gap-10 xl:gap-14 items-center relative z-10">
         {/* ==================================================================
             LEFT COLUMN: IDENTIFICATION LABEL, EDITORIAL STATEMENT, DESCRIPTION, CTA (45%)
             ================================================================== */}

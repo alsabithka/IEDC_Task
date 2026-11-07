@@ -1,10 +1,9 @@
 import React, { Suspense, useMemo } from 'react'
-import { Canvas, useThree } from '@react-three/fiber'
+import { Canvas } from '@react-three/fiber'
 import { PerspectiveCamera } from '@react-three/drei'
 import * as THREE from 'three'
 import { CartoonCalendar3D } from './CartoonCalendar3D'
 import { CartoonStopwatch3D } from './CartoonStopwatch3D'
-import { ReactiveSegmentField } from './ReactiveSegmentField'
 
 interface CountdownInstrumentSceneProps {
   days: number
@@ -33,36 +32,24 @@ function SceneContent({
   seconds,
   isMobile = false,
 }: CountdownInstrumentSceneProps) {
-  const { size } = useThree()
-
   // Desktop and Tablet: Always Side-by-Side!
   // Mobile phones (< 768px): Stacked
   const isStacked = Boolean(isMobile)
 
-  // Dynamic camera framing and instrument placement based on canvas aspect ratio
-  const aspect = size.width / Math.max(1, size.height)
-
-  const calX = isStacked ? 0 : aspect < 1.3 ? -1.82 : -2.02
-  const stopX = isStacked ? 0 : aspect < 1.3 ? 1.82 : 1.95
-
-  // Side-by-Side: Large dominant Calendar on LEFT, Stopwatch on RIGHT, both centered at y = 0
-  // Stacked: Calendar at y = 1.6, Stopwatch at y = -2.0
+  // Side-by-Side: Reduced gap between instruments (snug & cohesive pair)
+  // Calendar at x = -1.42, Stopwatch at x = 1.32, both centered vertically at y = 0
+  // Stacked: Calendar at y = 1.45, Stopwatch at y = -1.75
   const calendarPos: [number, number, number] = isStacked
-    ? [0, 1.6, 0]
-    : [calX, 0, 0]
+    ? [0, 1.45, 0]
+    : [-1.42, 0, 0]
 
   const stopwatchPos: [number, number, number] = isStacked
-    ? [0, -2.0, 0]
-    : [stopX, 0, 0]
+    ? [0, -1.75, 0]
+    : [1.32, 0, 0]
 
-  const cameraZ = isStacked
-    ? 9.5
-    : aspect < 1.15
-      ? 8.75
-      : aspect < 1.3
-        ? 8.35
-        : 7.85
-  const cameraY = isStacked ? -0.2 : 0
+  // Frame instruments comfortably with zero edge clipping
+  const cameraZ = isStacked ? 9.2 : 7.9
+  const cameraY = isStacked ? -0.15 : 0
 
   return (
     <>
@@ -98,29 +85,20 @@ function SceneContent({
         color="#FFFFFF"
       />
 
-      {/* ── SURROUNDING SHORT REACTIVE SEGMENT LINE SYSTEM ── */}
-      <ReactiveSegmentField
-        isMobile={isMobile}
-        calendarX={calendarPos[0]}
-        calendarY={calendarPos[1]}
-        stopwatchX={stopwatchPos[0]}
-        stopwatchY={stopwatchPos[1]}
-      />
-
-      {/* ── 1. CARTOON CALENDAR (Dominant instrument on LEFT) ── */}
+      {/* ── 1. CARTOON CALENDAR (Dominant instrument on LEFT, reduced size) ── */}
       <CartoonCalendar3D
         days={days}
         position={calendarPos}
-        scale={isStacked ? 1 : 1.12}
+        scale={isStacked ? 0.88 : 0.90}
       />
 
-      {/* ── 2. CARTOON STOPWATCH (Large, clearly legible on RIGHT) ── */}
+      {/* ── 2. CARTOON STOPWATCH (Clearly legible on RIGHT, reduced size) ── */}
       <CartoonStopwatch3D
         hours={hours}
         minutes={minutes}
         seconds={seconds}
         position={stopwatchPos}
-        scale={isStacked ? 0.96 : 1.06}
+        scale={isStacked ? 0.80 : 0.82}
       />
     </>
   )
