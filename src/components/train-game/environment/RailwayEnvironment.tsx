@@ -18,14 +18,14 @@ const CartoonCottage: React.FC<CottageProps> = ({
 }) => {
   return (
     <group position={position} rotation={[0, rotationY, 0]}>
-      {/* House Body */}
+      {/* House Main Body */}
       <mesh position={[0, 1.1, 0]} castShadow receiveShadow>
         <boxGeometry args={[2.8, 2.2, 2.4]} />
         <meshStandardMaterial color={wallColor} roughness={0.7} />
       </mesh>
 
       {/* Pitched Roof */}
-      <mesh position={[0, 2.65, 0]} rotation={[0, 0, 0]} castShadow>
+      <mesh position={[0, 2.65, 0]} castShadow>
         <coneGeometry args={[2.3, 1.3, 4]} />
         <meshStandardMaterial color={roofColor} roughness={0.5} flatShading />
       </mesh>
@@ -70,29 +70,33 @@ const CartoonCottage: React.FC<CottageProps> = ({
 export const RailwayEnvironment: React.FC = () => {
   const pineTreesRef = useRef<THREE.InstancedMesh>(null)
   const roundTreesRef = useRef<THREE.InstancedMesh>(null)
+  const cherryTreesRef = useRef<THREE.InstancedMesh>(null)
   const rocksRef = useRef<THREE.InstancedMesh>(null)
   const redFlowersRef = useRef<THREE.InstancedMesh>(null)
   const yellowFlowersRef = useRef<THREE.InstancedMesh>(null)
+  const telegraphPolesRef = useRef<THREE.InstancedMesh>(null)
 
-  // Generate deterministic environmental scatter around track
+  // Generate deterministic environmental scatter with GUARANTEED clearance
   const {
     pineMatrices,
     roundTreeMatrices,
+    cherryMatrices,
     rockMatrices,
     redFlowerMatrices,
     yellowFlowerMatrices,
-    signalPositions,
+    telegraphMatrices,
   } = useMemo(() => {
     const curve = getGameRailwayCurve()
     const pines: THREE.Matrix4[] = []
     const roundTrees: THREE.Matrix4[] = []
+    const cherryTrees: THREE.Matrix4[] = []
     const rocks: THREE.Matrix4[] = []
     const redFlowers: THREE.Matrix4[] = []
     const yellowFlowers: THREE.Matrix4[] = []
-    const signals: { position: [number, number, number]; rotation: number }[] = []
+    const telegraphs: THREE.Matrix4[] = []
 
     const dummy = new THREE.Object3D()
-    const samples = 160
+    const samples = 180
 
     for (let i = 0; i < samples; i++) {
       const t = i / samples
@@ -101,19 +105,20 @@ export const RailwayEnvironment: React.FC = () => {
       const up = new THREE.Vector3(0, 1, 0)
       const normal = new THREE.Vector3().crossVectors(tangent, up).normalize()
 
-      // Pseudo-random deterministic offsets based on index
+      // Pseudo-random deterministic offsets
       const seed = Math.sin(i * 12.9898 + 78.233) * 43758.5453
-      const side = (i % 2 === 0 ? 1 : -1)
+      const side = i % 2 === 0 ? 1 : -1
 
-      // Ensure clearance around station platforms
+      // 1. Check Station Proximity to guarantee platform & stopping clearance
       const isNearStation = GAME_STATIONS.some(
-        (stn) => Math.abs(t - stn.trackProgress) < 0.04
+        (stn) => Math.abs(t - stn.trackProgress) < 0.038
       )
 
+      // 2. Trees (Strict clearance > 6.5m from track centerline, > 9m near stations)
       if (!isNearStation) {
-        const distanceOffset = 6.2 + Math.abs(seed % 15)
-        const treeX = pt.x + normal.x * distanceOffset * side
-        const treeZ = pt.z + normal.z * distanceOffset * side
+        const minDistance = 6.8 + Math.abs(seed % 16)
+        const treeX = pt.x + normal.x * minDistance * side
+        const treeZ = pt.z + normal.z * minDistance * side
         const treeY = pt.y
 
         dummy.position.set(treeX, treeY, treeZ)
@@ -122,30 +127,32 @@ export const RailwayEnvironment: React.FC = () => {
         dummy.rotation.y = Math.abs(seed * 5) % Math.PI
         dummy.updateMatrix()
 
-        if (i % 2 === 0) {
+        if (i % 3 === 0) {
           pines.push(dummy.matrix.clone())
-        } else {
+        } else if (i % 3 === 1) {
           roundTrees.push(dummy.matrix.clone())
+        } else {
+          cherryTrees.push(dummy.matrix.clone())
         }
       }
 
-      // Add colorful trackside boulders (outside clearance zone)
-      if (i % 3 === 0 && !isNearStation) {
-        const rockX = pt.x + normal.x * (3.6 + Math.abs(seed % 3.0)) * -side
-        const rockZ = pt.z + normal.z * (3.6 + Math.abs(seed % 3.0)) * -side
+      // 3. Trackside Boulders (safely 3.8m outside rail gauge)
+      if (i % 4 === 0 && !isNearStation) {
+        const rockX = pt.x + normal.x * (3.8 + Math.abs(seed % 2.5)) * -side
+        const rockZ = pt.z + normal.z * (3.8 + Math.abs(seed % 2.5)) * -side
         dummy.position.set(rockX, pt.y + 0.1, rockZ)
-        const rockScale = 0.45 + Math.abs((seed * 7) % 0.5)
+        const rockScale = 0.45 + Math.abs((seed * 7) % 0.4)
         dummy.scale.set(rockScale, rockScale * 0.7, rockScale)
         dummy.updateMatrix()
         rocks.push(dummy.matrix.clone())
       }
 
-      // Add wildflower patches near track edges
-      if (i % 2 === 0) {
-        const flX = pt.x + normal.x * (2.1 + (Math.abs(seed) % 1.5)) * side
-        const flZ = pt.z + normal.z * (2.1 + (Math.abs(seed) % 1.5)) * side
+      // 4. Wildflower Patches along track verges
+      if (i % 2 === 0 && !isNearStation) {
+        const flX = pt.x + normal.x * (2.4 + (Math.abs(seed) % 1.2)) * side
+        const flZ = pt.z + normal.z * (2.4 + (Math.abs(seed) % 1.2)) * side
         dummy.position.set(flX, pt.y + 0.08, flZ)
-        dummy.scale.set(0.25, 0.25, 0.25)
+        dummy.scale.set(0.28, 0.28, 0.28)
         dummy.rotation.y = Math.abs(seed * 2)
         dummy.updateMatrix()
 
@@ -156,25 +163,28 @@ export const RailwayEnvironment: React.FC = () => {
         }
       }
 
-      // Add Railway Trackside Signals every ~18 sample points
-      if (i % 16 === 0) {
-        const sigX = pt.x + normal.x * 2.3
-        const sigZ = pt.z + normal.z * 2.3
+      // 5. Telegraph Poles along the railway embankment (every ~7 samples on inland side)
+      if (i % 7 === 0 && !isNearStation) {
+        // Positioned 3.4m on inland side (-normal)
+        const poleX = pt.x - normal.x * 3.4
+        const poleZ = pt.z - normal.z * 3.4
+        dummy.position.set(poleX, pt.y, poleZ)
         const angle = Math.atan2(tangent.x, tangent.z)
-        signals.push({
-          position: [sigX, pt.y, sigZ],
-          rotation: angle,
-        })
+        dummy.rotation.set(0, angle, 0)
+        dummy.scale.set(1, 1, 1)
+        dummy.updateMatrix()
+        telegraphs.push(dummy.matrix.clone())
       }
     }
 
     return {
       pineMatrices: pines,
       roundTreeMatrices: roundTrees,
+      cherryMatrices: cherryTrees,
       rockMatrices: rocks,
       redFlowerMatrices: redFlowers,
       yellowFlowerMatrices: yellowFlowers,
-      signalPositions: signals,
+      telegraphMatrices: telegraphs,
     }
   }, [])
 
@@ -186,6 +196,10 @@ export const RailwayEnvironment: React.FC = () => {
     if (roundTreesRef.current) {
       roundTreeMatrices.forEach((matrix, i) => roundTreesRef.current!.setMatrixAt(i, matrix))
       roundTreesRef.current.instanceMatrix.needsUpdate = true
+    }
+    if (cherryTreesRef.current) {
+      cherryMatrices.forEach((matrix, i) => cherryTreesRef.current!.setMatrixAt(i, matrix))
+      cherryTreesRef.current.instanceMatrix.needsUpdate = true
     }
     if (rocksRef.current) {
       rockMatrices.forEach((matrix, i) => rocksRef.current!.setMatrixAt(i, matrix))
@@ -199,44 +213,56 @@ export const RailwayEnvironment: React.FC = () => {
       yellowFlowerMatrices.forEach((matrix, i) => yellowFlowersRef.current!.setMatrixAt(i, matrix))
       yellowFlowersRef.current.instanceMatrix.needsUpdate = true
     }
-  }, [pineMatrices, roundTreeMatrices, rockMatrices, redFlowerMatrices, yellowFlowerMatrices])
+    if (telegraphPolesRef.current) {
+      telegraphMatrices.forEach((matrix, i) => telegraphPolesRef.current!.setMatrixAt(i, matrix))
+      telegraphPolesRef.current.instanceMatrix.needsUpdate = true
+    }
+  }, [
+    pineMatrices,
+    roundTreeMatrices,
+    cherryMatrices,
+    rockMatrices,
+    redFlowerMatrices,
+    yellowFlowerMatrices,
+    telegraphMatrices,
+  ])
 
-  // Stylized River Curve winding across the landscape
+  // Stylized River Curve winding across the landscape and under the Station 3 Bridge
   const riverGeometry = useMemo(() => {
     const riverPoints = [
-      new THREE.Vector3(20, -0.15, -90),
-      new THREE.Vector3(45, -0.15, -55),
-      new THREE.Vector3(72, -0.15, -15), // Under bridge
-      new THREE.Vector3(78, -0.15, 15),  // Under bridge
-      new THREE.Vector3(60, -0.15, 50),
-      new THREE.Vector3(15, -0.15, 85),
+      new THREE.Vector3(30, -0.15, -95),
+      new THREE.Vector3(55, -0.15, -50),
+      new THREE.Vector3(76, -0.15, 10), // Under the high elevated Station 3 Bridge (Y=2.8)
+      new THREE.Vector3(68, -0.15, 45),
+      new THREE.Vector3(30, -0.15, 85),
+      new THREE.Vector3(-10, -0.15, 95),
     ]
     const riverCurve = new THREE.CatmullRomCurve3(riverPoints, false, 'centripetal', 0.5)
-    return new THREE.TubeGeometry(riverCurve, 64, 4.2, 10, false)
+    return new THREE.TubeGeometry(riverCurve, 64, 4.5, 10, false)
   }, [])
 
   return (
     <group>
       {/* ==================================================================
-          1. LUSH MEADOW GROUND (Vibrant Cartoon Green)
+          1. LUSH MEADOW GROUND (Vibrant Cartoon Green with Layered Patches)
           ================================================================== */}
       <mesh position={[0, -0.05, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
         <planeGeometry args={[280, 280]} />
         <meshStandardMaterial color="#55B938" roughness={0.85} metalness={0.0} />
       </mesh>
 
-      {/* Varied Grassy Hill Patches (Adds warm green depth) */}
-      <mesh position={[15, -0.03, -10]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
-        <circleGeometry args={[42, 32]} />
+      {/* Grassy Meadow Depth Patches */}
+      <mesh position={[20, -0.03, -15]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
+        <circleGeometry args={[45, 32]} />
         <meshStandardMaterial color="#66C844" roughness={0.9} />
       </mesh>
-      <mesh position={[-35, -0.03, 20]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
-        <circleGeometry args={[38, 32]} />
+      <mesh position={[-35, -0.03, 25]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
+        <circleGeometry args={[42, 32]} />
         <meshStandardMaterial color="#4CAF30" roughness={0.9} />
       </mesh>
 
       {/* ==================================================================
-          2. WINDING BLUE RIVER (Sparkling Cartoon Stream)
+          2. WINDING BLUE RIVER (Sparkling Stream under Bridge)
           ================================================================== */}
       <mesh geometry={riverGeometry} receiveShadow>
         <meshStandardMaterial
@@ -253,100 +279,104 @@ export const RailwayEnvironment: React.FC = () => {
           ================================================================== */}
       <group>
         {/* North Mountain Range */}
-        <group position={[0, 7, -98]}>
+        <group position={[0, 8, -100]}>
           <mesh castShadow receiveShadow>
-            <coneGeometry args={[48, 22, 7]} />
+            <coneGeometry args={[52, 24, 7]} />
             <meshStandardMaterial color="#334155" roughness={0.8} flatShading />
           </mesh>
-          {/* Snowy Peak Top */}
-          <mesh position={[0, 7.8, 0]}>
-            <coneGeometry args={[16, 7.5, 7]} />
+          <mesh position={[0, 8.5, 0]}>
+            <coneGeometry args={[18, 8.2, 7]} />
             <meshStandardMaterial color="#FFFFFF" roughness={0.4} flatShading />
           </mesh>
         </group>
 
-        <group position={[-65, 8, -88]}>
+        <group position={[-68, 8, -92]}>
           <mesh castShadow receiveShadow>
-            <coneGeometry args={[42, 20, 6]} />
+            <coneGeometry args={[44, 22, 6]} />
             <meshStandardMaterial color="#1E3A8A" roughness={0.8} flatShading />
           </mesh>
-          <mesh position={[0, 7.2, 0]}>
-            <coneGeometry args={[14, 6.8, 6]} />
+          <mesh position={[0, 7.8, 0]}>
+            <coneGeometry args={[15, 7.2, 6]} />
             <meshStandardMaterial color="#FFFFFF" roughness={0.4} flatShading />
           </mesh>
         </group>
 
-        <group position={[70, 7, -85]}>
+        <group position={[72, 8, -88]}>
           <mesh castShadow receiveShadow>
-            <coneGeometry args={[40, 18, 7]} />
+            <coneGeometry args={[42, 20, 7]} />
             <meshStandardMaterial color="#0F766E" roughness={0.8} flatShading />
           </mesh>
-          <mesh position={[0, 6.5, 0]}>
-            <coneGeometry args={[13, 6.0, 7]} />
+          <mesh position={[0, 7.0, 0]}>
+            <coneGeometry args={[14, 6.5, 7]} />
             <meshStandardMaterial color="#FFFFFF" roughness={0.4} flatShading />
           </mesh>
         </group>
 
         {/* South Mountain Range */}
-        <group position={[-45, 8, 95]}>
+        <group position={[-50, 9, 98]}>
           <mesh castShadow receiveShadow>
-            <coneGeometry args={[45, 20, 6]} />
+            <coneGeometry args={[48, 22, 6]} />
             <meshStandardMaterial color="#4338CA" roughness={0.8} flatShading />
           </mesh>
-          <mesh position={[0, 7.0, 0]}>
-            <coneGeometry args={[15, 6.8, 6]} />
+          <mesh position={[0, 7.8, 0]}>
+            <coneGeometry args={[16, 7.4, 6]} />
             <meshStandardMaterial color="#FFFFFF" roughness={0.4} flatShading />
           </mesh>
         </group>
 
-        <group position={[55, 9, 90]}>
+        <group position={[58, 9, 92]}>
           <mesh castShadow receiveShadow>
-            <coneGeometry args={[46, 22, 7]} />
+            <coneGeometry args={[48, 24, 7]} />
             <meshStandardMaterial color="#3B82F6" roughness={0.8} flatShading />
           </mesh>
-          <mesh position={[0, 7.8, 0]}>
-            <coneGeometry args={[15, 7.2, 7]} />
+          <mesh position={[0, 8.4, 0]}>
+            <coneGeometry args={[16, 7.8, 7]} />
             <meshStandardMaterial color="#FFFFFF" roughness={0.4} flatShading />
           </mesh>
         </group>
       </group>
 
       {/* ==================================================================
-          4. CHARMING CARTOON COTTAGES & HOUSES
+          4. CHARMING VILLAGE COTTAGES (Carefully placed in scenic glades)
           ================================================================== */}
+      {/* Northbrook Hamlet (Near North Plains) */}
       <CartoonCottage
-        position={[-38, 0, -36]}
+        position={[-30, 0, -38]}
         rotationY={0.6}
         wallColor="#FFFBEB"
         roofColor="#EF4444"
       />
       <CartoonCottage
-        position={[-46, 0, -42]}
+        position={[-38, 0, -42]}
         rotationY={-0.4}
         wallColor="#E0F2FE"
         roofColor="#F97316"
       />
+
+      {/* Southfields Village (Near South Plains) */}
       <CartoonCottage
-        position={[14, 0, 42]}
+        position={[25, 0, 38]}
         rotationY={2.2}
         wallColor="#FEF3C7"
         roofColor="#2563EB"
       />
       <CartoonCottage
-        position={[22, 0, 48]}
+        position={[34, 0, 44]}
         rotationY={1.7}
         wallColor="#FFF1F2"
         roofColor="#8B5CF6"
       />
+
+      {/* Woodcutter's Clearing (Center Glade) */}
       <CartoonCottage
-        position={[-6, 0, 4]}
+        position={[-8, 0, 5]}
         rotationY={-1.2}
         wallColor="#ECFDF5"
         roofColor="#EA580C"
       />
 
       {/* ==================================================================
-          5. INSTANCED PINE TREES (Vibrant Evergreen Emerald)
+          5. INSTANCED STYLIZED PINES (Tiered Evergreen)
           ================================================================== */}
       <instancedMesh
         ref={pineTreesRef}
@@ -359,7 +389,7 @@ export const RailwayEnvironment: React.FC = () => {
       </instancedMesh>
 
       {/* ==================================================================
-          6. INSTANCED ROUND OAK TREES (Lush Cartoon Canopy)
+          6. INSTANCED STYLIZED ROUND OAK TREES (Lush Cartoon Green Canopy)
           ================================================================== */}
       <instancedMesh
         ref={roundTreesRef}
@@ -372,7 +402,20 @@ export const RailwayEnvironment: React.FC = () => {
       </instancedMesh>
 
       {/* ==================================================================
-          7. INSTANCED TRACKSIDE BOULDERS (Warm Slate Pebble Grey)
+          7. INSTANCED BLOSSOMING CHERRY TREES (Soft Pink Canopies)
+          ================================================================== */}
+      <instancedMesh
+        ref={cherryTreesRef}
+        args={[undefined, undefined, cherryMatrices.length]}
+        castShadow
+        receiveShadow
+      >
+        <dodecahedronGeometry args={[1.4, 0]} />
+        <meshStandardMaterial color="#FB7185" roughness={0.7} flatShading />
+      </instancedMesh>
+
+      {/* ==================================================================
+          8. INSTANCED TRACKSIDE BOULDERS (Warm Slate Pebble Grey)
           ================================================================== */}
       <instancedMesh
         ref={rocksRef}
@@ -385,7 +428,7 @@ export const RailwayEnvironment: React.FC = () => {
       </instancedMesh>
 
       {/* ==================================================================
-          8. WILDFLOWER BLOOMS (Red Poppies & Yellow Buttercups)
+          9. WILDFLOWER BLOOMS (Red Poppies & Yellow Buttercups)
           ================================================================== */}
       <instancedMesh
         ref={redFlowersRef}
@@ -404,41 +447,16 @@ export const RailwayEnvironment: React.FC = () => {
       </instancedMesh>
 
       {/* ==================================================================
-          9. RAILWAY TRACKSIDE SIGNAL POSTS (Vibrant Yellow Posts & Jewel Lights)
+          10. TELEGRAPH UTILITY POLES (Along Railway Embankment)
           ================================================================== */}
-      {signalPositions.map((sig, idx) => (
-        <group key={`sig-${idx}`} position={sig.position} rotation={[0, sig.rotation, 0]}>
-          {/* Post (Bright Yellow Safety Post) */}
-          <mesh position={[0, 1.4, 0]} castShadow>
-            <cylinderGeometry args={[0.06, 0.06, 2.8, 12]} />
-            <meshStandardMaterial color="#FACC15" metalness={0.2} roughness={0.4} />
-          </mesh>
-          {/* Signal Housing Box */}
-          <mesh position={[0, 2.5, 0]} castShadow>
-            <boxGeometry args={[0.28, 0.72, 0.22]} />
-            <meshStandardMaterial color="#1E293B" roughness={0.5} />
-          </mesh>
-          {/* Green Signal Lens (Glowing Emerald) */}
-          <mesh position={[0, 2.68, 0.12]}>
-            <circleGeometry args={[0.08, 16]} />
-            <meshStandardMaterial
-              color="#10B981"
-              emissive="#10B981"
-              emissiveIntensity={2.5}
-            />
-          </mesh>
-          {/* Yellow/Amber Signal Lens */}
-          <mesh position={[0, 2.46, 0.12]}>
-            <circleGeometry args={[0.07, 16]} />
-            <meshStandardMaterial color="#78350F" />
-          </mesh>
-          {/* Red Signal Lens */}
-          <mesh position={[0, 2.24, 0.12]}>
-            <circleGeometry args={[0.07, 16]} />
-            <meshStandardMaterial color="#7F1D1D" />
-          </mesh>
-        </group>
-      ))}
+      <instancedMesh
+        ref={telegraphPolesRef}
+        args={[undefined, undefined, telegraphMatrices.length]}
+        castShadow
+      >
+        <cylinderGeometry args={[0.07, 0.09, 3.2, 8]} />
+        <meshStandardMaterial color="#78350F" roughness={0.8} />
+      </instancedMesh>
     </group>
   )
 }

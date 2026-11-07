@@ -1,22 +1,34 @@
 import * as THREE from 'three'
 
-// 14-Waypoint Scenic Circuit defining the 3D Railway Track
-const RAW_TRACK_POINTS = [
-  new THREE.Vector3(-70, 0, -45), // 0: Station 1 (Departure)
-  new THREE.Vector3(-30, 0, -60), // 1: North Valley straight
-  new THREE.Vector3(25, 0, -55),  // 2: Station 2 (Ideation)
-  new THREE.Vector3(65, 1.8, -40),// 3: Bridge Incline
-  new THREE.Vector3(80, 2.4, -5), // 4: Station 3 (Dining Depot)
-  new THREE.Vector3(75, 1.2, 35), // 5: Bridge Decline
-  new THREE.Vector3(40, 0, 60),   // 6: Station 4 (Synergy Hub)
-  new THREE.Vector3(-10, 0, 65),  // 7: South Plains
-  new THREE.Vector3(-55, 0, 50),  // 8: Station 5 (Morning Terminal)
-  new THREE.Vector3(-80, 1.5, 25),// 9: West Forest Rise
-  new THREE.Vector3(-82, 1.8, -5),// 10: Station 6 (Code Labs)
-  new THREE.Vector3(-60, 0.8, -25),// 11: Cutting Descent
-  new THREE.Vector3(-25, 0, -15), // 12: Station 7 (Refuel)
-  new THREE.Vector3(-45, 0, -30), // 13: Station 8 (Grand Terminus) Approach
-]
+// 16-Waypoint Smooth Radial Circuit defining the 3D Railway Track
+// Continuous, non-intersecting, zero subterranean dips, smooth curves.
+const rx = 78
+const rz = 62
+
+const RAW_TRACK_POINTS: THREE.Vector3[] = []
+const WAYPOINT_COUNT = 16
+
+for (let i = 0; i < WAYPOINT_COUNT; i++) {
+  // Angle around circuit starting from North (-Z) proceeding clockwise
+  const angle = (i / WAYPOINT_COUNT) * Math.PI * 2 - Math.PI / 2
+  const x = Math.cos(angle) * (rx + (i % 2 === 0 ? 0 : 3))
+  const z = Math.sin(angle) * (rz + (i % 2 === 0 ? 0 : 2))
+
+  // Base elevation safely above terrain (y = 0.25)
+  let y = 0.25
+  // East scenic bridge over river (inclines and elevated bridge deck)
+  if (i === 3) y = 1.4
+  if (i === 4 || i === 5) y = 2.8
+  if (i === 6) y = 1.4
+  // West forest mountain cutting (inclines and ridge deck)
+  if (i === 11) y = 1.4
+  if (i === 12) y = 2.4
+  if (i === 13) y = 1.4
+
+  RAW_TRACK_POINTS.push(
+    new THREE.Vector3(Number(x.toFixed(2)), y, Number(z.toFixed(2)))
+  )
+}
 
 let cachedCurve: THREE.CatmullRomCurve3 | null = null
 
@@ -24,7 +36,7 @@ export function getGameRailwayCurve(): THREE.CatmullRomCurve3 {
   if (!cachedCurve) {
     cachedCurve = new THREE.CatmullRomCurve3(
       RAW_TRACK_POINTS,
-      true, // closed loop
+      true, // closed continuous loop
       'centripetal',
       0.5
     )
@@ -46,6 +58,7 @@ export function getTrackFrameAt(t: number): {
   const position = curve.getPointAt(normalizedT)
   const tangent = curve.getTangentAt(normalizedT).normalize()
   const up = new THREE.Vector3(0, 1, 0)
+  // Perpendicular outward normal vector relative to tangent
   const normal = new THREE.Vector3().crossVectors(tangent, up).normalize()
 
   return { position, tangent, normal, up }

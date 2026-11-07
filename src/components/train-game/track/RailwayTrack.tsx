@@ -11,16 +11,19 @@ export const RailwayTrack: React.FC = () => {
     ballastGeometry,
     sleeperMatrices,
     bridgePillars,
+    bridgeGuardrails,
   } = useMemo(() => {
     const curve = getGameRailwayCurve()
-    const samples = 360
-    const railOffset = 0.45
+    const samples = 480 // 1 sample per ~0.94 meters
+    const railOffset = 0.48 // Standard model railway gauge
+    const railHeight = 0.12 // Height above ballast
     const up = new THREE.Vector3(0, 1, 0)
 
     const leftPoints: THREE.Vector3[] = []
     const rightPoints: THREE.Vector3[] = []
     const ballastPoints: THREE.Vector3[] = []
     const pillars: { position: [number, number, number]; height: number }[] = []
+    const guardrails: { position: [number, number, number]; rotationY: number }[] = []
 
     for (let i = 0; i < samples; i++) {
       const t = i / samples
@@ -28,33 +31,45 @@ export const RailwayTrack: React.FC = () => {
       const tangent = curve.getTangentAt(t).normalize()
       const normal = new THREE.Vector3().crossVectors(tangent, up).normalize()
 
+      // Left and Right parallel steel rails
       leftPoints.push(
-        new THREE.Vector3().copy(pt).addScaledVector(normal, railOffset).addScaledVector(up, 0.12)
+        new THREE.Vector3().copy(pt).addScaledVector(normal, railOffset).addScaledVector(up, railHeight)
       )
       rightPoints.push(
-        new THREE.Vector3().copy(pt).addScaledVector(normal, -railOffset).addScaledVector(up, 0.12)
+        new THREE.Vector3().copy(pt).addScaledVector(normal, -railOffset).addScaledVector(up, railHeight)
       )
-      ballastPoints.push(new THREE.Vector3().copy(pt).setY(pt.y + 0.02))
 
-      // Check if track is elevated on a bridge
-      if (pt.y > 1.2 && i % 18 === 0) {
-        pillars.push({
-          position: [pt.x, pt.y / 2, pt.z],
-          height: pt.y,
-        })
+      // Continuous ballast gravel bed beneath tracks
+      ballastPoints.push(new THREE.Vector3().copy(pt).setY(Math.max(0.12, pt.y - 0.04)))
+
+      // Elevated bridge support pillars & side guardrails
+      if (pt.y > 1.1) {
+        if (i % 16 === 0) {
+          pillars.push({
+            position: [pt.x, pt.y / 2, pt.z],
+            height: pt.y,
+          })
+        }
+        if (i % 6 === 0) {
+          const angle = Math.atan2(tangent.x, tangent.z)
+          guardrails.push({
+            position: [pt.x, pt.y + 0.35, pt.z],
+            rotationY: angle,
+          })
+        }
       }
     }
 
-    const leftCurve = new THREE.CatmullRomCurve3(leftPoints, true)
-    const rightCurve = new THREE.CatmullRomCurve3(rightPoints, true)
-    const ballastCurve = new THREE.CatmullRomCurve3(ballastPoints, true)
+    const leftCurve = new THREE.CatmullRomCurve3(leftPoints, true, 'centripetal', 0.5)
+    const rightCurve = new THREE.CatmullRomCurve3(rightPoints, true, 'centripetal', 0.5)
+    const ballastCurve = new THREE.CatmullRomCurve3(ballastPoints, true, 'centripetal', 0.5)
 
-    const leftGeom = new THREE.TubeGeometry(leftCurve, 320, 0.05, 8, true)
-    const rightGeom = new THREE.TubeGeometry(rightCurve, 320, 0.05, 8, true)
-    const ballastGeom = new THREE.TubeGeometry(ballastCurve, 320, 0.72, 8, true)
+    const leftGeom = new THREE.TubeGeometry(leftCurve, 420, 0.052, 10, true)
+    const rightGeom = new THREE.TubeGeometry(rightCurve, 420, 0.052, 10, true)
+    const ballastGeom = new THREE.TubeGeometry(ballastCurve, 380, 0.72, 8, true)
 
-    // Calculate Sleepers (Ties) Matrices
-    const sleeperCount = 200
+    // Calculate Sleepers (Ties) Matrices (310 sleepers along 451m circuit)
+    const sleeperCount = 310
     const dummy = new THREE.Object3D()
     const matrices: THREE.Matrix4[] = []
 
@@ -76,6 +91,7 @@ export const RailwayTrack: React.FC = () => {
       ballastGeometry: ballastGeom,
       sleeperMatrices: matrices,
       bridgePillars: pillars,
+      bridgeGuardrails: guardrails,
     }
   }, [])
 
@@ -89,43 +105,69 @@ export const RailwayTrack: React.FC = () => {
 
   return (
     <group>
-      {/* 1. Ballast Bed (Warm Earthy Gravel Strip) */}
+      {/* 1. Continuous Ballast Gravel Bed */}
       <mesh geometry={ballastGeometry} receiveShadow>
-        <meshStandardMaterial color="#8D8374" roughness={0.9} />
+        <meshStandardMaterial color="#78716C" roughness={0.9} />
       </mesh>
 
-      {/* 2. Instanced Sleepers / Ties (Rich Timber Wood Brown) */}
+      {/* 2. Instanced Sleepers / Ties (Rich Treated Timber Wood) */}
       <instancedMesh
         ref={sleepersRef}
         args={[undefined, undefined, sleeperMatrices.length]}
         castShadow
         receiveShadow
       >
-        <boxGeometry args={[1.4, 0.09, 0.28]} />
-        <meshStandardMaterial color="#6B4226" roughness={0.7} />
+        <boxGeometry args={[1.48, 0.09, 0.28]} />
+        <meshStandardMaterial color="#5C3D28" roughness={0.7} />
       </instancedMesh>
 
-      {/* 3. Left Steel Rail (Gleaming Polished Steel) */}
+      {/* 3. Left Continuous Steel Rail (Polished Chrome with Subtle Specular Highlight) */}
       <mesh geometry={leftRailGeometry} castShadow receiveShadow>
-        <meshStandardMaterial color="#F8FAFC" roughness={0.2} metalness={0.8} />
+        <meshStandardMaterial color="#F8FAFC" roughness={0.18} metalness={0.85} />
       </mesh>
 
-      {/* 4. Right Steel Rail (Gleaming Polished Steel) */}
+      {/* 4. Right Continuous Steel Rail */}
       <mesh geometry={rightRailGeometry} castShadow receiveShadow>
-        <meshStandardMaterial color="#F8FAFC" roughness={0.2} metalness={0.8} />
+        <meshStandardMaterial color="#F8FAFC" roughness={0.18} metalness={0.85} />
       </mesh>
 
-      {/* 5. Bridge Rustic Brick Support Pillars */}
+      {/* 5. Bridge Rustic Masonry Pillars with Coping Caps */}
       {bridgePillars.map((pillar, idx) => (
         <group key={`pillar-${idx}`} position={pillar.position}>
+          {/* Main Masonry Pillar */}
           <mesh castShadow receiveShadow>
-            <boxGeometry args={[1.9, pillar.height, 1.9]} />
-            <meshStandardMaterial color="#B91C1C" roughness={0.8} />
+            <boxGeometry args={[2.0, pillar.height, 2.0]} />
+            <meshStandardMaterial color="#991B1B" roughness={0.75} />
           </mesh>
           {/* Stone Coping Cap */}
-          <mesh position={[0, pillar.height / 2 + 0.05, 0]}>
-            <boxGeometry args={[2.1, 0.15, 2.1]} />
-            <meshStandardMaterial color="#F1F5F9" roughness={0.5} />
+          <mesh position={[0, pillar.height / 2 + 0.06, 0]}>
+            <boxGeometry args={[2.2, 0.14, 2.2]} />
+            <meshStandardMaterial color="#F1F5F9" roughness={0.4} />
+          </mesh>
+        </group>
+      ))}
+
+      {/* 6. Elevated Bridge Side Safety Guardrails */}
+      {bridgeGuardrails.map((gr, idx) => (
+        <group key={`guard-${idx}`} position={gr.position} rotation={[0, gr.rotationY, 0]}>
+          {/* Left Railing Post */}
+          <mesh position={[-0.95, 0, 0]} castShadow>
+            <boxGeometry args={[0.08, 0.55, 0.08]} />
+            <meshStandardMaterial color="#FACC15" roughness={0.4} />
+          </mesh>
+          {/* Right Railing Post */}
+          <mesh position={[0.95, 0, 0]} castShadow>
+            <boxGeometry args={[0.08, 0.55, 0.08]} />
+            <meshStandardMaterial color="#FACC15" roughness={0.4} />
+          </mesh>
+          {/* Top Railing Bars */}
+          <mesh position={[-0.95, 0.25, 0]}>
+            <boxGeometry args={[0.06, 0.06, 0.95]} />
+            <meshStandardMaterial color="#FACC15" roughness={0.4} />
+          </mesh>
+          <mesh position={[0.95, 0.25, 0]}>
+            <boxGeometry args={[0.06, 0.06, 0.95]} />
+            <meshStandardMaterial color="#FACC15" roughness={0.4} />
           </mesh>
         </group>
       ))}

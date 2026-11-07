@@ -40,35 +40,43 @@ export const DriverCamera: React.FC<DriverCameraProps> = ({
     const forwardOffset = 0.15
     const sideOffset = 0.0
 
-    // Add subtle speed vibration / track joint click-clack
-    const speedRatio = speedKmh / 65
+    // Add subtle speed vibration / track joint click-clack (only when moving)
+    const absSpeed = Math.abs(speedKmh)
+    const speedRatio = Math.min(1.0, absSpeed / 60)
     const rumble =
-      speedRatio > 0.05
-        ? Math.sin(state.clock.elapsedTime * 24) * 0.008 * speedRatio
+      absSpeed > 0.8
+        ? (Math.sin(state.clock.elapsedTime * 22) * 0.006 +
+           Math.sin(state.clock.elapsedTime * 11) * 0.003) * speedRatio
+        : 0
+
+    // Subtle lateral sway on curves
+    const lateralSway =
+      absSpeed > 0.8
+        ? Math.sin(state.clock.elapsedTime * 4.5) * 0.005 * speedRatio
         : 0
 
     const eyePosition = new THREE.Vector3()
       .copy(trackPos)
       .addScaledVector(up, eyeHeight + rumble)
       .addScaledVector(tangent, forwardOffset)
-      .addScaledVector(normal, sideOffset)
+      .addScaledVector(normal, sideOffset + lateralSway)
 
     camera.position.copy(eyePosition)
 
     // 3. Compute Base Forward Look Direction along Track Tangent
     const forwardTarget = new THREE.Vector3()
       .copy(eyePosition)
-      .addScaledVector(tangent, 15) // Look 15 units ahead on track
+      .addScaledVector(tangent, 16) // Look ahead on track
 
     // 4. Apply Natural Head-Look Angular Offsets (Constrained inside cabin)
-    // Yaw: max +- 22 degrees (0.38 rad)
-    const yawAngle = -pointerLook.current.x * 0.38
+    // Yaw: max +- 24 degrees (0.42 rad)
+    const yawAngle = -pointerLook.current.x * 0.42
     // Pitch: -12 to +8 degrees (-0.21 to +0.14 rad)
     const pitchAngle = pointerLook.current.y * 0.18
 
     // Offset look target based on head turn
-    forwardTarget.addScaledVector(normal, yawAngle * 12)
-    forwardTarget.addScaledVector(up, pitchAngle * 8)
+    forwardTarget.addScaledVector(normal, yawAngle * 14)
+    forwardTarget.addScaledVector(up, pitchAngle * 9)
 
     camera.lookAt(forwardTarget)
   })

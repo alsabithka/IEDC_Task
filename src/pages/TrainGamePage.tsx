@@ -35,6 +35,10 @@ export const TrainGamePage: React.FC<TrainGamePageProps> = ({
     distanceToNextStation,
     activeStation,
     isAtStation,
+    isOvershot,
+    overshotStation,
+    overshotDistanceMeters,
+    reverseToPlatform,
     updatePhysics,
     startEngine,
     restartGame,
@@ -91,10 +95,14 @@ export const TrainGamePage: React.FC<TrainGamePageProps> = ({
           nextStation={nextStation}
           distanceMeters={distanceToNextStation}
           isAtStation={isAtStation}
+          isOvershot={isOvershot}
+          overshotStation={overshotStation}
+          overshotDistanceMeters={overshotDistanceMeters}
           activeStation={activeStation}
           onOpenSessionModal={() => setIsSessionModalOpen(true)}
           onTogglePause={() => setIsPaused((p) => !p)}
           onReturnToWebsite={onReturnToWebsite}
+          onReverseToPlatform={reverseToPlatform}
           onMobileThrottle={setMobileThrottle}
           onMobileBrake={setMobileBrake}
           onMobileInteract={triggerMobileInteract}

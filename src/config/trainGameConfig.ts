@@ -32,7 +32,7 @@ export const GAME_STATIONS: GameStationConfig[] = [
       'Participant check-in, identity verification, workstation allotment, and the official opening ceremony hosted by IEDC BOOTCAMP CEC.',
     venue: 'Main Auditorium Foyer',
     duration: '60 Mins',
-    trackProgress: 0.02,
+    trackProgress: 0.035,
     landmark: 'welcome_arch',
     accentColor: '#FF4757', // Cherry Red
     roofColor: '#E63946',
@@ -51,7 +51,7 @@ export const GAME_STATIONS: GameStationConfig[] = [
       'Keynote workshop, problem statement breakdown, design thinking frameworks, and solution framing methodologies.',
     venue: 'Seminar Hall 1',
     duration: '180 Mins',
-    trackProgress: 0.15,
+    trackProgress: 0.160,
     landmark: 'workshop_gear',
     accentColor: '#3A86FF', // Azure Blue
     roofColor: '#1D3557',
@@ -70,7 +70,7 @@ export const GAME_STATIONS: GameStationConfig[] = [
       'Nutritional recharge, informal interactions, and cross-team networking across diverse engineering disciplines.',
     venue: 'Dining Pavilion',
     duration: '60 Mins',
-    trackProgress: 0.28,
+    trackProgress: 0.285,
     landmark: 'dining_depot',
     accentColor: '#2EC4B6', // Fresh Teal / Mint
     roofColor: '#0081A7',
@@ -89,7 +89,7 @@ export const GAME_STATIONS: GameStationConfig[] = [
       'Interactive team sprint activities, inter-team networking, mentor consultations, and commencement of prototype building.',
     venue: 'Innovation Workspace Arena',
     duration: 'Overnight Sprint',
-    trackProgress: 0.41,
+    trackProgress: 0.410,
     landmark: 'synergy_hub',
     accentColor: '#8338EC', // Purple Violet
     roofColor: '#560BAD',
@@ -108,7 +108,7 @@ export const GAME_STATIONS: GameStationConfig[] = [
       'Day 2 morning sync, progress recap, evaluation criteria review, and sprint timeline checkpoint before final submission sprints.',
     venue: 'Main Auditorium',
     duration: '60 Mins',
-    trackProgress: 0.54,
+    trackProgress: 0.535,
     landmark: 'morning_beacon',
     accentColor: '#FF7B00', // Sunrise Amber
     roofColor: '#E85D04',
@@ -127,7 +127,7 @@ export const GAME_STATIONS: GameStationConfig[] = [
       'High-intensity building session, mentor critique integration, solution polishing, and pitch rehearsals.',
     venue: 'Project Labs & Workstations',
     duration: '180 Mins',
-    trackProgress: 0.67,
+    trackProgress: 0.660,
     landmark: 'code_lab',
     accentColor: '#00B4D8', // Electric Cyan
     roofColor: '#03045E',
@@ -146,7 +146,7 @@ export const GAME_STATIONS: GameStationConfig[] = [
       'Midday meal, final pitch deck checks, audiovisual equipment calibration, and pre-presentation setup.',
     venue: 'Dining Pavilion',
     duration: '60 Mins',
-    trackProgress: 0.80,
+    trackProgress: 0.785,
     landmark: 'refuel_pavilion',
     accentColor: '#E76F51', // Terracotta Coral
     roofColor: '#F4A261',
@@ -165,7 +165,7 @@ export const GAME_STATIONS: GameStationConfig[] = [
       'Team pitch presentations before the evaluation jury, announcement of winners, awards, and valedictory address.',
     venue: 'Main Auditorium Stage',
     duration: 'Final Ceremony',
-    trackProgress: 0.93,
+    trackProgress: 0.910,
     landmark: 'grand_podium',
     accentColor: '#FFB703', // Imperial Gold
     roofColor: '#800020', // Burgundy
@@ -176,9 +176,11 @@ export const GAME_STATIONS: GameStationConfig[] = [
 // Train physics configuration constants
 export const TRAIN_PHYSICS_CONFIG = {
   maxSpeedKmh: 65, // km/h
-  accelerationRate: 14, // km/h per second at 100% throttle
-  brakeDecelerationRate: 22, // km/h per second at 100% brake
+  maxReverseSpeedKmh: 18, // km/h reverse speed
+  accelerationRate: 15, // km/h per second at 100% throttle
+  brakeDecelerationRate: 24, // km/h per second at 100% brake
   naturalFrictionRate: 3.5, // km/h per second coasting decay
-  trackLengthMeters: 450, // simulated total track circuit length
-  stoppingZoneTolerance: 0.016, // normalized track distance where train is considered at the platform
+  trackLengthMeters: 451.1, // simulated total track circuit length
+  stoppingZoneToleranceMeters: 8.5, // distance (meters) tolerance where train is in designated stop zone
+  stoppingZoneTolerance: 0.0188, // normalized track distance where train is considered at the platform
 }
