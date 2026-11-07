@@ -1,5 +1,7 @@
-import React, { useState } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import { TrainGamePromo } from './TrainGamePromo'
+import gsap from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import {
   Clock,
   MapPin,
@@ -15,6 +17,8 @@ import {
   ArrowRight,
   ArrowDown,
 } from 'lucide-react'
+
+gsap.registerPlugin(ScrollTrigger)
 
 export interface RoadmapMilestone {
   id: string
@@ -163,12 +167,119 @@ export const ScheduleRoadmapSection: React.FC<ScheduleRoadmapSectionProps> = ({
 }) => {
   const [activeTab, setActiveTab] = useState<'day1' | 'day2'>('day1')
 
+  const trackContainerRef = useRef<HTMLDivElement>(null)
+  const progressBarRef = useRef<HTMLDivElement>(null)
+  const milestoneRefs = useRef<(HTMLDivElement | null)[]>([])
+  const nodeRefs = useRef<(HTMLDivElement | null)[]>([])
+  const finishNodeRef = useRef<HTMLDivElement>(null)
+
+  const handleTabChange = (tab: 'day1' | 'day2') => {
+    setActiveTab(tab)
+    setTimeout(() => {
+      ScrollTrigger.refresh()
+    }, 150)
+  }
+
+  // GSAP ScrollTrigger: White progress line + Station highlight + Roadmap cards slowly unrevealing
+  useEffect(() => {
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    if (prefersReducedMotion || !trackContainerRef.current) return
+
+    const ctx = gsap.context(() => {
+      // 1. Left side white line showing scroll progress
+      if (progressBarRef.current && trackContainerRef.current) {
+        gsap.fromTo(
+          progressBarRef.current,
+          { scaleY: 0, transformOrigin: 'top center' },
+          {
+            scaleY: 1,
+            ease: 'none',
+            scrollTrigger: {
+              trigger: trackContainerRef.current,
+              start: 'top 75%',
+              end: 'bottom 85%',
+              scrub: 0.4,
+            },
+          }
+        )
+      }
+
+      // 2. Each station node highlights & milestone card slowly unreveals as scroll reaches it
+      milestoneRefs.current.forEach((cardEl, idx) => {
+        if (!cardEl) return
+        const nodeEl = nodeRefs.current[idx]
+
+        // Faint initial state
+        gsap.set(cardEl, { autoAlpha: 0.2, y: 16 })
+        if (nodeEl) {
+          gsap.set(nodeEl, {
+            backgroundColor: '#121212',
+            color: '#777777',
+            borderColor: 'rgba(255, 255, 255, 0.25)',
+          })
+        }
+
+        const tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: cardEl,
+            start: 'top 85%',
+            end: 'top 55%',
+            scrub: 0.4,
+          },
+        })
+
+        // Slowly unreveal the card
+        tl.to(cardEl, {
+          autoAlpha: 1,
+          y: 0,
+          ease: 'power2.out',
+        })
+
+        // Highlight current station on left line
+        if (nodeEl) {
+          tl.to(
+            nodeEl,
+            {
+              backgroundColor: '#ffffff',
+              color: '#000000',
+              borderColor: '#ffffff',
+              boxShadow: '0 0 14px rgba(255, 255, 255, 0.7)',
+              scale: 1.1,
+              ease: 'power2.out',
+            },
+            0
+          )
+        }
+      })
+
+      // 3. Highlight finish node at destination
+      if (finishNodeRef.current) {
+        gsap.fromTo(
+          finishNodeRef.current,
+          { scale: 0.85, opacity: 0.4 },
+          {
+            scale: 1,
+            opacity: 1,
+            scrollTrigger: {
+              trigger: finishNodeRef.current,
+              start: 'top 90%',
+              end: 'top 70%',
+              scrub: 0.4,
+            },
+          }
+        )
+      }
+    }, trackContainerRef)
+
+    return () => ctx.revert()
+  }, [activeTab])
+
   const visibleDays = SCHEDULE_ROADMAP.filter((day) => day.dayId === activeTab)
 
   return (
     <section
       id="schedule"
-      className="relative w-full min-h-screen scroll-mt-16 sm:scroll-mt-20 bg-[#000000] text-white py-16 sm:py-24 lg:py-28 px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20 border-t border-[#1a1a1a] select-none"
+      className="relative w-full min-h-screen scroll-mt-16 sm:scroll-mt-20 bg-[#000000] text-white pt-12 sm:pt-16 lg:pt-20 pb-4 sm:pb-6 px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20 border-t border-[#1a1a1a] select-none"
     >
       <div className="w-full max-w-[1720px] 2xl:max-w-[1800px] mx-auto">
         {/* ==================================================================
@@ -208,14 +319,14 @@ export const ScheduleRoadmapSection: React.FC<ScheduleRoadmapSectionProps> = ({
         </div>
 
         {/* ==================================================================
-            3. DAY 1 / DAY 2 TAB SELECTOR (BROUGHT DOWN AFTER GAME SESSION)
+            3. DAY 1 / DAY 2 TAB SELECTOR (SMOOTH TOGGLE TRANSFER)
             ================================================================== */}
         <div id="day-tab-selector" className="w-full max-w-4xl mx-auto flex items-center justify-between mb-6 sm:mb-8 scroll-mt-24">
           <div className="flex items-center gap-2 p-1.5 rounded-full bg-[#0d0d0d] border border-[#222222]">
             <button
               type="button"
-              onClick={() => setActiveTab('day1')}
-              className={`px-5 sm:px-7 py-2 rounded-full font-sans text-xs sm:text-sm font-bold uppercase tracking-wider transition-all duration-150 cursor-pointer ${
+              onClick={() => handleTabChange('day1')}
+              className={`px-5 sm:px-7 py-2 rounded-full font-sans text-xs sm:text-sm font-bold uppercase tracking-wider transition-all duration-300 ease-out cursor-pointer ${
                 activeTab === 'day1'
                   ? 'bg-white text-black shadow-md'
                   : 'text-[#888888] hover:text-white hover:bg-white/5'
@@ -225,8 +336,8 @@ export const ScheduleRoadmapSection: React.FC<ScheduleRoadmapSectionProps> = ({
             </button>
             <button
               type="button"
-              onClick={() => setActiveTab('day2')}
-              className={`px-5 sm:px-7 py-2 rounded-full font-sans text-xs sm:text-sm font-bold uppercase tracking-wider transition-all duration-150 cursor-pointer ${
+              onClick={() => handleTabChange('day2')}
+              className={`px-5 sm:px-7 py-2 rounded-full font-sans text-xs sm:text-sm font-bold uppercase tracking-wider transition-all duration-300 ease-out cursor-pointer ${
                 activeTab === 'day2'
                   ? 'bg-white text-black shadow-md'
                   : 'text-[#888888] hover:text-white hover:bg-white/5'
@@ -248,7 +359,8 @@ export const ScheduleRoadmapSection: React.FC<ScheduleRoadmapSectionProps> = ({
           {visibleDays.map((daySchedule) => (
             <div
               key={daySchedule.dayId}
-              className="relative flex flex-col rounded-3xl border border-[#202020] bg-[#070707] p-5 sm:p-8 lg:p-10 shadow-2xl"
+              ref={trackContainerRef}
+              className="relative flex flex-col rounded-3xl border border-[#202020] bg-[#070707] p-5 sm:p-8 lg:p-10 shadow-2xl transition-all duration-300 ease-out animate-in fade-in duration-300"
             >
               {/* Day Track Header Bar */}
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 sm:pb-8 border-b border-[#1f1f1f] mb-8 sm:mb-10">
@@ -274,14 +386,8 @@ export const ScheduleRoadmapSection: React.FC<ScheduleRoadmapSectionProps> = ({
 
               {/* Waypoint Start Node */}
               <div className="relative pl-12 sm:pl-16 mb-8">
-                {/* Continuous Road Center Line */}
-                <div
-                  className="absolute left-4 sm:left-6 top-5 bottom-0 w-0.5 border-l-2 border-dashed border-white/25"
-                  aria-hidden="true"
-                />
-
                 {/* Road Start Indicator */}
-                <div className="absolute left-2 sm:left-4 top-0.5 flex h-6 w-6 sm:h-7 sm:w-7 items-center justify-center rounded-full bg-white text-black ring-4 ring-black shadow-lg">
+                <div className="absolute left-2 sm:left-4 top-0.5 flex h-6 w-6 sm:h-7 sm:w-7 items-center justify-center rounded-full bg-white text-black ring-4 ring-black shadow-lg z-10">
                   <Navigation className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-black" />
                 </div>
 
@@ -294,6 +400,16 @@ export const ScheduleRoadmapSection: React.FC<ScheduleRoadmapSectionProps> = ({
 
               {/* Milestones Flow along the Road Track */}
               <div className="space-y-6 sm:space-y-8 relative">
+                {/* Continuous Left Spine: Background dashed line + Dynamic White Progress Line */}
+                <div
+                  className="absolute left-[19px] sm:left-[29px] top-4 bottom-4 w-[2px] border-l-2 border-dashed border-white/20 pointer-events-none"
+                  aria-hidden="true"
+                />
+                <div
+                  ref={progressBarRef}
+                  className="absolute left-[19px] sm:left-[29px] top-4 bottom-4 w-[2px] bg-white pointer-events-none shadow-[0_0_8px_rgba(255,255,255,0.7)]"
+                  aria-hidden="true"
+                />
                 {daySchedule.milestones.map((milestone, mIdx) => {
                   const Icon = milestone.icon
                   const isLast = mIdx === daySchedule.milestones.length - 1
@@ -303,15 +419,13 @@ export const ScheduleRoadmapSection: React.FC<ScheduleRoadmapSectionProps> = ({
                       key={milestone.id}
                       className="relative pl-12 sm:pl-16 group"
                     >
-                      {/* Vertical Road Spine running through this milestone */}
+                      {/* Connecting down arrows */}
                       {!isLast && (
                         <div
-                          className="absolute left-4 sm:left-6 top-8 bottom-[-24px] sm:bottom-[-32px] w-0.5 border-l-2 border-dashed border-white/25 group-hover:border-white transition-colors duration-200"
+                          className="absolute left-[13px] sm:left-[21px] top-1/2 transform -translate-y-1/2 opacity-30 group-hover:opacity-80 transition-opacity pointer-events-none z-10"
                           aria-hidden="true"
                         >
-                          <div className="absolute top-1/2 -left-1 transform -translate-y-1/2 opacity-40 group-hover:opacity-100 transition-opacity">
-                            <ArrowDown className="h-2.5 w-2.5 text-white" />
-                          </div>
+                          <ArrowDown className="h-3 w-3 text-white" />
                         </div>
                       )}
 
@@ -322,14 +436,24 @@ export const ScheduleRoadmapSection: React.FC<ScheduleRoadmapSectionProps> = ({
                       />
 
                       {/* Milestone Stop Node on the Road */}
-                      <div className="absolute left-2 sm:left-4 top-3.5 flex h-6 w-6 sm:h-7 sm:w-7 items-center justify-center rounded-full bg-[#121212] border-2 border-white text-white group-hover:bg-white group-hover:text-black transition-all duration-200 ring-4 ring-black shadow-md z-10">
+                      <div
+                        ref={(el) => {
+                          nodeRefs.current[mIdx] = el
+                        }}
+                        className="absolute left-2 sm:left-4 top-3.5 flex h-6 w-6 sm:h-7 sm:w-7 items-center justify-center rounded-full bg-[#121212] border-2 border-white text-white group-hover:bg-white group-hover:text-black transition-all duration-200 ring-4 ring-black shadow-md z-10"
+                      >
                         <span className="font-mono text-[10px] sm:text-xs font-bold leading-none">
                           {milestone.stepNumber}
                         </span>
                       </div>
 
                       {/* Milestone Road Card */}
-                      <div className="rounded-2xl border border-[#222222] bg-[#0c0c0c] p-4 sm:p-6 transition-all duration-200 group-hover:border-white/40 group-hover:bg-[#121212] group-hover:translate-x-1 shadow-lg">
+                      <div
+                        ref={(el) => {
+                          milestoneRefs.current[mIdx] = el
+                        }}
+                        className="rounded-2xl border border-[#222222] bg-[#0c0c0c] p-4 sm:p-6 transition-all duration-200 group-hover:border-white/40 group-hover:bg-[#121212] group-hover:translate-x-1 shadow-lg"
+                      >
                         {/* Time & Category Badge Row */}
                         <div className="flex flex-wrap items-center justify-between gap-2.5 mb-3">
                           <div className="flex flex-wrap items-center gap-2">
@@ -380,7 +504,10 @@ export const ScheduleRoadmapSection: React.FC<ScheduleRoadmapSectionProps> = ({
 
               {/* Waypoint Finish / Transition Marker */}
               <div className="relative pl-12 sm:pl-16 mt-8 pt-4 border-t border-[#191919]">
-                <div className="absolute left-2 sm:left-4 top-4 flex h-6 w-6 sm:h-7 sm:w-7 items-center justify-center rounded-full bg-white text-black ring-4 ring-black">
+                <div
+                  ref={finishNodeRef}
+                  className="absolute left-2 sm:left-4 top-4 flex h-6 w-6 sm:h-7 sm:w-7 items-center justify-center rounded-full bg-white text-black ring-4 ring-black z-10 transition-transform"
+                >
                   <Flag className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-black" />
                 </div>
                 <div className="flex items-center justify-between">
@@ -396,7 +523,7 @@ export const ScheduleRoadmapSection: React.FC<ScheduleRoadmapSectionProps> = ({
                   </span>
                 </div>
 
-                {/* Day 1 Bottom Action: Go to Day 2 Button */}
+                {/* Day 1 Bottom Action: Go to Day 2 Button (Smoothly transfer to Day 2) */}
                 {daySchedule.dayId === 'day1' && (
                   <div className="mt-6 pt-5 border-t border-[#1f1f1f] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <p className="font-sans text-xs sm:text-sm text-[#888888]">
@@ -405,7 +532,7 @@ export const ScheduleRoadmapSection: React.FC<ScheduleRoadmapSectionProps> = ({
                     <button
                       type="button"
                       onClick={() => {
-                        setActiveTab('day2')
+                        handleTabChange('day2')
                         const trackEl = document.getElementById('day-tab-selector')
                         if (trackEl) {
                           trackEl.scrollIntoView({ behavior: 'smooth' })
@@ -418,9 +545,6 @@ export const ScheduleRoadmapSection: React.FC<ScheduleRoadmapSectionProps> = ({
                     </button>
                   </div>
                 )}
-
-                
-                
               </div>
             </div>
           ))}

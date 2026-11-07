@@ -6,7 +6,7 @@ import { RegistrationForm } from '../registration/RegistrationForm'
 export const RegistrationSection: React.FC = () => {
   return (
     <section id="register" className="relative z-10 w-full border-t border-[#1a1a1a] bg-[#000000] scroll-mt-16 sm:scroll-mt-20">
-      <div className="w-full max-w-[1720px] 2xl:max-w-[1800px] mx-auto px-6 sm:px-10 lg:px-12 xl:px-16 2xl:px-20 py-16 sm:py-24">
+      <div className="w-full max-w-[1720px] 2xl:max-w-[1800px] mx-auto px-6 sm:px-10 lg:px-12 xl:px-16 2xl:px-20 pt-6 sm:pt-8 pb-16 sm:pb-20">
         {/* Section Header */}
         <div className="max-w-3xl mb-10 sm:mb-14">
           <div className="flex items-center gap-2.5 mb-3 sm:mb-4">
