@@ -8,8 +8,6 @@ import {
   Flag,
   Navigation,
   ArrowRight,
-  CheckCircle2,
-  Sparkles,
 } from 'lucide-react'
 import type { DaySchedule } from './ScheduleRoadmapSection'
 
@@ -200,15 +198,17 @@ export const Day1CinematicTrack: React.FC<Day1CinematicTrackProps> = ({
         }
       )
 
-      // Scroll-Driven Timeline Drawing (Fine glowing white hairline stopping cleanly at the flag)
+      // Scroll-Driven Timeline Drawing (Fine glowing white hairline connecting directly to the flag symbol)
+      // Progress line draws as the route approaches the vertical centre of the page
       gsap.to(svgLineRef.current, {
         strokeDashoffset: 0,
         ease: 'none',
         scrollTrigger: {
-          trigger: innerTrackRef.current,
-          start: 'top 75%',
-          end: 'bottom 80%',
-          scrub: 0.4,
+          trigger: startNodeRef.current,
+          start: 'top 65%',
+          endTrigger: finishNodeRef.current,
+          end: 'center center',
+          scrub: 0.3,
           onRefresh: (self) => {
             const h = calculateLineGeometry()
             if (svgLineRef.current) {
@@ -221,7 +221,7 @@ export const Day1CinematicTrack: React.FC<Day1CinematicTrackProps> = ({
         },
       })
 
-      // Station Destinations Sequence: Each marker activates & card reveals
+      // Station Destinations Sequence: Marker activates & card reveals as event detail approaches center of the page
       cardRefs.current.forEach((card, idx) => {
         if (!card) return
         const node = nodeRefs.current[idx]
@@ -233,9 +233,9 @@ export const Day1CinematicTrack: React.FC<Day1CinematicTrackProps> = ({
         const cardTl = gsap.timeline({
           scrollTrigger: {
             trigger: card,
-            start: 'top 82%',
-            end: 'top 52%',
-            scrub: 0.4,
+            start: 'top 75%',
+            end: 'top 48%',
+            scrub: 0.3,
           },
         })
 
@@ -294,13 +294,14 @@ export const Day1CinematicTrack: React.FC<Day1CinematicTrackProps> = ({
       })
 
       // Final Destination: Finish Flag & Day 1 Completion Sequence
+      // Activates as the flag approaches the center of the page
       if (finishNodeRef.current) {
         const finishTl = gsap.timeline({
           scrollTrigger: {
             trigger: finishNodeRef.current,
-            start: 'top 88%',
-            end: 'top 65%',
-            scrub: 0.4,
+            start: 'top 75%',
+            end: 'center center',
+            scrub: 0.3,
           },
         })
 
@@ -372,16 +373,9 @@ export const Day1CinematicTrack: React.FC<Day1CinematicTrackProps> = ({
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
-          <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/5 px-3 py-1 font-mono text-[10px] sm:text-[11px] uppercase tracking-wider text-white">
-            <Sparkles className="h-3 w-3 text-white" />
-            <span>LIVE TIMELINE</span>
-          </div>
-
-          <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3.5 py-1 font-mono text-[11px] uppercase tracking-wider text-[#D0D0D0]">
-            <Calendar className="h-3 w-3 text-white" />
-            <span>4 Stations</span>
-          </div>
+        <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3.5 py-1 font-mono text-[11px] uppercase tracking-wider text-[#D0D0D0]">
+          <Calendar className="h-3 w-3 text-white" />
+          <span>4 Stations</span>
         </div>
       </div>
 
@@ -568,10 +562,6 @@ export const Day1CinematicTrack: React.FC<Day1CinematicTrackProps> = ({
               <span className="font-mono text-[11px] text-[#A0A0A0]">
                 Overnight Checkpoint Reached · All 4 Sessions Unlocked
               </span>
-            </div>
-            <div className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/40 bg-emerald-950/40 px-3 py-1 font-mono text-[10px] uppercase tracking-wider text-emerald-300 self-start sm:self-auto">
-              <CheckCircle2 className="h-3 w-3 text-emerald-400" />
-              <span>JOURNEY COMPLETED</span>
             </div>
           </div>
 
