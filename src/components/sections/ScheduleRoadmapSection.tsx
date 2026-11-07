@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { TrainGamePromo } from './TrainGamePromo'
+import { Day1CinematicTrack } from './Day1CinematicTrack'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import {
@@ -186,7 +187,7 @@ export const ScheduleRoadmapSection: React.FC<ScheduleRoadmapSectionProps> = ({
   // GSAP ScrollTrigger: White progress line + Station highlight + Roadmap cards slowly unrevealing
   useEffect(() => {
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    if (prefersReducedMotion || !trackContainerRef.current) return
+    if (prefersReducedMotion || activeTab === 'day1' || !trackContainerRef.current) return
 
     const ctx = gsap.context(() => {
       // Smooth toggle slide animation on container when switching days
@@ -386,17 +387,30 @@ export const ScheduleRoadmapSection: React.FC<ScheduleRoadmapSectionProps> = ({
             4. ROADMAP TRACK (Focused Road Track for Selected Day)
             ================================================================== */}
         <div className="w-full max-w-4xl mx-auto">
-          {visibleDays.map((daySchedule) => (
-            <div
-              key={daySchedule.dayId}
-              ref={trackContainerRef}
-              className="relative flex flex-col rounded-3xl border border-[#202020] bg-[#070707] p-5 sm:p-8 lg:p-10 shadow-2xl transition-all duration-300 ease-out animate-in fade-in duration-300"
-            >
+          {visibleDays.map((daySchedule) =>
+            daySchedule.dayId === 'day1' ? (
+              <Day1CinematicTrack
+                key="day1-cinematic"
+                daySchedule={daySchedule}
+                onGoToDay2={() => {
+                  handleTabChange('day2')
+                  const trackEl = document.getElementById('day-tab-selector')
+                  if (trackEl) {
+                    trackEl.scrollIntoView({ behavior: 'smooth' })
+                  }
+                }}
+              />
+            ) : (
+              <div
+                key={daySchedule.dayId}
+                ref={trackContainerRef}
+                className="relative flex flex-col rounded-3xl border border-[#202020] bg-[#070707] p-5 sm:p-8 lg:p-10 shadow-2xl transition-all duration-300 ease-out animate-in fade-in duration-300"
+              >
               {/* Day Track Header Bar */}
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 sm:pb-8 border-b border-[#1f1f1f] mb-8 sm:mb-10">
                 <div className="flex items-center gap-3">
                   <span className="flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-xl bg-white text-black font-mono font-black text-sm">
-                    {daySchedule.dayId === 'day1' ? '01' : '02'}
+                    02
                   </span>
                   <div>
                     <h3 className="font-sans text-lg sm:text-xl font-black uppercase text-white tracking-tight">
@@ -542,42 +556,16 @@ export const ScheduleRoadmapSection: React.FC<ScheduleRoadmapSectionProps> = ({
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="font-mono text-xs font-bold uppercase tracking-wider text-white">
-                    {daySchedule.dayId === 'day1'
-                      ? 'DAY 01 STAGE COMPLETE'
-                      : 'SPRINT DESTINATION REACHED'}
+                    SPRINT DESTINATION REACHED
                   </span>
                   <span className="font-mono text-[11px] text-[#777777]">
-                    {daySchedule.dayId === 'day1'
-                      ? 'Overnight Checkpoint'
-                      : 'Valedictory & Awards'}
+                    Valedictory & Awards
                   </span>
                 </div>
-
-                {/* Day 1 Bottom Action: Go to Day 2 Button (Smoothly transfer to Day 2) */}
-                {daySchedule.dayId === 'day1' && (
-                  <div className="mt-6 pt-5 border-t border-[#1f1f1f] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <p className="font-sans text-xs sm:text-sm text-[#888888]">
-                      Ready for the next stage? Continue to Day 02 challenges.
-                    </p>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        handleTabChange('day2')
-                        const trackEl = document.getElementById('day-tab-selector')
-                        if (trackEl) {
-                          trackEl.scrollIntoView({ behavior: 'smooth' })
-                        }
-                      }}
-                      className="group inline-flex items-center justify-center gap-2.5 rounded-full bg-white text-black px-6 py-3 font-sans text-xs sm:text-sm font-black uppercase tracking-wider hover:bg-[#EAEAEA] hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer shrink-0 shadow-lg"
-                    >
-                      <span>GO TO DAY 2</span>
-                      <ArrowRight className="h-4 w-4 text-black group-hover:translate-x-1 transition-transform duration-200" />
-                    </button>
-                  </div>
-                )}
               </div>
             </div>
-          ))}
+          )
+        )}
         </div>
       </div>
     </section>
