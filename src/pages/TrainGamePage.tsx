@@ -11,10 +11,12 @@ import { JourneyCompleteOverlay } from '../components/train-game/ui/JourneyCompl
 
 interface TrainGamePageProps {
   onReturnToWebsite: () => void
+  onRegister?: () => void
 }
 
 export const TrainGamePage: React.FC<TrainGamePageProps> = ({
   onReturnToWebsite,
+  onRegister,
 }) => {
   // Input handling hook with direct event callbacks
   const {
@@ -140,6 +142,7 @@ export const TrainGamePage: React.FC<TrainGamePageProps> = ({
         <JourneyCompleteOverlay
           onRestart={restartGame}
           onReturnToWebsite={onReturnToWebsite}
+          onRegister={onRegister}
         />
       )}
     </div>

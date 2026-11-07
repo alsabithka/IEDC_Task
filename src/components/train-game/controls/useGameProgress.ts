@@ -169,7 +169,32 @@ export function useGameProgress(inputRef: React.RefObject<TrainInputState>) {
         sim.speedKmh = 0
       }
 
-      // 5. Station Proximity, Stopping Zone & Overshoot Detection
+      // 5. Check for Arrival at Final Destination (Station 8 Grand Terminus)
+      // REGARDLESS of throttle input, automatically halt train and trigger journey end message
+      const stn8 = GAME_STATIONS[7]
+      const distToStn8Meters = (stn8.trackProgress - sim.trackProgress) * TRAIN_PHYSICS_CONFIG.trackLengthMeters
+      if (
+        (Math.abs(distToStn8Meters) <= TRAIN_PHYSICS_CONFIG.stoppingZoneToleranceMeters ||
+          sim.trackProgress >= 0.958) &&
+        !isJourneyCompleted
+      ) {
+        sim.speedKmh = 0
+        sim.throttlePercent = 0
+        sim.brakePercent = 100
+        sim.trackProgress = stn8.trackProgress
+        setVisitedStationIds((prev) =>
+          prev.includes(stn8.id) ? prev : [...prev, stn8.id]
+        )
+        setIsAtStation(true)
+        setActiveStation(stn8)
+        setIsOvershot(false)
+        setOvershotStation(null)
+        setIsSessionModalOpen(false)
+        setIsJourneyCompleted(true)
+        return sim
+      }
+
+      // 6. Station Proximity, Stopping Zone & Overshoot Detection
       let closestStation: GameStationConfig = GAME_STATIONS[GAME_STATIONS.length - 1]
       let minAheadDistMeters = 99999
       let stoppedStation: GameStationConfig | null = null
@@ -274,10 +299,11 @@ export function useGameProgress(inputRef: React.RefObject<TrainInputState>) {
   const jumpToStation = useCallback((stationNumber: number) => {
     const target = GAME_STATIONS.find((s) => s.number === stationNumber)
     if (!target) return
+    const isTerminal = target.number === 8
     simRef.current = {
       speedKmh: 0,
       throttlePercent: 0,
-      brakePercent: 0,
+      brakePercent: isTerminal ? 100 : 0,
       trackProgress: target.trackProgress,
       distanceTraveledMeters: 0,
     }
@@ -290,8 +316,16 @@ export function useGameProgress(inputRef: React.RefObject<TrainInputState>) {
     setOvershotStation(null)
     setActiveStation(target)
 
-    const nextIdx = Math.min(GAME_STATIONS.length - 1, target.number)
-    setNextStation(GAME_STATIONS[nextIdx])
+    if (isTerminal) {
+      setVisitedStationIds((prev) =>
+        prev.includes(target.id) ? prev : [...prev, target.id]
+      )
+      setIsJourneyCompleted(true)
+    } else {
+      setIsJourneyCompleted(false)
+      const nextIdx = Math.min(GAME_STATIONS.length - 1, target.number)
+      setNextStation(GAME_STATIONS[nextIdx])
+    }
   }, [])
 
   const handleTogglePause = useCallback(() => {

@@ -53,6 +53,16 @@ export const App: React.FC = () => {
     setIsGameRoute(false)
   }
 
+  const navigateToRegister = () => {
+    if (window.location.pathname.startsWith('/train-game')) {
+      window.history.pushState({}, '', '/')
+    } else {
+      window.location.hash = ''
+    }
+    setIsGameRoute(false)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
   // If in Train Game Mode, render isolated 3D simulation with lightweight loading fallback
   if (isGameRoute) {
     return (
@@ -71,7 +81,10 @@ export const App: React.FC = () => {
           </div>
         }
       >
-        <TrainGamePage onReturnToWebsite={navigateToWebsite} />
+        <TrainGamePage
+          onReturnToWebsite={navigateToWebsite}
+          onRegister={navigateToRegister}
+        />
       </Suspense>
     )
   }
