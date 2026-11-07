@@ -15,9 +15,9 @@ export interface PreloaderProps {
  * 1. Initial State: Centered "IDEA SPRINT" appears in white.
  * 2. Physical Rearrangement:
  *    - SPRINT and the letter A naturally fade out and drift downward.
- *    - I, E, D physically travel and rearrange (E crosses over D, remaining pure white).
+ *    - I, E, D physically travel and rearrange (E arcs over D in 2.5D space to prevent clogging).
  *    - The letter C appears from nowhere in slot 4, entering in sync with IDE.
- * 3. Final State: Centered, large, bold "IEDC" in pure white holds briefly.
+ * 3. Seamless Handoff: Real native Flexbox slots in targetRef take over for 100% stable final IEDC hold.
  * 4. Curtain Lift Reveal: The entire full-screen overlay animates upwards (yPercent: -100)
  *    to reveal the already rendered website underneath.
  */
@@ -41,6 +41,12 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
   // SPRINT letters array
   const sprintLettersRef = useRef<HTMLSpanElement[]>([])
 
+  // Font loading guard to prevent measurement race condition
+  const [fontsLoaded, setFontsLoaded] = useState(() => {
+    if (typeof document === 'undefined' || !document.fonts) return true
+    return document.fonts.status === 'loaded'
+  })
+
   // Respect prefers-reduced-motion
   const [isRemoved, setIsRemoved] = useState(() => {
     if (typeof window !== 'undefined') {
@@ -48,6 +54,30 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
     }
     return false
   })
+
+  // Ensure fonts are loaded before measuring DOM rects
+  useEffect(() => {
+    if (typeof document === 'undefined' || !document.fonts || document.fonts.status === 'loaded') {
+      return
+    }
+
+    let mounted = true
+    const timer = setTimeout(() => {
+      if (mounted) setFontsLoaded(true)
+    }, 350)
+
+    document.fonts.ready.then(() => {
+      if (mounted) {
+        clearTimeout(timer)
+        setFontsLoaded(true)
+      }
+    })
+
+    return () => {
+      mounted = false
+      clearTimeout(timer)
+    }
+  }, [])
 
   // Prevent background scrolling while preloader is active
   useEffect(() => {
@@ -64,7 +94,7 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
 
   useGSAP(
     () => {
-      if (isRemoved || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      if (!fontsLoaded || isRemoved || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
         return
       }
 
@@ -135,7 +165,7 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
         {
           opacity: 1,
           y: 0,
-          duration: 0.6,
+          duration: 0.55,
           ease: 'power3.out',
         },
       )
@@ -165,8 +195,8 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
           'rearrange',
         )
 
-        // 3. PHYSICAL LETTER REARRANGEMENT
-        // Letter I travels to slot 1 and stays pure white
+        // 3. PHYSICAL LETTER REARRANGEMENT WITHOUT CLOGGING
+        // Letter I travels smoothly to slot 1
         .to(
           letterI,
           {
@@ -181,12 +211,11 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
           'rearrange+=0.1',
         )
 
-        // Letter E physically moves to slot 2 (crosses over D) and stays pure white
+        // Letter E moves to slot 2 (crosses OVER D with an upward arc to prevent collision)
         .to(
           letterE,
           {
             x: deltaE.x,
-            y: deltaE.y,
             scale: deltaE.scale,
             color: '#FFFFFF',
             duration: 1.15,
@@ -195,13 +224,22 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
           },
           'rearrange+=0.1',
         )
+        .to(
+          letterE,
+          {
+            keyframes: [
+              { y: deltaE.y - 32, duration: 0.55, ease: 'power2.out' },
+              { y: deltaE.y, duration: 0.60, ease: 'power2.in' },
+            ],
+          },
+          'rearrange+=0.1',
+        )
 
-        // Letter D physically moves to slot 3 (crosses behind E) and stays pure white
+        // Letter D moves to slot 3 (crosses BEHIND E with a slight downward dip)
         .to(
           letterD,
           {
             x: deltaD.x,
-            y: deltaD.y,
             scale: deltaD.scale,
             color: '#FFFFFF',
             duration: 1.15,
@@ -210,13 +248,23 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
           },
           'rearrange+=0.1',
         )
+        .to(
+          letterD,
+          {
+            keyframes: [
+              { y: deltaD.y + 16, duration: 0.55, ease: 'power2.out' },
+              { y: deltaD.y, duration: 0.60, ease: 'power2.in' },
+            ],
+          },
+          'rearrange+=0.1',
+        )
 
-        // Letter C comes along with IDE from nowhere into slot 4
+        // Letter C comes along into slot 4 in sync with IDE
         .fromTo(
           letterC,
           {
             opacity: 0,
-            scale: 0.35,
+            scale: 0.4,
             y: 25,
             transformOrigin: 'center center',
           },
@@ -230,10 +278,23 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
           'rearrange+=0.1',
         )
 
-        // 4. Final IEDC Hold: Brief hold on the large, bold, centered IEDC
+        // 4. SEAMLESS HANDOFF TO NATIVE FLEXBOX SLOTS
+        // Instantly activates the native unscaled Flexbox slots so letters never misalign or clog
+        .set(
+          [slotI, slotE, slotD],
+          { opacity: 1 },
+          'rearrange+=1.25',
+        )
+        .set(
+          [letterI, letterE, letterD],
+          { opacity: 0 },
+          'rearrange+=1.25',
+        )
+
+        // 5. Final IEDC Hold: Clean, bold, perfectly spaced native IEDC holds
         .to({}, { duration: 0.65 })
 
-        // 5. Full-Screen Upward Lift: Curtain lifts away from y: 0 to yPercent: -100
+        // 6. Full-Screen Upward Lift: Curtain lifts away from y: 0 to yPercent: -100
         .to(
           containerRef.current,
           {
@@ -243,7 +304,7 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
           },
         )
     },
-    { scope: containerRef },
+    { dependencies: [fontsLoaded], scope: containerRef },
   )
 
   if (isRemoved) {
@@ -258,14 +319,14 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
       aria-live="polite"
     >
       {/* ====================================================================
-          1. INVISIBLE TARGET REFERENCE CONTAINER (Used to compute exact final IEDC slots)
+          1. TARGET REFERENCE CONTAINER (Exact final IEDC slots with clean gap spacing)
           ==================================================================== */}
       <div
         ref={targetRef}
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 flex items-center justify-center select-none"
       >
-        <div className="font-sans font-black tracking-tight text-6xl sm:text-8xl md:text-9xl lg:text-[140px] xl:text-[170px] leading-none text-white flex items-center justify-center whitespace-nowrap">
+        <div className="font-sans font-black tracking-normal text-6xl sm:text-8xl md:text-9xl lg:text-[140px] xl:text-[170px] leading-none text-white flex items-center justify-center whitespace-nowrap gap-1 sm:gap-2.5 md:gap-3 lg:gap-4">
           <span ref={targetSlotI} className="inline-block opacity-0">
             I
           </span>
@@ -275,7 +336,7 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
           <span ref={targetSlotD} className="inline-block opacity-0">
             D
           </span>
-          {/* Letter C enters from nowhere into slot 4 in sync with IDE */}
+          {/* Letter C enters into slot 4 in sync with IDE */}
           <span
             ref={letterCRef}
             className="inline-block opacity-0 will-change-transform text-white"
@@ -290,19 +351,19 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
           ==================================================================== */}
       <div
         ref={initialWordRef}
-        className="relative z-10 flex items-center justify-center font-sans font-black tracking-tight text-3xl sm:text-5xl md:text-6xl lg:text-7xl leading-none whitespace-nowrap px-4 text-white"
+        className="relative z-10 flex items-center justify-center font-sans font-black tracking-normal text-3xl sm:text-5xl md:text-6xl lg:text-7xl leading-none whitespace-nowrap px-4 text-white"
       >
         {/* IDEA Word (Individually positioned characters) */}
-        <div className="flex items-center">
+        <div className="flex items-center gap-0.5 sm:gap-1">
           {/* Letter I */}
           <span
             ref={letterIRef}
-            className="inline-block will-change-transform"
+            className="inline-block will-change-transform z-10"
           >
             I
           </span>
 
-          {/* Letter D */}
+          {/* Letter D (Lower z-index so E glides cleanly above it) */}
           <span
             ref={letterDRef}
             className="inline-block will-change-transform z-0"
@@ -313,7 +374,7 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
           {/* Letter E (Elevated z-index to physically glide over D during rearrangement) */}
           <span
             ref={letterERef}
-            className="inline-block will-change-transform z-10"
+            className="inline-block will-change-transform z-20"
           >
             E
           </span>
