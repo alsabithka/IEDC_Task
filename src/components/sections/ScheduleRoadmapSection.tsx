@@ -182,7 +182,7 @@ export const ScheduleRoadmapSection: React.FC<ScheduleRoadmapSectionProps> = ({
               aria-hidden="true"
             />
             <span className="font-mono text-xs sm:text-sm md:text-base font-bold uppercase tracking-[0.24em] text-[#D0D0D0]">
-              EVENT SCHEDULE · ROADMAP
+              EVENT SCHEDULE
             </span>
           </div>
 
@@ -210,7 +210,7 @@ export const ScheduleRoadmapSection: React.FC<ScheduleRoadmapSectionProps> = ({
         {/* ==================================================================
             3. DAY 1 / DAY 2 TAB SELECTOR (BROUGHT DOWN AFTER GAME SESSION)
             ================================================================== */}
-        <div className="w-full max-w-4xl mx-auto flex items-center justify-between mb-6 sm:mb-8">
+        <div id="day-tab-selector" className="w-full max-w-4xl mx-auto flex items-center justify-between mb-6 sm:mb-8 scroll-mt-24">
           <div className="flex items-center gap-2 p-1.5 rounded-full bg-[#0d0d0d] border border-[#222222]">
             <button
               type="button"
@@ -395,6 +395,29 @@ export const ScheduleRoadmapSection: React.FC<ScheduleRoadmapSectionProps> = ({
                       : 'Valedictory & Awards'}
                   </span>
                 </div>
+
+                {/* Day 1 Bottom Action: Go to Day 2 Button */}
+                {daySchedule.dayId === 'day1' && (
+                  <div className="mt-6 pt-5 border-t border-[#1f1f1f] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <p className="font-sans text-xs sm:text-sm text-[#888888]">
+                      Ready for the next stage? Continue to Day 02 challenges.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setActiveTab('day2')
+                        const trackEl = document.getElementById('day-tab-selector')
+                        if (trackEl) {
+                          trackEl.scrollIntoView({ behavior: 'smooth' })
+                        }
+                      }}
+                      className="group inline-flex items-center justify-center gap-2.5 rounded-full bg-white text-black px-6 py-3 font-sans text-xs sm:text-sm font-black uppercase tracking-wider hover:bg-[#EAEAEA] hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer shrink-0 shadow-lg"
+                    >
+                      <span>GO TO DAY 2</span>
+                      <ArrowRight className="h-4 w-4 text-black group-hover:translate-x-1 transition-transform duration-200" />
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           ))}
