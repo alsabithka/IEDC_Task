@@ -227,6 +227,41 @@ export const RailwayStation: React.FC<RailwayStationProps> = ({
           <meshStandardMaterial color={station.bannerColor} roughness={0.4} />
         </mesh>
 
+        {/* Elevated Station Marquee Sign atop Canopy Roof for High-Angle Visibility */}
+        <group position={[0.6, 3.35, 0]}>
+          {/* Backing Frame */}
+          <mesh castShadow>
+            <boxGeometry args={[0.1, 0.7, 4.4]} />
+            <meshStandardMaterial color="#0F172A" roughness={0.3} />
+          </mesh>
+          {/* Accent Color Inset */}
+          <mesh position={[0.06, 0, 0]}>
+            <boxGeometry args={[0.02, 0.62, 4.26]} />
+            <meshStandardMaterial color={station.accentColor} />
+          </mesh>
+          {/* Track-facing Elevated Station Name */}
+          <Text
+            position={[0.08, 0.08, 0]}
+            rotation={[0, Math.PI / 2, 0]}
+            fontSize={0.25}
+            color="#0F172A"
+            anchorX="center"
+            anchorY="middle"
+          >
+            {station.name.toUpperCase()}
+          </Text>
+          <Text
+            position={[0.08, -0.15, 0]}
+            rotation={[0, Math.PI / 2, 0]}
+            fontSize={0.11}
+            color="#FFFFFF"
+            anchorX="center"
+            anchorY="middle"
+          >
+            {`${station.time} · ${station.sessionTitle}`}
+          </Text>
+        </group>
+
         {/* Waiting Benches on rear deck */}
         <group position={[-0.5, 0.25, -2.0]}>
           <mesh castShadow>
@@ -262,90 +297,191 @@ export const RailwayStation: React.FC<RailwayStationProps> = ({
       </group>
 
       {/* ==================================================================
-          6. LARGE READABLE STATION NAMEBOARD (Facing Arriving Train at Z = -5.8)
+          6. ELEVATED STATION NAMEBOARDS FOR MAXIMUM LONG & CLOSE VISIBILITY
           ================================================================== */}
-      <group position={[-0.2, 0.5, -5.8]}>
+      {/* 6a. Entrance Station Nameboard at Z = -6.2 (Raised to Y = 2.45m for long-distance approach visibility) */}
+      <group position={[-0.4, 2.45, -6.2]}>
+        {/* Sturdy Steel Mounting Posts anchored into platform deck */}
+        <mesh position={[-1.1, -0.95, -0.04]} castShadow>
+          <cylinderGeometry args={[0.05, 0.05, 1.9, 12]} />
+          <meshStandardMaterial color="#1E293B" metalness={0.8} roughness={0.3} />
+        </mesh>
+        <mesh position={[1.1, -0.95, -0.04]} castShadow>
+          <cylinderGeometry args={[0.05, 0.05, 1.9, 12]} />
+          <meshStandardMaterial color="#1E293B" metalness={0.8} roughness={0.3} />
+        </mesh>
+
         <Billboard follow={true}>
           {/* Main Board Plate */}
           <mesh castShadow>
-            <boxGeometry args={[3.8, 1.4, 0.08]} />
+            <boxGeometry args={[2.9, 1.15, 0.08]} />
             <meshStandardMaterial color="#FFFFFF" roughness={0.2} />
           </mesh>
 
           {/* Color Header Banner */}
-          <mesh position={[0, 0.52, 0.045]}>
-            <boxGeometry args={[3.72, 0.28, 0.02]} />
+          <mesh position={[0, 0.42, 0.045]}>
+            <boxGeometry args={[2.82, 0.24, 0.02]} />
             <meshStandardMaterial color={station.accentColor} />
           </mesh>
 
           {/* Station Number Badge */}
-          <mesh position={[-1.4, 0.52, 0.06]}>
-            <boxGeometry args={[0.6, 0.22, 0.02]} />
+          <mesh position={[-1.02, 0.42, 0.06]}>
+            <boxGeometry args={[0.55, 0.18, 0.02]} />
             <meshStandardMaterial color="#0F172A" />
           </mesh>
 
           <Text
-            position={[-1.4, 0.52, 0.08]}
-            fontSize={0.13}
+            position={[-1.02, 0.42, 0.08]}
+            fontSize={0.11}
             color="#FFFFFF"
             anchorX="center"
             anchorY="middle"
-            font={undefined}
           >
             {`STN 0${station.number}`}
           </Text>
 
           <Text
-            position={[0.2, 0.52, 0.08]}
-            fontSize={0.14}
+            position={[0.22, 0.42, 0.08]}
+            fontSize={0.12}
             color="#0F172A"
             anchorX="center"
             anchorY="middle"
-            font={undefined}
           >
             {`${station.time} · ${station.day}`}
           </Text>
 
           {/* Station Name */}
           <Text
-            position={[0, 0.16, 0.05]}
-            fontSize={0.28}
+            position={[0, 0.12, 0.05]}
+            fontSize={0.24}
             color="#0F172A"
             anchorX="center"
             anchorY="middle"
-            font={undefined}
           >
             {station.name.toUpperCase()}
           </Text>
 
           {/* Session Title */}
           <Text
-            position={[0, -0.22, 0.05]}
-            fontSize={0.17}
+            position={[0, -0.18, 0.05]}
+            fontSize={0.14}
             color="#334155"
             anchorX="center"
             anchorY="middle"
-            maxWidth={3.5}
-            font={undefined}
+            maxWidth={2.7}
           >
             {station.sessionTitle}
           </Text>
 
           {/* Terminal Station Eyebrow Tag */}
           {isTerminus && (
-            <mesh position={[0, -0.52, 0.045]}>
-              <boxGeometry args={[3.72, 0.22, 0.02]} />
+            <mesh position={[0, -0.42, 0.045]}>
+              <boxGeometry args={[2.82, 0.18, 0.02]} />
               <meshStandardMaterial color="#DC2626" />
             </mesh>
           )}
           {isTerminus && (
             <Text
-              position={[0, -0.52, 0.08]}
-              fontSize={0.13}
+              position={[0, -0.42, 0.08]}
+              fontSize={0.11}
               color="#FFFFFF"
               anchorX="center"
               anchorY="middle"
-              font={undefined}
+            >
+              FINAL DESTINATION · GRAND TERMINUS
+            </Text>
+          )}
+        </Billboard>
+      </group>
+
+      {/* 6b. Platform Center Station Nameboard at Z = +2.4 (Elevated at Y = 2.15m directly framed in cab windshield) */}
+      <group position={[0.15, 2.15, 2.4]}>
+        {/* Sturdy Steel Mounting Posts anchored into platform deck */}
+        <mesh position={[-0.8, -0.85, -0.04]} castShadow>
+          <cylinderGeometry args={[0.04, 0.04, 1.7, 12]} />
+          <meshStandardMaterial color="#1E293B" metalness={0.8} roughness={0.3} />
+        </mesh>
+        <mesh position={[0.8, -0.85, -0.04]} castShadow>
+          <cylinderGeometry args={[0.04, 0.04, 1.7, 12]} />
+          <meshStandardMaterial color="#1E293B" metalness={0.8} roughness={0.3} />
+        </mesh>
+
+        <Billboard follow={true}>
+          {/* Main Board Plate */}
+          <mesh castShadow>
+            <boxGeometry args={[2.2, 0.95, 0.08]} />
+            <meshStandardMaterial color="#FFFFFF" roughness={0.2} />
+          </mesh>
+
+          {/* Color Header Banner */}
+          <mesh position={[0, 0.35, 0.045]}>
+            <boxGeometry args={[2.14, 0.20, 0.02]} />
+            <meshStandardMaterial color={station.accentColor} />
+          </mesh>
+
+          {/* Station Number Badge */}
+          <mesh position={[-0.78, 0.35, 0.06]}>
+            <boxGeometry args={[0.45, 0.15, 0.02]} />
+            <meshStandardMaterial color="#0F172A" />
+          </mesh>
+
+          <Text
+            position={[-0.78, 0.35, 0.08]}
+            fontSize={0.095}
+            color="#FFFFFF"
+            anchorX="center"
+            anchorY="middle"
+          >
+            {`STN 0${station.number}`}
+          </Text>
+
+          <Text
+            position={[0.2, 0.35, 0.08]}
+            fontSize={0.105}
+            color="#0F172A"
+            anchorX="center"
+            anchorY="middle"
+          >
+            {`${station.time} · ${station.day}`}
+          </Text>
+
+          {/* Station Name */}
+          <Text
+            position={[0, 0.10, 0.05]}
+            fontSize={0.21}
+            color="#0F172A"
+            anchorX="center"
+            anchorY="middle"
+          >
+            {station.name.toUpperCase()}
+          </Text>
+
+          {/* Session Title */}
+          <Text
+            position={[0, -0.15, 0.05]}
+            fontSize={0.125}
+            color="#334155"
+            anchorX="center"
+            anchorY="middle"
+            maxWidth={2.05}
+          >
+            {station.sessionTitle}
+          </Text>
+
+          {/* Terminal Station Eyebrow Tag */}
+          {isTerminus && (
+            <mesh position={[0, -0.35, 0.045]}>
+              <boxGeometry args={[2.14, 0.15, 0.02]} />
+              <meshStandardMaterial color="#DC2626" />
+            </mesh>
+          )}
+          {isTerminus && (
+            <Text
+              position={[0, -0.35, 0.08]}
+              fontSize={0.095}
+              color="#FFFFFF"
+              anchorX="center"
+              anchorY="middle"
             >
               FINAL DESTINATION · GRAND TERMINUS
             </Text>
@@ -394,15 +530,16 @@ export const RailwayStation: React.FC<RailwayStationProps> = ({
         </group>
       )}
 
-      {/* Station 3: Dining Depot (Striped Cafe Umbrella) */}
+      {/* Station 3: Dining Depot (Striped Cafe Umbrella at Platform Exit) */}
       {station.landmark === 'dining_depot' && (
-        <group position={[-0.6, 0.44, 4.2]}>
-          <mesh position={[0, 1.8, 0]} castShadow>
+        <group position={[-0.8, 0.44, 5.8]}>
+          {/* Cafe Umbrella */}
+          <mesh position={[0, 2.1, 0]} castShadow>
             <coneGeometry args={[1.2, 0.65, 16]} />
             <meshStandardMaterial color="#2EC4B6" roughness={0.3} />
           </mesh>
-          <mesh position={[0, 0.9, 0]} castShadow>
-            <cylinderGeometry args={[0.06, 0.06, 1.8, 12]} />
+          <mesh position={[0, 1.05, 0]} castShadow>
+            <cylinderGeometry args={[0.06, 0.06, 2.1, 12]} />
             <meshStandardMaterial color="#FFFFFF" />
           </mesh>
         </group>
