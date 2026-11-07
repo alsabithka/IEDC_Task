@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { TrainGameInvitation } from './TrainGameInvitation'
 import {
   Clock,
   MapPin,
@@ -153,7 +154,13 @@ const SCHEDULE_ROADMAP: DaySchedule[] = [
   },
 ]
 
-export const ScheduleRoadmapSection: React.FC = () => {
+interface ScheduleRoadmapSectionProps {
+  onPlayGame?: () => void
+}
+
+export const ScheduleRoadmapSection: React.FC<ScheduleRoadmapSectionProps> = ({
+  onPlayGame,
+}) => {
   const [activeTab, setActiveTab] = useState<'day1' | 'day2'>('day1')
 
   const visibleDays = SCHEDULE_ROADMAP.filter((day) => day.dayId === activeTab)
@@ -378,7 +385,19 @@ export const ScheduleRoadmapSection: React.FC = () => {
         </div>
 
         {/* ==================================================================
-            3. ROADMAP FOOTER SUMMARY (Clean, Static Technical Footer)
+            3. IDEA SPRINT EXPRESS — 3D TRAIN GAME INVITATION AREA
+            ================================================================== */}
+        <TrainGameInvitation
+          onPlayGame={
+            onPlayGame ||
+            (() => {
+              window.location.hash = '#/train-game'
+            })
+          }
+        />
+
+        {/* ==================================================================
+            4. ROADMAP FOOTER SUMMARY (Clean, Static Technical Footer)
             ================================================================== */}
         <div className="mt-12 sm:mt-16 lg:mt-20 rounded-2xl border border-[#202020] bg-[#080808] p-5 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-4">
