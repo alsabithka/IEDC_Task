@@ -8,12 +8,17 @@ import { RailwayStation } from '../stations/RailwayStation'
 import { CartoonClouds } from '../environment/CartoonClouds'
 import { GAME_STATIONS } from '../../../config/trainGameConfig'
 import type { TrainDynamics } from '../controls/useGameProgress'
+import type { TrainInputState } from '../controls/useTrainControls'
+import type { GraphicsProfileConfig } from '../graphics/graphicsProfiles'
 
 interface GameWorldProps {
   dynamics: TrainDynamics
   activeStationId: string | null
   isAtStation: boolean
   onPhysicsTick: (delta: number) => void
+  profile: GraphicsProfileConfig
+  inputRef: React.RefObject<TrainInputState>
+  onFrameTick?: (time: number) => void
 }
 
 export const GameWorld: React.FC<GameWorldProps> = ({
@@ -21,49 +26,58 @@ export const GameWorld: React.FC<GameWorldProps> = ({
   activeStationId,
   isAtStation,
   onPhysicsTick,
+  profile,
+  inputRef,
+  onFrameTick,
 }) => {
-  // Run physics update on frame
-  useFrame((_, delta) => {
+  // Run physics update & performance counter on frame
+  useFrame((state, delta) => {
     onPhysicsTick(delta)
+    onFrameTick?.(state.clock.elapsedTime * 1000)
   })
 
   return (
     <>
-      {/* 1. Vibrant Cartoon Sky & Atmospheric Horizon Fog */}
+      {/* 1. Sky & Profile-Adapted Fog Distance */}
       <color attach="background" args={['#60A5FA']} />
-      <fog attach="fog" args={['#93C5FD', 55, 210]} />
+      <fog attach="fog" args={['#93C5FD', 45, profile.fogFar]} />
 
       {/* 2. Soft Floating 3D Cartoon Clouds */}
-      <CartoonClouds />
+      <CartoonClouds driftEnabled={profile.enableCloudsDrift} />
 
-      {/* 3. Warm Sunlight & Balanced Sky Lighting */}
-      <ambientLight intensity={0.9} color="#FFFBEB" />
-      <hemisphereLight
-        args={['#60A5FA', '#4ADE80', 1.2]}
-      />
-      <directionalLight
-        position={[50, 65, 35]}
-        intensity={2.6}
-        color="#FFFDF0"
-        castShadow
-        shadow-mapSize-width={2048}
-        shadow-mapSize-height={2048}
-        shadow-camera-far={160}
-        shadow-camera-left={-70}
-        shadow-camera-right={70}
-        shadow-camera-top={70}
-        shadow-camera-bottom={-70}
-        shadow-bias={-0.0003}
-      />
-      <directionalLight position={[-45, 25, -45]} intensity={0.7} color="#BFDBFE" />
+      {/* 3. Sunlight & Balanced Sky Lighting */}
+      <ambientLight intensity={profile.shadows ? 0.9 : 1.15} color="#FFFBEB" />
+      <hemisphereLight args={['#60A5FA', '#4ADE80', profile.shadows ? 1.2 : 1.35]} />
 
-      {/* 3. First-Person Camera inside Locomotive Cabin */}
+      {profile.shadows ? (
+        <directionalLight
+          position={[50, 65, 35]}
+          intensity={2.6}
+          color="#FFFDF0"
+          castShadow
+          shadow-mapSize-width={profile.shadowMapSize}
+          shadow-mapSize-height={profile.shadowMapSize}
+          shadow-camera-far={160}
+          shadow-camera-left={-65}
+          shadow-camera-right={65}
+          shadow-camera-top={65}
+          shadow-camera-bottom={-65}
+          shadow-bias={-0.0003}
+        />
+      ) : (
+        <directionalLight position={[50, 65, 35]} intensity={2.2} color="#FFFDF0" />
+      )}
+
+      <directionalLight position={[-45, 25, -45]} intensity={0.6} color="#BFDBFE" />
+
+      {/* 4. First-Person Camera inside Cabin with touch-look input */}
       <DriverCamera
         trackProgress={dynamics.trackProgress}
         speedKmh={dynamics.speedKmh}
+        inputRef={inputRef}
       />
 
-      {/* 4. Locomotive & Driver's Cockpit */}
+      {/* 5. Locomotive Cockpit */}
       <TrainLocomotive
         trackProgress={dynamics.trackProgress}
         speedKmh={dynamics.speedKmh}
@@ -71,18 +85,23 @@ export const GameWorld: React.FC<GameWorldProps> = ({
         brakePercent={dynamics.brakePercent}
       />
 
-      {/* 5. 3D Railway Track with Rails, Sleepers & Bridge Pillars */}
-      <RailwayTrack />
+      {/* 6. 3D Track with Instanced Sleepers and Bridge Pillars */}
+      <RailwayTrack shadowsEnabled={profile.shadows} />
 
-      {/* 6. Surrounding Stylized Low-Poly Terrain, Trees & Signals */}
-      <RailwayEnvironment />
+      {/* 7. Scaled Vegetation & Environment */}
+      <RailwayEnvironment
+        vegetationDensity={profile.vegetationDensity}
+        shadowsEnabled={profile.shadows}
+      />
 
-      {/* 7. Physical Event Stations along the Track */}
+      {/* 8. Event Stations with Distance LOD Culling */}
       {GAME_STATIONS.map((station) => (
         <RailwayStation
           key={station.id}
           station={station}
           isTrainStoppedHere={isAtStation && activeStationId === station.id}
+          trainTrackProgress={dynamics.trackProgress}
+          lodDistanceMeters={profile.stationLodDistance}
         />
       ))}
     </>

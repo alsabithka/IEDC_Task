@@ -6,6 +6,9 @@ export interface TrainInputState {
   brake: boolean
   interact: boolean
   pause: boolean
+  targetThrottlePercent: number | null
+  cameraLookX: number
+  cameraLookY: number
 }
 
 export interface UseTrainControlsOptions {
@@ -20,6 +23,9 @@ export function useTrainControls(options?: UseTrainControlsOptions) {
     brake: false,
     interact: false,
     pause: false,
+    targetThrottlePercent: null,
+    cameraLookX: 0,
+    cameraLookY: 0,
   })
 
   const optionsRef = useRef(options)
@@ -35,10 +41,12 @@ export function useTrainControls(options?: UseTrainControlsOptions) {
         case 'KeyW':
         case 'ArrowUp':
           inputRef.current.throttleUp = true
+          inputRef.current.targetThrottlePercent = null
           break
         case 'KeyS':
         case 'ArrowDown':
           inputRef.current.throttleDown = true
+          inputRef.current.targetThrottlePercent = null
           break
         case 'Space':
           inputRef.current.brake = true
@@ -87,12 +95,25 @@ export function useTrainControls(options?: UseTrainControlsOptions) {
 
   // Virtual touch button callbacks for mobile
   const setMobileThrottle = (direction: 'up' | 'down', active: boolean) => {
+    inputRef.current.targetThrottlePercent = null
     if (direction === 'up') inputRef.current.throttleUp = active
     if (direction === 'down') inputRef.current.throttleDown = active
   }
 
+  // Direct vertical slider throttle (0 to 100)
+  const setSliderThrottle = (percent: number) => {
+    inputRef.current.targetThrottlePercent = Math.max(0, Math.min(100, percent))
+    inputRef.current.throttleUp = false
+    inputRef.current.throttleDown = false
+  }
+
   const setMobileBrake = (active: boolean) => {
     inputRef.current.brake = active
+  }
+
+  const setCameraLook = (x: number, y: number) => {
+    inputRef.current.cameraLookX = Math.max(-1, Math.min(1, x))
+    inputRef.current.cameraLookY = Math.max(-1, Math.min(1, y))
   }
 
   const triggerMobileInteract = () => {
@@ -102,7 +123,9 @@ export function useTrainControls(options?: UseTrainControlsOptions) {
   return {
     inputRef,
     setMobileThrottle,
+    setSliderThrottle,
     setMobileBrake,
+    setCameraLook,
     triggerMobileInteract,
   }
 }

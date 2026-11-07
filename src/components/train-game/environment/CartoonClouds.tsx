@@ -11,12 +11,16 @@ interface CloudData {
   spheres: { offset: [number, number, number]; r: number }[]
 }
 
-export const CartoonClouds: React.FC = () => {
+interface CartoonCloudsProps {
+  driftEnabled?: boolean
+}
+
+export const CartoonClouds: React.FC<CartoonCloudsProps> = ({ driftEnabled = true }) => {
   const groupRef = useRef<THREE.Group>(null)
 
   const clouds: CloudData[] = useMemo(() => {
     const list: CloudData[] = []
-    const count = 18
+    const count = 16
 
     for (let i = 0; i < count; i++) {
       const angle = (i / count) * Math.PI * 2
@@ -25,13 +29,11 @@ export const CartoonClouds: React.FC = () => {
       const z = Math.sin(angle) * radius
       const y = 22 + (i % 4) * 4
 
-      // 4-5 overlapping rounded puffs to make a cute cartoon cloud
       const spheres = [
         { offset: [0, 0, 0] as [number, number, number], r: 3.2 },
         { offset: [2.2, -0.4, 0.4] as [number, number, number], r: 2.4 },
         { offset: [-2.2, -0.3, -0.3] as [number, number, number], r: 2.3 },
         { offset: [1.1, 1.2, -0.2] as [number, number, number], r: 2.0 },
-        { offset: [-1.0, 1.0, 0.3] as [number, number, number], r: 1.9 },
       ]
 
       list.push({
@@ -46,9 +48,9 @@ export const CartoonClouds: React.FC = () => {
     return list
   }, [])
 
-  // Slowly drift clouds across the sky
+  // Slowly drift clouds across sky if enabled
   useFrame((_, delta) => {
-    if (!groupRef.current) return
+    if (!driftEnabled || !groupRef.current) return
     groupRef.current.rotation.y += delta * 0.005
   })
 
@@ -62,7 +64,7 @@ export const CartoonClouds: React.FC = () => {
         >
           {c.spheres.map((s, sIdx) => (
             <mesh key={`s-${sIdx}`} position={s.offset} castShadow={false}>
-              <sphereGeometry args={[s.r, 10, 8]} />
+              <sphereGeometry args={[s.r, 8, 6]} />
               <meshStandardMaterial
                 color="#FFFFFF"
                 roughness={0.95}
