@@ -1,5 +1,5 @@
 import React from 'react'
-import { ArrowRight, Train } from 'lucide-react'
+import { ArrowRight } from 'lucide-react'
 
 export interface TrainGamePromoProps {
   onPlayGame: () => void
@@ -12,21 +12,6 @@ export const TrainGamePromo: React.FC<TrainGamePromoProps> = ({
 }) => {
   return (
     <div className={`relative w-full ${className}`}>
-      {/* ── Top Attractive Railway Line Accent ── */}
-      <div className="relative flex items-center justify-between gap-4 mb-6 sm:mb-8" aria-hidden="true">
-        {/* Track Line Left */}
-        <div className="h-px flex-1 bg-gradient-to-r from-transparent via-white/25 to-white/40" />
-
-        {/* Center Railway Badge Indicator */}
-        <div className="flex items-center gap-2 px-3.5 py-1 rounded-full border border-white/15 bg-[#0a0a0a] text-white/70 text-[10px] sm:text-[11px] font-mono font-bold uppercase tracking-[0.22em] shrink-0">
-          <Train className="h-3 w-3 text-white" />
-          <span>IDEA SPRINT EXPRESS</span>
-        </div>
-
-        {/* Track Line Right */}
-        <div className="h-px flex-1 bg-gradient-to-l from-transparent via-white/25 to-white/40" />
-      </div>
-
       {/* ── Main Editorial Content (Clean Headline & Action, No Clutter) ── */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 sm:gap-10 py-1">
         <div className="max-w-3xl">
@@ -49,8 +34,8 @@ export const TrainGamePromo: React.FC<TrainGamePromoProps> = ({
         </div>
       </div>
 
-      {/* ── Bottom Attractive Railway Line Accent ── */}
-      <div className="h-px w-full bg-gradient-to-r from-transparent via-white/20 to-transparent mt-6 sm:mt-8" aria-hidden="true" />
+      {/* ── Bottom Subtle Accent Line Separator ── */}
+      <div className="h-px w-full bg-gradient-to-r from-transparent via-white/15 to-transparent mt-6 sm:mt-8" aria-hidden="true" />
     </div>
   )
 }

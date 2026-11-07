@@ -174,32 +174,44 @@ export const ScheduleRoadmapSection: React.FC<ScheduleRoadmapSectionProps> = ({
         {/* ==================================================================
             1. SECTION HEADER (High-Impact Editorial Header)
             ================================================================== */}
-        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 sm:gap-8 mb-8 sm:mb-12">
-          <div className="max-w-2xl">
-            {/* Identification Label */}
-            <div className="flex items-center gap-2.5 mb-3 sm:mb-4">
-              <span
-                className="w-[3px] h-4 sm:h-5 bg-white shrink-0 rounded-xs"
-                aria-hidden="true"
-              />
-              <span className="font-mono text-xs sm:text-sm md:text-base font-bold uppercase tracking-[0.24em] text-[#D0D0D0]">
-                EVENT SCHEDULE · ROADMAP
-              </span>
-            </div>
-
-            {/* Main Headline */}
-            <h2 className="font-display font-normal uppercase text-white tracking-[-0.015em] leading-[0.93] text-4xl sm:text-6xl lg:text-7xl">
-              EVENT SCHEDULE
-            </h2>
-
-            {/* Subtitle */}
-            <p className="mt-4 text-sm sm:text-base md:text-lg text-[#A0A0A0] font-sans font-medium leading-relaxed">
-              A structured two-day milestone roadmap following the ideathon journey from morning inauguration to final jury presentations and closing ceremony.
-            </p>
+        <div className="mb-6 sm:mb-8">
+          {/* Identification Label */}
+          <div className="flex items-center gap-2.5 mb-3 sm:mb-4">
+            <span
+              className="w-[3px] h-4 sm:h-5 bg-white shrink-0 rounded-xs"
+              aria-hidden="true"
+            />
+            <span className="font-mono text-xs sm:text-sm md:text-base font-bold uppercase tracking-[0.24em] text-[#D0D0D0]">
+              EVENT SCHEDULE · ROADMAP
+            </span>
           </div>
 
-          {/* Day 1 / Day 2 Tab Selector */}
-          <div className="flex items-center gap-2 p-1.5 rounded-full bg-[#0d0d0d] border border-[#222222] self-start lg:self-end">
+          {/* Main Headline */}
+          <h2 className="font-display font-normal uppercase text-white tracking-[-0.015em] leading-[0.93] text-4xl sm:text-6xl lg:text-7xl">
+            EVENT SCHEDULE
+          </h2>
+        </div>
+
+        {/* ==================================================================
+            2. PROMOTIONAL TRAIN GAME CALLOUT (GAME SESSION)
+            "WHY SCROLL THROUGH THE SCHEDULE WHEN YOU CAN RIDE THROUGH IT?"
+            ================================================================== */}
+        <div className="mb-8 sm:mb-10">
+          <TrainGamePromo
+            onPlayGame={
+              onPlayGame ||
+              (() => {
+                window.location.hash = '#/train-game'
+              })
+            }
+          />
+        </div>
+
+        {/* ==================================================================
+            3. DAY 1 / DAY 2 TAB SELECTOR (BROUGHT DOWN AFTER GAME SESSION)
+            ================================================================== */}
+        <div className="w-full max-w-4xl mx-auto flex items-center justify-between mb-6 sm:mb-8">
+          <div className="flex items-center gap-2 p-1.5 rounded-full bg-[#0d0d0d] border border-[#222222]">
             <button
               type="button"
               onClick={() => setActiveTab('day1')}
@@ -223,25 +235,14 @@ export const ScheduleRoadmapSection: React.FC<ScheduleRoadmapSectionProps> = ({
               Day 2
             </button>
           </div>
+
+          <span className="font-mono text-xs uppercase tracking-wider text-[#777777] hidden sm:inline-block">
+            {activeTab === 'day1' ? 'Day 1 — Saturday · 4 Stations' : 'Day 2 — Sunday · 4 Stations'}
+          </span>
         </div>
 
         {/* ==================================================================
-            2. PROMOTIONAL TRAIN GAME CALLOUT (UNDER EVENT SCHEDULE)
-            "WHY SCROLL THROUGH THE SCHEDULE WHEN YOU CAN RIDE THROUGH IT?"
-            ================================================================== */}
-        <div className="mb-12 sm:mb-16">
-          <TrainGamePromo
-            onPlayGame={
-              onPlayGame ||
-              (() => {
-                window.location.hash = '#/train-game'
-              })
-            }
-          />
-        </div>
-
-        {/* ==================================================================
-            3. ROADMAP TRACK (Focused Road Track for Selected Day)
+            4. ROADMAP TRACK (Focused Road Track for Selected Day)
             ================================================================== */}
         <div className="w-full max-w-4xl mx-auto">
           {visibleDays.map((daySchedule) => (
