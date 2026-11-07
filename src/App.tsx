@@ -1,10 +1,24 @@
-import React, { useState, useEffect, Suspense } from 'react'
+import React, { useState, useEffect, useRef, useCallback, Suspense } from 'react'
 import { Preloader } from './components/ui/Preloader'
 import { Layout } from './components/layout/Layout'
 import { MainContentPanel } from './components/sections/MainContentPanel'
 import { ScheduleRoadmapSection } from './components/sections/ScheduleRoadmapSection'
 import { RegistrationSection } from './components/sections/RegistrationSection'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+
+const PRELOADER_STORAGE_KEY = 'iedc_preloader_completed'
+
+/**
+ * Checks if the preloader has already completed in the current browser session.
+ */
+function isPreloaderCompleted(): boolean {
+  if (typeof window === 'undefined') return true
+  try {
+    return sessionStorage.getItem(PRELOADER_STORAGE_KEY) === 'true'
+  } catch {
+    return false
+  }
+}
 
 // Lazy-load the heavy 3D Train Driving Game only when requested
 const TrainGamePage = React.lazy(() => import('./pages/TrainGamePage'))
@@ -25,6 +39,24 @@ function checkIsGameRoute(): boolean {
  */
 export const App: React.FC = () => {
   const [isGameRoute, setIsGameRoute] = useState<boolean>(checkIsGameRoute)
+
+  // Only trigger the preloader once per browser session on the first genuine website visit
+  const [showPreloader, setShowPreloader] = useState<boolean>(() => !isPreloaderCompleted())
+  const preloaderFinishedRef = useRef<boolean>(false)
+
+  const handlePreloaderComplete = useCallback(() => {
+    if (preloaderFinishedRef.current) return
+    preloaderFinishedRef.current = true
+
+    try {
+      sessionStorage.setItem(PRELOADER_STORAGE_KEY, 'true')
+    } catch {
+      // Safely ignore storage quota / private browsing errors
+    }
+
+    setShowPreloader(false)
+    ScrollTrigger.refresh()
+  }, [])
 
   useEffect(() => {
     const handleLocationChange = () => {
@@ -97,8 +129,10 @@ export const App: React.FC = () => {
 
   return (
     <>
-      {/* GSAP Cinematic Preloader (Preserved: IDEA SPRINT -> IEDC transformation) */}
-      <Preloader onComplete={() => ScrollTrigger.refresh()} />
+      {/* GSAP Cinematic Preloader (Runs once per session on the first genuine website visit) */}
+      {showPreloader && (
+        <Preloader onComplete={handlePreloaderComplete} />
+      )}
 
       {/* Main Website Flow: Hero Section, Event Schedule & Train Game Promo, Registration */}
       <Layout>
