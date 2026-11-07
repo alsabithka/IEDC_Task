@@ -431,7 +431,7 @@ export const RailwayEnvironment: React.FC = () => {
       </group>
 
       {/* ==================================================================
-          4. CHARMING VILLAGE COTTAGES (In central scenic glades)
+          4. CHARMING VILLAGE COTTAGES & RAILWAY UTILITY STRUCTURES
           ================================================================== */}
       <CartoonCottage
         position={[-30, 0, -38]}
@@ -463,6 +463,52 @@ export const RailwayEnvironment: React.FC = () => {
         wallColor="#FFF1F2"
         roofColor="#10B981"
       />
+
+      {/* Indian Railways Trackside Traction Substation Shed */}
+      <group position={[42, 0, -22]} rotation={[0, 0.4, 0]}>
+        <mesh position={[0, 1.4, 0]} castShadow receiveShadow>
+          <boxGeometry args={[4.5, 2.8, 3.2]} />
+          <meshStandardMaterial color="#B45309" roughness={0.8} />
+        </mesh>
+        <mesh position={[0, 2.9, 0]}>
+          <boxGeometry args={[4.8, 0.2, 3.5]} />
+          <meshStandardMaterial color="#475569" metalness={0.6} />
+        </mesh>
+        {/* Substation Transformer Yard Cage */}
+        <mesh position={[3.2, 0.9, 0]}>
+          <boxGeometry args={[1.6, 1.8, 2.4]} />
+          <meshStandardMaterial color="#64748B" wireframe={true} />
+        </mesh>
+        <mesh position={[3.2, 0.8, 0]} castShadow>
+          <cylinderGeometry args={[0.35, 0.35, 1.4, 12]} />
+          <meshStandardMaterial color="#334155" metalness={0.8} />
+        </mesh>
+      </group>
+
+      {/* Precast Concrete Railway Boundary Wall (Slotted Concrete Panels) */}
+      {[
+        { pos: [48, 0, -32] as [number, number, number], rot: 0.6 },
+        { pos: [52, 0, -27] as [number, number, number], rot: 0.7 },
+        { pos: [-42, 0, 48] as [number, number, number], rot: -0.5 },
+        { pos: [-48, 0, 44] as [number, number, number], rot: -0.6 },
+      ].map((wall, wIdx) => (
+        <group key={`bwall-${wIdx}`} position={wall.pos} rotation={[0, wall.rot, 0]}>
+          {/* Concrete posts */}
+          {[-2.0, 0, 2.0].map((xPost, pIdx) => (
+            <mesh key={`p-${pIdx}`} position={[xPost, 0.9, 0]} castShadow>
+              <boxGeometry args={[0.22, 1.8, 0.22]} />
+              <meshStandardMaterial color="#94A3B8" roughness={0.9} />
+            </mesh>
+          ))}
+          {/* Slotted horizontal concrete panels */}
+          {[0.4, 0.8, 1.2, 1.6].map((yPanel, pIdx) => (
+            <mesh key={`pan-${pIdx}`} position={[0, yPanel, 0]} castShadow>
+              <boxGeometry args={[4.2, 0.25, 0.08]} />
+              <meshStandardMaterial color="#CBD5E1" roughness={0.8} />
+            </mesh>
+          ))}
+        </group>
+      ))}
 
       {/* ==================================================================
           5. INSTANCED PROCEDURAL VEGETATION & ASSETS
