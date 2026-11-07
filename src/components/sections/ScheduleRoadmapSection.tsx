@@ -154,12 +154,9 @@ const SCHEDULE_ROADMAP: DaySchedule[] = [
 ]
 
 export const ScheduleRoadmapSection: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'all' | 'day1' | 'day2'>('all')
+  const [activeTab, setActiveTab] = useState<'day1' | 'day2'>('day1')
 
-  const visibleDays =
-    activeTab === 'all'
-      ? SCHEDULE_ROADMAP
-      : SCHEDULE_ROADMAP.filter((day) => day.dayId === activeTab)
+  const visibleDays = SCHEDULE_ROADMAP.filter((day) => day.dayId === activeTab)
 
   return (
     <section
@@ -194,55 +191,38 @@ export const ScheduleRoadmapSection: React.FC = () => {
             </p>
           </div>
 
-          {/* Interactive Road Map Track Filter Pills */}
+          {/* Day 1 / Day 2 Tab Selector */}
           <div className="flex items-center gap-2 p-1.5 rounded-full bg-[#0d0d0d] border border-[#222222] self-start lg:self-end">
             <button
               type="button"
-              onClick={() => setActiveTab('all')}
-              className={`px-4 sm:px-6 py-2 rounded-full font-sans text-xs sm:text-sm font-bold uppercase tracking-wider transition-all duration-150 cursor-pointer ${
-                activeTab === 'all'
-                  ? 'bg-white text-black shadow-md'
-                  : 'text-[#888888] hover:text-white hover:bg-white/5'
-              }`}
-            >
-              Full Roadmap
-            </button>
-            <button
-              type="button"
               onClick={() => setActiveTab('day1')}
-              className={`px-4 sm:px-6 py-2 rounded-full font-sans text-xs sm:text-sm font-bold uppercase tracking-wider transition-all duration-150 cursor-pointer ${
+              className={`px-5 sm:px-7 py-2 rounded-full font-sans text-xs sm:text-sm font-bold uppercase tracking-wider transition-all duration-150 cursor-pointer ${
                 activeTab === 'day1'
                   ? 'bg-white text-black shadow-md'
                   : 'text-[#888888] hover:text-white hover:bg-white/5'
               }`}
             >
-              Day 01
+              Day 1
             </button>
             <button
               type="button"
               onClick={() => setActiveTab('day2')}
-              className={`px-4 sm:px-6 py-2 rounded-full font-sans text-xs sm:text-sm font-bold uppercase tracking-wider transition-all duration-150 cursor-pointer ${
+              className={`px-5 sm:px-7 py-2 rounded-full font-sans text-xs sm:text-sm font-bold uppercase tracking-wider transition-all duration-150 cursor-pointer ${
                 activeTab === 'day2'
                   ? 'bg-white text-black shadow-md'
                   : 'text-[#888888] hover:text-white hover:bg-white/5'
               }`}
             >
-              Day 02
+              Day 2
             </button>
           </div>
         </div>
 
         {/* ==================================================================
-            2. ROADMAP TRACKS (Side-by-Side Dual Highway on Desktop, Stacked on Mobile)
+            2. ROADMAP TRACK (Focused Road Track for Selected Day)
             ================================================================== */}
-        <div
-          className={`grid gap-10 lg:gap-12 xl:gap-14 ${
-            visibleDays.length === 2
-              ? 'grid-cols-1 lg:grid-cols-2'
-              : 'grid-cols-1 max-w-4xl mx-auto'
-          }`}
-        >
-          {visibleDays.map((daySchedule, dayIdx) => (
+        <div className="w-full max-w-4xl mx-auto">
+          {visibleDays.map((daySchedule) => (
             <div
               key={daySchedule.dayId}
               className="relative flex flex-col rounded-3xl border border-[#202020] bg-[#070707] p-5 sm:p-8 lg:p-10 shadow-2xl"
@@ -251,7 +231,7 @@ export const ScheduleRoadmapSection: React.FC = () => {
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 sm:pb-8 border-b border-[#1f1f1f] mb-8 sm:mb-10">
                 <div className="flex items-center gap-3">
                   <span className="flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-xl bg-white text-black font-mono font-black text-sm">
-                    {dayIdx === 0 && activeTab === 'all' ? '01' : daySchedule.dayId === 'day1' ? '01' : '02'}
+                    {daySchedule.dayId === 'day1' ? '01' : '02'}
                   </span>
                   <div>
                     <h3 className="font-sans text-lg sm:text-xl font-black uppercase text-white tracking-tight">
