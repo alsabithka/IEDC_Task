@@ -41,7 +41,6 @@ export function useGameProgress(inputRef: React.RefObject<TrainInputState>) {
   const [activeStation, setActiveStation] = useState<GameStationConfig | null>(GAME_STATIONS[0])
   const [isAtStation, setIsAtStation] = useState<boolean>(true)
   const [visitedStationIds, setVisitedStationIds] = useState<string[]>(['stn-1'])
-  const visitedStationIdsRef = useRef<string[]>(['stn-1'])
 
   // Overshoot recovery tracking
   const [isOvershot, setIsOvershot] = useState<boolean>(false)
@@ -193,12 +192,8 @@ export function useGameProgress(inputRef: React.RefObject<TrainInputState>) {
           stoppedStation = stn
         }
 
-        // Overshoot detection: train drove past platform stopping zone of an unvisited station
-        if (
-          !visitedStationIdsRef.current.includes(stn.id) &&
-          distMeters < -TRAIN_PHYSICS_CONFIG.stoppingZoneToleranceMeters &&
-          distMeters > -28
-        ) {
+        // Overshoot detection: train drove past platform stopping zone by 8.5m - 28m
+        if (distMeters < -TRAIN_PHYSICS_CONFIG.stoppingZoneToleranceMeters && distMeters > -28) {
           missedStation = stn
           missedMeters = Math.round(Math.abs(distMeters))
         }
@@ -215,10 +210,9 @@ export function useGameProgress(inputRef: React.RefObject<TrainInputState>) {
       if (currentlyAtPlatform && stoppedStation) {
         setIsOvershot(false)
         setOvershotStation(null)
-        if (!visitedStationIdsRef.current.includes(stoppedStation.id)) {
-          visitedStationIdsRef.current = [...visitedStationIdsRef.current, stoppedStation.id]
-          setVisitedStationIds([...visitedStationIdsRef.current])
-        }
+        setVisitedStationIds((prev) =>
+          prev.includes(stoppedStation.id) ? prev : [...prev, stoppedStation.id]
+        )
 
         // FINAL STATION ARRIVAL CHECK: Station 8 and speed is stopped
         if (stoppedStation.number === 8 && Math.abs(sim.speedKmh) < 1.0 && !isJourneyCompleted) {
@@ -269,7 +263,6 @@ export function useGameProgress(inputRef: React.RefObject<TrainInputState>) {
     setIsPaused(false)
     setIsSessionModalOpen(false)
     setIsJourneyCompleted(false)
-    visitedStationIdsRef.current = ['stn-1']
     setVisitedStationIds(['stn-1'])
     setIsAtStation(true)
     setIsOvershot(false)
