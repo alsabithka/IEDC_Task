@@ -1,4 +1,4 @@
-import React, { Suspense, useMemo, useState, useEffect } from 'react'
+import React, { Suspense, useMemo, useState, useEffect, useCallback } from 'react'
 import { Canvas } from '@react-three/fiber'
 import { useTrainControls } from '../components/train-game/controls/useTrainControls'
 import { useGameProgress } from '../components/train-game/controls/useGameProgress'
@@ -120,6 +120,63 @@ export const TrainGamePage: React.FC<TrainGamePageProps> = ({
     }
   }, [])
 
+  // When Grand Terminus is reached (journey completed), switch orientation back to portrait and exit fullscreen
+  useEffect(() => {
+    if (!isJourneyCompleted) return
+
+    const exitFullscreenAndRestorePortrait = async () => {
+      // 1. Exit fullscreen mode if active
+      try {
+        if (document.fullscreenElement) {
+          await document.exitFullscreen()
+        } else if ((document as unknown as { webkitFullscreenElement?: Element }).webkitFullscreenElement) {
+          const docWithWebkit = document as unknown as { webkitExitFullscreen?: () => Promise<void> }
+          if (docWithWebkit.webkitExitFullscreen) {
+            await docWithWebkit.webkitExitFullscreen()
+          }
+        }
+      } catch {
+        // Ignored
+      }
+
+      // 2. Switch orientation back to portrait
+      try {
+        const orientation = screen.orientation as ScreenOrientation & {
+          unlock?: () => void
+          lock?: (orientation: string) => Promise<void>
+        }
+        if (typeof orientation?.lock === 'function') {
+          await orientation.lock('portrait')
+        } else if (typeof orientation?.unlock === 'function') {
+          orientation.unlock()
+        }
+      } catch {
+        try {
+          const orientation = screen.orientation as ScreenOrientation & { unlock?: () => void }
+          if (typeof orientation?.unlock === 'function') {
+            orientation.unlock()
+          }
+        } catch {
+          // Ignored
+        }
+      }
+    }
+
+    exitFullscreenAndRestorePortrait()
+  }, [isJourneyCompleted])
+
+  // Handle restarting journey from completion screen
+  const handleRestartJourney = useCallback(() => {
+    restartGame()
+    try {
+      if (screen.orientation && 'lock' in screen.orientation) {
+        screen.orientation.lock('landscape').catch(() => {})
+      }
+    } catch {
+      // Ignored
+    }
+  }, [restartGame])
+
   return (
     <div className="fixed inset-0 w-full h-[100dvh] max-h-[100dvh] bg-[#60A5FA] text-white overflow-hidden select-none touch-none">
       {/* Fallback for WebGL Context Loss */}
@@ -237,7 +294,7 @@ export const TrainGamePage: React.FC<TrainGamePageProps> = ({
       {/* 6. Journey Completion Ending Sequence */}
       {isJourneyCompleted && (
         <JourneyCompleteOverlay
-          onRestart={restartGame}
+          onRestart={handleRestartJourney}
           onReturnToWebsite={onReturnToWebsite}
           onRegister={onRegister}
         />

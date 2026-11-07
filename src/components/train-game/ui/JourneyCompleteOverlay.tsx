@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import {
   Trophy,
   RotateCcw,
@@ -20,6 +20,49 @@ export const JourneyCompleteOverlay: React.FC<JourneyCompleteOverlayProps> = ({
   onReturnToWebsite,
   onRegister,
 }) => {
+  // When arriving at Grand Terminus, switch orientation back to portrait and exit fullscreen
+  useEffect(() => {
+    const exitFullscreenAndRestorePortrait = async () => {
+      // 1. Exit full screen if active
+      try {
+        if (document.fullscreenElement) {
+          await document.exitFullscreen()
+        } else if ((document as unknown as { webkitFullscreenElement?: Element }).webkitFullscreenElement) {
+          const docWithWebkit = document as unknown as { webkitExitFullscreen?: () => Promise<void> }
+          if (docWithWebkit.webkitExitFullscreen) {
+            await docWithWebkit.webkitExitFullscreen()
+          }
+        }
+      } catch {
+        // Ignored
+      }
+
+      // 2. Switch orientation back to portrait
+      try {
+        const orientation = screen.orientation as ScreenOrientation & {
+          unlock?: () => void
+          lock?: (orientation: string) => Promise<void>
+        }
+        if (typeof orientation?.lock === 'function') {
+          await orientation.lock('portrait')
+        } else if (typeof orientation?.unlock === 'function') {
+          orientation.unlock()
+        }
+      } catch {
+        try {
+          const orientation = screen.orientation as ScreenOrientation & { unlock?: () => void }
+          if (typeof orientation?.unlock === 'function') {
+            orientation.unlock()
+          }
+        } catch {
+          // Ignored
+        }
+      }
+    }
+
+    exitFullscreenAndRestorePortrait()
+  }, [])
+
   const handleRegister = () => {
     if (onRegister) {
       onRegister()
