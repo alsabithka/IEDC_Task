@@ -16,7 +16,6 @@ import {
   CheckCircle2,
   Sparkles,
   ArrowRight,
-  ArrowDown,
 } from 'lucide-react'
 
 gsap.registerPlugin(ScrollTrigger)
@@ -174,6 +173,29 @@ export const ScheduleRoadmapSection: React.FC<ScheduleRoadmapSectionProps> = ({
   const milestoneRefs = useRef<(HTMLDivElement | null)[]>([])
   const nodeRefs = useRef<(HTMLDivElement | null)[]>([])
   const finishNodeRef = useRef<HTMLDivElement>(null)
+
+  const smoothScrollToScheduleTop = () => {
+    const target = document.getElementById('schedule')
+    if (!target) return
+
+    const targetY = target.offsetTop
+    const startY = window.scrollY
+    const duration = 750
+    const startTime = performance.now()
+
+    const animateScroll = (now: number) => {
+      const elapsed = now - startTime
+      const progress = Math.min(elapsed / duration, 1)
+      const ease = 1 - Math.pow(1 - progress, 3)
+      window.scrollTo(0, startY + (targetY - startY) * ease)
+
+      if (progress < 1) {
+        requestAnimationFrame(animateScroll)
+      }
+    }
+
+    requestAnimationFrame(animateScroll)
+  }
 
   const handleTabChange = (tab: 'day1' | 'day2') => {
     if (tab === activeTab) return
@@ -394,10 +416,7 @@ export const ScheduleRoadmapSection: React.FC<ScheduleRoadmapSectionProps> = ({
                 daySchedule={daySchedule}
                 onGoToDay2={() => {
                   handleTabChange('day2')
-                  const trackEl = document.getElementById('day-tab-selector')
-                  if (trackEl) {
-                    trackEl.scrollIntoView({ behavior: 'smooth' })
-                  }
+                  smoothScrollToScheduleTop()
                 }}
               />
             ) : (
@@ -456,23 +475,12 @@ export const ScheduleRoadmapSection: React.FC<ScheduleRoadmapSectionProps> = ({
                 />
                 {daySchedule.milestones.map((milestone, mIdx) => {
                   const Icon = milestone.icon
-                  const isLast = mIdx === daySchedule.milestones.length - 1
 
                   return (
                     <div
                       key={milestone.id}
                       className="relative pl-12 sm:pl-16 group"
                     >
-                      {/* Connecting down arrows */}
-                      {!isLast && (
-                        <div
-                          className="absolute left-[13px] sm:left-[21px] top-1/2 transform -translate-y-1/2 opacity-30 group-hover:opacity-80 transition-opacity pointer-events-none z-10"
-                          aria-hidden="true"
-                        >
-                          <ArrowDown className="h-3 w-3 text-white" />
-                        </div>
-                      )}
-
                       {/* Horizontal Connector Arm to Card */}
                       <div
                         className="absolute left-5 sm:left-7 top-6 w-5 sm:w-7 h-[1px] bg-white/20 group-hover:bg-white/50 transition-colors"

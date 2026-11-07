@@ -8,7 +8,6 @@ import {
   Flag,
   Navigation,
   ArrowRight,
-  ArrowDown,
   CheckCircle2,
   Sparkles,
 } from 'lucide-react'
@@ -26,11 +25,14 @@ interface Day1CinematicTrackProps {
  * 
  * Progressive unfolding scroll experience:
  * - Pure black-and-white editorial aesthetic (No aeroplanes, no vehicles, no decorative journey graphics)
- * - Fine SVG vector timeline line drawing progressively from top to bottom
- * - Station destination markers illuminating as the line reaches each station
- * - Session cards revealing with subtle opacity, translateY, border flash, and staggered text
+ * - Single shared SVG for dashed inactive line and active white hairline (Zero overlapping / misalignment)
+ * - Timeline stops EXACTLY at the finish flag (Zero line extends below the flag)
+ * - No arrow marks between milestone cards
+ * - Station destination markers illuminate as the line reaches each station
+ * - Session cards reveal with subtle opacity, translateY, border flash, and staggered text
  * - Completion flag pops with spring bounce, completion badge reveals
  * - GO TO DAY 2 button appears ONLY AFTER the entire journey is completed
+ * - Clicking GO TO DAY 2 smooth-scrolls back to the top of the schedule
  * - Supports smooth reverse scrolling and prefers-reduced-motion fallback
  */
 export const Day1CinematicTrack: React.FC<Day1CinematicTrackProps> = ({
@@ -108,17 +110,40 @@ export const Day1CinematicTrack: React.FC<Day1CinematicTrackProps> = ({
         !innerTrackRef.current ||
         !startNodeRef.current ||
         !finishNodeRef.current ||
-        !svgLineRef.current
+        !svgLineRef.current ||
+        !lineTrackRef.current
       ) {
         return
       }
 
-      // Calculate track height for the SVG hairline drawing
-      const trackHeight = lineTrackRef.current?.clientHeight || 850
-      svgLineRef.current.setAttribute('y2', String(trackHeight))
+      // Calculate exact geometry: Line starts at center of Start Node and ends at center of Flag Node
+      const calculateLineGeometry = () => {
+        if (!innerTrackRef.current || !startNodeRef.current || !finishNodeRef.current || !lineTrackRef.current) {
+          return 800
+        }
+        const innerRect = innerTrackRef.current.getBoundingClientRect()
+        const startRect = startNodeRef.current.getBoundingClientRect()
+        const finishRect = finishNodeRef.current.getBoundingClientRect()
+
+        const startY = (startRect.top - innerRect.top) + (startRect.height / 2)
+        const finishY = (finishRect.top - innerRect.top) + (finishRect.height / 2)
+        const totalLineLength = Math.max(0, finishY - startY)
+
+        lineTrackRef.current.style.top = `${startY}px`
+        lineTrackRef.current.style.height = `${totalLineLength}px`
+
+        if (svgLineRef.current) {
+          svgLineRef.current.setAttribute('y2', String(totalLineLength))
+        }
+
+        return totalLineLength
+      }
+
+      const totalLineLength = calculateLineGeometry()
+
       gsap.set(svgLineRef.current, {
-        strokeDasharray: trackHeight,
-        strokeDashoffset: trackHeight,
+        strokeDasharray: totalLineLength,
+        strokeDashoffset: totalLineLength,
       })
 
       // 1. Initial State: All cards hidden with subtle elevation & scale
@@ -159,7 +184,7 @@ export const Day1CinematicTrack: React.FC<Day1CinematicTrackProps> = ({
         })
       }
 
-      // 1. Outer Container Smooth Entrance
+      // Outer Container Smooth Entrance
       gsap.fromTo(
         containerRef.current,
         { autoAlpha: 0.7, y: 16 },
@@ -175,7 +200,7 @@ export const Day1CinematicTrack: React.FC<Day1CinematicTrackProps> = ({
         }
       )
 
-      // 2. Scroll-Driven Timeline Drawing (Fine glowing white hairline)
+      // Scroll-Driven Timeline Drawing (Fine glowing white hairline stopping cleanly at the flag)
       gsap.to(svgLineRef.current, {
         strokeDashoffset: 0,
         ease: 'none',
@@ -185,9 +210,8 @@ export const Day1CinematicTrack: React.FC<Day1CinematicTrackProps> = ({
           end: 'bottom 80%',
           scrub: 0.4,
           onRefresh: (self) => {
-            const h = lineTrackRef.current?.clientHeight || 850
+            const h = calculateLineGeometry()
             if (svgLineRef.current) {
-              svgLineRef.current.setAttribute('y2', String(h))
               gsap.set(svgLineRef.current, {
                 strokeDasharray: h,
                 strokeDashoffset: (1 - self.progress) * h,
@@ -197,7 +221,7 @@ export const Day1CinematicTrack: React.FC<Day1CinematicTrackProps> = ({
         },
       })
 
-      // 3. Station Destinations Sequence: Each marker activates & card reveals
+      // Station Destinations Sequence: Each marker activates & card reveals
       cardRefs.current.forEach((card, idx) => {
         if (!card) return
         const node = nodeRefs.current[idx]
@@ -269,7 +293,7 @@ export const Day1CinematicTrack: React.FC<Day1CinematicTrackProps> = ({
         }
       })
 
-      // 4. Final Destination: Finish Flag & Day 1 Completion Sequence
+      // Final Destination: Finish Flag & Day 1 Completion Sequence
       if (finishNodeRef.current) {
         const finishTl = gsap.timeline({
           scrollTrigger: {
@@ -365,18 +389,28 @@ export const Day1CinematicTrack: React.FC<Day1CinematicTrackProps> = ({
       <div ref={innerTrackRef} className="relative">
         {/* ====================================================================
             SCROLL-DRIVEN VECTOR TIMELINE DRAWING
-            Dotted inactive line + Active fine glowing white stroke
+            Single SVG hosting both inactive dashed track and active glowing white stroke.
+            Starts at the Route Start Node center and ends cleanly at the Finish Flag center.
+            No line extends below the flag.
             ==================================================================== */}
         <div
           ref={lineTrackRef}
-          className="absolute left-[19px] sm:left-[29px] top-3 bottom-12 w-[2px] pointer-events-none z-0"
+          className="absolute left-[19px] sm:left-[29px] w-[2px] pointer-events-none z-0"
           aria-hidden="true"
         >
-          {/* Subtle Inactive Dotted Timeline */}
-          <div className="absolute inset-0 border-l-2 border-dashed border-white/20" />
-
-          {/* Active SVG Drawing Line */}
           <svg className="absolute inset-0 w-full h-full overflow-visible">
+            {/* Inactive Dashed Timeline Track */}
+            <line
+              x1="0"
+              y1="0"
+              x2="0"
+              y2="100%"
+              stroke="rgba(255, 255, 255, 0.22)"
+              strokeWidth="2"
+              strokeDasharray="4 6"
+            />
+
+            {/* Active Glowing White Vector Stroke */}
             <line
               ref={svgLineRef}
               x1="0"
@@ -384,7 +418,7 @@ export const Day1CinematicTrack: React.FC<Day1CinematicTrackProps> = ({
               x2="0"
               y2="100%"
               stroke="#ffffff"
-              strokeWidth="1.5"
+              strokeWidth="2"
               strokeLinecap="round"
               className="drop-shadow-[0_0_2px_rgba(255,255,255,0.4)]"
             />
@@ -408,23 +442,12 @@ export const Day1CinematicTrack: React.FC<Day1CinematicTrackProps> = ({
         <div className="space-y-6 sm:space-y-8 relative">
           {daySchedule.milestones.map((milestone, mIdx) => {
             const Icon = milestone.icon
-            const isLast = mIdx === daySchedule.milestones.length - 1
 
             return (
               <div
                 key={milestone.id}
                 className="relative pl-12 sm:pl-16 group"
               >
-                {/* Connecting down arrows */}
-                {!isLast && (
-                  <div
-                    className="absolute left-[13px] sm:left-[21px] top-1/2 transform -translate-y-1/2 opacity-30 group-hover:opacity-80 transition-opacity pointer-events-none z-10"
-                    aria-hidden="true"
-                  >
-                    <ArrowDown className="h-3 w-3 text-white" />
-                  </div>
-                )}
-
                 {/* Horizontal Connector Arm to Card */}
                 <div
                   className="absolute left-5 sm:left-7 top-6 w-5 sm:w-7 h-[1px] bg-white/20 group-hover:bg-white/50 transition-colors"
@@ -520,12 +543,14 @@ export const Day1CinematicTrack: React.FC<Day1CinematicTrackProps> = ({
 
         {/* ====================================================================
             WAYPOINT FINISH DESTINATION & DAY 1 COMPLETION
+            No top horizontal border cutting across the line.
+            The timeline stops directly at this Flag Node; no line continues down.
             ==================================================================== */}
-        <div className="relative pl-12 sm:pl-16 mt-8 pt-4 border-t border-[#191919]">
+        <div className="relative pl-12 sm:pl-16 mt-8 pt-1">
           {/* Finish Flag Node */}
           <div
             ref={finishNodeRef}
-            className="absolute left-2 sm:left-4 top-4 flex h-6 w-6 sm:h-7 sm:w-7 items-center justify-center rounded-full bg-white text-black ring-4 ring-black shadow-lg z-10"
+            className="absolute left-2 sm:left-4 top-0.5 flex h-6 w-6 sm:h-7 sm:w-7 items-center justify-center rounded-full bg-white text-black ring-4 ring-black shadow-lg z-10"
           >
             <div ref={finishFlagRef}>
               <Flag className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-black" />
@@ -552,7 +577,8 @@ export const Day1CinematicTrack: React.FC<Day1CinematicTrackProps> = ({
 
           {/* ==================================================================
               DAY 1 BOTTOM ACTION: GO TO DAY 2 BUTTON
-              REVEALED ONLY AFTER TIMELINE PROGRESS REACHES THE FINISHING FLAG
+              REVEALED ONLY AFTER TIMELINE PROGRESS REACHES THE FINISHING FLAG.
+              Clicking smoothly transfers to Day 2 and scrolls to the top of the schedule.
               ================================================================== */}
           <div className="mt-6 pt-5 border-t border-[#1f1f1f] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <p className="font-sans text-xs sm:text-sm text-[#888888]">
