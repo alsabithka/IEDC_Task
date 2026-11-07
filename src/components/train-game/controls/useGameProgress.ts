@@ -171,9 +171,10 @@ export function useGameProgress(inputRef: React.RefObject<{
           prev.includes(stoppedStation.id) ? prev : [...prev, stoppedStation.id]
         )
 
-        // FINAL STATION ARRIVAL CHECK: Station 8 and speed is completely 0
-        if (stoppedStation.number === 8 && sim.speedKmh === 0 && !isJourneyCompleted) {
+        // FINAL STATION ARRIVAL CHECK: Station 8 and speed is stopped
+        if (stoppedStation.number === 8 && sim.speedKmh < 0.8 && !isJourneyCompleted) {
           setIsJourneyCompleted(true)
+          setIsSessionModalOpen(false)
         }
       }
 

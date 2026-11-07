@@ -58,7 +58,7 @@ export const TrainGamePage: React.FC<TrainGamePageProps> = ({
   useTrainControls(controlsOptions)
 
   return (
-    <div className="fixed inset-0 w-screen h-screen bg-[#070707] text-white overflow-hidden select-none">
+    <div className="fixed inset-0 w-screen h-screen bg-[#60A5FA] text-white overflow-hidden select-none">
       {/* 1. Full-Screen 3D Game Canvas */}
       <Canvas
         shadows
@@ -77,8 +77,6 @@ export const TrainGamePage: React.FC<TrainGamePageProps> = ({
         <Suspense fallback={null}>
           <GameWorld
             dynamics={dynamics}
-            nextStationName={nextStation.sessionTitle}
-            distanceMeters={distanceToNextStation}
             activeStationId={activeStation?.id ?? null}
             isAtStation={isAtStation}
             onPhysicsTick={updatePhysics}
@@ -112,7 +110,7 @@ export const TrainGamePage: React.FC<TrainGamePageProps> = ({
       )}
 
       {/* 4. Interactive Session Info Panel (When stopped at platform) */}
-      {isSessionModalOpen && activeStation && (
+      {isSessionModalOpen && activeStation && !isJourneyCompleted && (
         <SessionInfoPanel
           station={activeStation}
           onClose={() => setIsSessionModalOpen(false)}

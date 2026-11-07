@@ -14,6 +14,8 @@ export interface GameStationConfig {
   trackProgress: number
   landmark: 'welcome_arch' | 'workshop_gear' | 'dining_depot' | 'synergy_hub' | 'morning_beacon' | 'code_lab' | 'refuel_pavilion' | 'grand_podium'
   accentColor: string
+  roofColor: string
+  bannerColor: string
 }
 
 export const GAME_STATIONS: GameStationConfig[] = [
@@ -32,7 +34,9 @@ export const GAME_STATIONS: GameStationConfig[] = [
     duration: '60 Mins',
     trackProgress: 0.02,
     landmark: 'welcome_arch',
-    accentColor: '#FFFFFF',
+    accentColor: '#FF4757', // Cherry Red
+    roofColor: '#E63946',
+    bannerColor: '#FFEAA7',
   },
   {
     id: 'stn-2',
@@ -49,7 +53,9 @@ export const GAME_STATIONS: GameStationConfig[] = [
     duration: '180 Mins',
     trackProgress: 0.15,
     landmark: 'workshop_gear',
-    accentColor: '#E0E0E0',
+    accentColor: '#3A86FF', // Azure Blue
+    roofColor: '#1D3557',
+    bannerColor: '#FFBE0B',
   },
   {
     id: 'stn-3',
@@ -66,7 +72,9 @@ export const GAME_STATIONS: GameStationConfig[] = [
     duration: '60 Mins',
     trackProgress: 0.28,
     landmark: 'dining_depot',
-    accentColor: '#D4D4D4',
+    accentColor: '#2EC4B6', // Fresh Teal / Mint
+    roofColor: '#0081A7',
+    bannerColor: '#FFD166',
   },
   {
     id: 'stn-4',
@@ -83,7 +91,9 @@ export const GAME_STATIONS: GameStationConfig[] = [
     duration: 'Overnight Sprint',
     trackProgress: 0.41,
     landmark: 'synergy_hub',
-    accentColor: '#FFFFFF',
+    accentColor: '#8338EC', // Purple Violet
+    roofColor: '#560BAD',
+    bannerColor: '#CCFF33',
   },
   {
     id: 'stn-5',
@@ -100,7 +110,9 @@ export const GAME_STATIONS: GameStationConfig[] = [
     duration: '60 Mins',
     trackProgress: 0.54,
     landmark: 'morning_beacon',
-    accentColor: '#E8E8E8',
+    accentColor: '#FF7B00', // Sunrise Amber
+    roofColor: '#E85D04',
+    bannerColor: '#48CAE4',
   },
   {
     id: 'stn-6',
@@ -117,7 +129,9 @@ export const GAME_STATIONS: GameStationConfig[] = [
     duration: '180 Mins',
     trackProgress: 0.67,
     landmark: 'code_lab',
-    accentColor: '#FFFFFF',
+    accentColor: '#00B4D8', // Electric Cyan
+    roofColor: '#03045E',
+    bannerColor: '#90E0EF',
   },
   {
     id: 'stn-7',
@@ -134,7 +148,9 @@ export const GAME_STATIONS: GameStationConfig[] = [
     duration: '60 Mins',
     trackProgress: 0.80,
     landmark: 'refuel_pavilion',
-    accentColor: '#D0D0D0',
+    accentColor: '#E76F51', // Terracotta Coral
+    roofColor: '#F4A261',
+    bannerColor: '#2A9D8F',
   },
   {
     id: 'stn-8',
@@ -151,7 +167,9 @@ export const GAME_STATIONS: GameStationConfig[] = [
     duration: 'Final Ceremony',
     trackProgress: 0.93,
     landmark: 'grand_podium',
-    accentColor: '#FFFFFF',
+    accentColor: '#FFB703', // Imperial Gold
+    roofColor: '#800020', // Burgundy
+    bannerColor: '#FFE066',
   },
 ]
 

@@ -89,38 +89,45 @@ export const RailwayTrack: React.FC = () => {
 
   return (
     <group>
-      {/* 1. Ballast Bed (Dark Gravel Strip) */}
+      {/* 1. Ballast Bed (Warm Earthy Gravel Strip) */}
       <mesh geometry={ballastGeometry} receiveShadow>
-        <meshStandardMaterial color="#0e0e0e" roughness={0.9} />
+        <meshStandardMaterial color="#8D8374" roughness={0.9} />
       </mesh>
 
-      {/* 2. Instanced Sleepers / Ties */}
+      {/* 2. Instanced Sleepers / Ties (Rich Timber Wood Brown) */}
       <instancedMesh
         ref={sleepersRef}
         args={[undefined, undefined, sleeperMatrices.length]}
         castShadow
         receiveShadow
       >
-        <boxGeometry args={[1.4, 0.08, 0.28]} />
-        <meshStandardMaterial color="#1f1f1f" roughness={0.7} />
+        <boxGeometry args={[1.4, 0.09, 0.28]} />
+        <meshStandardMaterial color="#6B4226" roughness={0.7} />
       </instancedMesh>
 
-      {/* 3. Left Steel Rail (White metallic chrome) */}
+      {/* 3. Left Steel Rail (Gleaming Polished Steel) */}
       <mesh geometry={leftRailGeometry} castShadow receiveShadow>
-        <meshStandardMaterial color="#EAEAEA" roughness={0.25} metalness={0.7} />
+        <meshStandardMaterial color="#F8FAFC" roughness={0.2} metalness={0.8} />
       </mesh>
 
-      {/* 4. Right Steel Rail (White metallic chrome) */}
+      {/* 4. Right Steel Rail (Gleaming Polished Steel) */}
       <mesh geometry={rightRailGeometry} castShadow receiveShadow>
-        <meshStandardMaterial color="#EAEAEA" roughness={0.25} metalness={0.7} />
+        <meshStandardMaterial color="#F8FAFC" roughness={0.2} metalness={0.8} />
       </mesh>
 
-      {/* 5. Bridge Concrete Support Pillars */}
+      {/* 5. Bridge Rustic Brick Support Pillars */}
       {bridgePillars.map((pillar, idx) => (
-        <mesh key={`pillar-${idx}`} position={pillar.position} castShadow receiveShadow>
-          <boxGeometry args={[1.8, pillar.height, 1.8]} />
-          <meshStandardMaterial color="#222222" roughness={0.8} />
-        </mesh>
+        <group key={`pillar-${idx}`} position={pillar.position}>
+          <mesh castShadow receiveShadow>
+            <boxGeometry args={[1.9, pillar.height, 1.9]} />
+            <meshStandardMaterial color="#B91C1C" roughness={0.8} />
+          </mesh>
+          {/* Stone Coping Cap */}
+          <mesh position={[0, pillar.height / 2 + 0.05, 0]}>
+            <boxGeometry args={[2.1, 0.15, 2.1]} />
+            <meshStandardMaterial color="#F1F5F9" roughness={0.5} />
+          </mesh>
+        </group>
       ))}
     </group>
   )

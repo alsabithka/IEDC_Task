@@ -9,8 +9,6 @@ interface TrainLocomotiveProps {
   speedKmh: number
   throttlePercent: number
   brakePercent: number
-  nextStationName: string
-  distanceMeters: number
 }
 
 export const TrainLocomotive: React.FC<TrainLocomotiveProps> = ({
@@ -18,8 +16,6 @@ export const TrainLocomotive: React.FC<TrainLocomotiveProps> = ({
   speedKmh,
   throttlePercent,
   brakePercent,
-  nextStationName,
-  distanceMeters,
 }) => {
   const trainGroupRef = useRef<THREE.Group>(null)
 
@@ -42,20 +38,43 @@ export const TrainLocomotive: React.FC<TrainLocomotiveProps> = ({
         speedKmh={speedKmh}
         throttlePercent={throttlePercent}
         brakePercent={brakePercent}
-        nextStationName={nextStationName}
-        distanceMeters={distanceMeters}
       />
 
-      {/* Exterior Chassis & Wheel Details */}
+      {/* Exterior Chassis & Wheel Details (Deep Charcoal Navy & Cobalt) */}
       <mesh position={[0, 0.18, 0.4]} receiveShadow>
         <boxGeometry args={[1.5, 0.22, 4.2]} />
-        <meshStandardMaterial color="#121212" roughness={0.7} />
+        <meshStandardMaterial color="#0F172A" roughness={0.6} />
       </mesh>
 
-      {/* Front Locomotive Cowcatcher (Wedge) */}
+      {/* Red Running Boards / Side Trim */}
+      <mesh position={[-0.76, 0.22, 0.4]}>
+        <boxGeometry args={[0.06, 0.08, 4.0]} />
+        <meshStandardMaterial color="#EF4444" roughness={0.4} />
+      </mesh>
+      <mesh position={[0.76, 0.22, 0.4]}>
+        <boxGeometry args={[0.06, 0.08, 4.0]} />
+        <meshStandardMaterial color="#EF4444" roughness={0.4} />
+      </mesh>
+
+      {/* Front Locomotive Cowcatcher (Vibrant Safety Yellow Wedge) */}
       <mesh position={[0, 0.16, 2.7]} rotation={[0.3, 0, 0]}>
         <boxGeometry args={[1.4, 0.28, 0.35]} />
-        <meshStandardMaterial color="#181818" roughness={0.8} />
+        <meshStandardMaterial color="#FACC15" roughness={0.4} />
+      </mesh>
+
+      {/* Front Golden Headlight Housing */}
+      <mesh position={[0, 0.95, 3.0]} castShadow>
+        <cylinderGeometry args={[0.18, 0.22, 0.35, 16]} />
+        <meshStandardMaterial color="#F59E0B" metalness={0.7} roughness={0.3} />
+      </mesh>
+      {/* Front Headlight Lens with Warm Glow */}
+      <mesh position={[0, 0.95, 3.18]}>
+        <circleGeometry args={[0.16, 16]} />
+        <meshStandardMaterial
+          color="#FFFBEB"
+          emissive="#FEF08A"
+          emissiveIntensity={2.5}
+        />
       </mesh>
     </group>
   )
