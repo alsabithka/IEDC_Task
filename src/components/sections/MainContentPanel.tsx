@@ -1,8 +1,9 @@
 import React, { useRef, useSyncExternalStore } from 'react'
 import { siteConfig } from '../../config/siteConfig'
+import { EVENT_CONFIG } from '../../data/eventConfig'
 import { scrollToSheet } from '../../lib/scrollUtils'
 import { useEventCountdown } from '../../hooks/useEventCountdown'
-import { CountdownInstrumentScene } from '../ui/CountdownInstrumentScene'
+import { TextCountdownCounter } from '../ui/TextCountdownCounter'
 import { FullPageStickField } from '../ui/FullPageStickField'
 
 function subscribeMobile(callback: () => void) {
@@ -84,22 +85,19 @@ export const MainContentPanel: React.FC = () => {
         </div>
 
         {/* ==================================================================
-            RIGHT COLUMN: PLAYFUL CARTOON 3D CALENDAR & STOPWATCH SCENE (55%)
+            RIGHT COLUMN: TEXT-DRIVEN COUNTDOWN COUNTER WITH DATE (55%)
             ================================================================== */}
-        <div className="flex flex-col items-center justify-center w-full relative">
-          <div className="w-full h-[290px] sm:h-[340px] md:h-[400px] lg:h-[min(550px,calc(100vh-160px))] xl:h-[min(630px,calc(100vh-180px))] 2xl:h-[700px] flex items-center justify-center relative">
-            <CountdownInstrumentScene
-              days={countdown.days}
-              hours={countdown.hours}
-              minutes={countdown.minutes}
-              seconds={countdown.seconds}
-              isMobile={isMobile}
-              className="w-full h-full"
-            />
-          </div>
+        <div className="flex flex-col items-center lg:items-end justify-center w-full relative">
+          <TextCountdownCounter
+            days={countdown.days}
+            hours={countdown.hours}
+            minutes={countdown.minutes}
+            seconds={countdown.seconds}
+            dateRange={EVENT_CONFIG.dates.eventDateRange}
+          />
 
-          {/* Mobile Registration CTA Button (Natural responsive flow beneath 3D scene) */}
-          <div className="mt-5 w-full flex justify-center lg:hidden">
+          {/* Mobile Registration CTA Button (Natural responsive flow beneath counter) */}
+          <div className="mt-6 sm:mt-8 w-full flex justify-center lg:hidden">
             <a
               href={siteConfig.hero.ctaPrimary.href || '#register'}
               onClick={handleRegisterClick}
