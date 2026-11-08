@@ -62,8 +62,12 @@ export interface EventConfig {
   venue: {
     name: string
     campus: string
+    address?: string
+    shortAddress?: string
     city: string
+    plusCode?: string
     mode: 'In-Person' | 'Hybrid' | 'Virtual'
+    mapsUrl?: string
   }
   navLinks: NavLinkItem[]
   introduction: {

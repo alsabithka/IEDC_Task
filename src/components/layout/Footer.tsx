@@ -1,7 +1,8 @@
 import React, { useRef } from 'react'
-import { ArrowRight, Mail, MapPin, Users, Building } from 'lucide-react'
+import { Mail, MapPin, Users, Building } from 'lucide-react'
 import { siteConfig } from '../../config/siteConfig'
 import { BrandEmblem } from '../ui/BrandEmblem'
+import { HeroVenueMap } from '../ui/HeroVenueMap'
 import { scrollToSheet } from '../../lib/scrollUtils'
 import { useScrollReveal } from '../../hooks/useScrollReveal'
 
@@ -108,9 +109,9 @@ export const Footer: React.FC<FooterProps> = ({ onNavigateToGame }) => {
             </span>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-end">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
             {/* Statement Text */}
-            <div className="lg:col-span-8">
+            <div className="lg:col-span-7 xl:col-span-7">
               <h2
                 data-reveal
                 className="font-display font-normal uppercase text-white tracking-[-0.02em] leading-[0.92] text-4xl sm:text-6xl md:text-7xl lg:text-[5.2rem] xl:text-[6.2rem]"
@@ -127,16 +128,9 @@ export const Footer: React.FC<FooterProps> = ({ onNavigateToGame }) => {
               </p>
             </div>
 
-            {/* Registration CTA Button */}
-            <div data-reveal className="lg:col-span-4 lg:flex lg:justify-end">
-              <a
-                href="#register"
-                onClick={(e) => handleAnchorClick(e, '#register')}
-                className="group inline-flex items-center justify-between gap-4 w-full sm:w-auto min-w-[270px] px-8 py-5 rounded-full bg-white text-black font-sans font-black text-sm sm:text-base uppercase tracking-wider hover:bg-[#eaeaea] transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] shadow-2xl cursor-pointer"
-              >
-                <span>BE PART OF THE SPRINT</span>
-                <ArrowRight className="h-5 w-5 transition-transform duration-200 group-hover:translate-x-1.5" />
-              </a>
+            {/* Venue Map Panel (Replacing "BE PART OF THE SPRINT") */}
+            <div data-reveal className="lg:col-span-5 xl:col-span-5 lg:flex lg:justify-end w-full">
+              <HeroVenueMap className="w-full max-w-[500px]" />
             </div>
           </div>
         </div>

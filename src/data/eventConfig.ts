@@ -39,10 +39,16 @@ export const EVENT_CONFIG: EventConfig = {
   },
 
   venue: {
-    name: 'Main Auditorium & Innovation Studio',
+    name: 'College of Engineering Chengannur',
     campus: 'College of Engineering Chengannur (CEC)',
+    address:
+      'Engineering College Road, opposite Federal Bank, Chengannur, Alappuzha District, Kerala – 689121',
+    shortAddress: 'Engineering College Road, Chengannur, Kerala – 689121',
     city: 'Chengannur, Alappuzha, Kerala',
+    plusCode: '8J88+WXQ',
     mode: 'In-Person',
+    mapsUrl:
+      'https://www.google.com/maps/search/?api=1&query=College%20of%20Engineering%20Chengannur%208J88%2BWXQ%2C%20Engineering%20College%20Road%20opp.%20FEDERALBANK%20Alapuzha%20District%2C%20SH%201%2C%20Chengannur%2C%20Kerala%20689121',
   },
 
   navLinks: [
