@@ -13,34 +13,24 @@ import type { DaySchedule } from './ScheduleRoadmapSection'
 
 gsap.registerPlugin(ScrollTrigger)
 
-// Session cache tracking (in-memory + sessionStorage)
-const DAY1_SESSION_STORAGE_KEY = 'iedc_day1_cinematic_cached'
+// In-memory runtime cache (clears on full browser reload, preserves across tab switching & client navigation)
 let day1SessionCached = false
 
-const isDay1Cached = (): boolean => {
-  if (day1SessionCached) return true
+// Clean up any legacy sessionStorage key so full reload resets animations
+if (typeof window !== 'undefined') {
   try {
-    if (typeof window !== 'undefined' && window.sessionStorage) {
-      if (sessionStorage.getItem(DAY1_SESSION_STORAGE_KEY) === 'true') {
-        day1SessionCached = true
-        return true
-      }
-    }
+    sessionStorage.removeItem('iedc_day1_cinematic_cached')
   } catch {
-    // Ignore security/quota errors in restricted environments
+    // Ignore security/quota errors
   }
-  return false
+}
+
+const isDay1Cached = (): boolean => {
+  return day1SessionCached
 }
 
 const markDay1Cached = () => {
   day1SessionCached = true
-  try {
-    if (typeof window !== 'undefined' && window.sessionStorage) {
-      sessionStorage.setItem(DAY1_SESSION_STORAGE_KEY, 'true')
-    }
-  } catch {
-    // Ignore security/quota errors
-  }
 }
 
 interface Day1CinematicTrackProps {

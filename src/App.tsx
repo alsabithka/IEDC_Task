@@ -8,17 +8,16 @@ import { RegistrationSection } from './components/sections/RegistrationSection'
 import { SmoothScrollProvider } from './providers/SmoothScrollProvider'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
-const PRELOADER_STORAGE_KEY = 'iedc_preloader_completed'
+// In-memory runtime tracking for preloader completion across client-side route navigation.
+// Resets naturally on every full browser reload (F5 / Ctrl + R) so the preloader always shows.
+let hasPreloaderCompletedInRuntime = false
 
-/**
- * Checks if the preloader has already completed in the current browser session.
- */
-function isPreloaderCompleted(): boolean {
-  if (typeof window === 'undefined') return true
+// Clean up any legacy sessionStorage keys so they never suppress reload animations
+if (typeof window !== 'undefined') {
   try {
-    return sessionStorage.getItem(PRELOADER_STORAGE_KEY) === 'true'
+    sessionStorage.removeItem('iedc_preloader_completed')
   } catch {
-    return false
+    // Ignore security/quota restrictions
   }
 }
 
@@ -42,22 +41,29 @@ function checkIsGameRoute(): boolean {
 export const App: React.FC = () => {
   const [isGameRoute, setIsGameRoute] = useState<boolean>(checkIsGameRoute)
 
-  // Only trigger the preloader once per browser session on the first genuine website visit
-  const [showPreloader, setShowPreloader] = useState<boolean>(() => !isPreloaderCompleted())
+  // Shows preloader on every full browser reload, but suppresses on client-side route navigation
+  const [showPreloader, setShowPreloader] = useState<boolean>(
+    () => !hasPreloaderCompletedInRuntime
+  )
   const preloaderFinishedRef = useRef<boolean>(false)
 
   const handlePreloaderComplete = useCallback(() => {
     if (preloaderFinishedRef.current) return
     preloaderFinishedRef.current = true
-
-    try {
-      sessionStorage.setItem(PRELOADER_STORAGE_KEY, 'true')
-    } catch {
-      // Safely ignore storage quota / private browsing errors
-    }
+    hasPreloaderCompletedInRuntime = true
 
     setShowPreloader(false)
     ScrollTrigger.refresh()
+  }, [])
+
+  useEffect(() => {
+    // Ensure scroll position resets to top on full page reload
+    if (typeof window !== 'undefined') {
+      if ('scrollRestoration' in window.history) {
+        window.history.scrollRestoration = 'manual'
+      }
+      window.scrollTo(0, 0)
+    }
   }, [])
 
   useEffect(() => {

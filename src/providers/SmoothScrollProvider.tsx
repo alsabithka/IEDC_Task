@@ -53,6 +53,9 @@ export const SmoothScrollProvider: React.FC<SmoothScrollProviderProps> = ({
     lenisRef.current = lenis
     setLenis(lenis)
 
+    // Ensure scroll begins at the very top on reload
+    lenis.scrollTo(0, { immediate: true })
+
     // Synchronize Lenis scroll position with GSAP ScrollTrigger
     const handleScroll = () => {
       ScrollTrigger.update()
