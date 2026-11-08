@@ -176,38 +176,46 @@ function FullPageStickScene({ isMobile = false }: { isMobile?: boolean }) {
     }))
   }, [segments])
 
-  const { lineGeo, nodeGeo } = useMemo(() => {
-    const linePositions = new Float32Array(segments.length * 6)
-    const nodePositions = new Float32Array(segments.length * 6)
+  const { lineGeo, nodeGeo, linePosBuffer, nodePosBuffer } = useMemo(() => {
+    const linePositions = new Float32Array(segmentCount * 6)
+    const nodePositions = new Float32Array(segmentCount * 6)
 
     segments.forEach((seg, idx) => {
       const end = seg.baseOrigin.clone().addScaledVector(seg.baseDir, seg.baseLength)
-      linePositions.set(
-        [seg.baseOrigin.x, seg.baseOrigin.y, seg.baseOrigin.z, end.x, end.y, end.z],
-        idx * 6
-      )
-      nodePositions.set(
-        [seg.baseOrigin.x, seg.baseOrigin.y, seg.baseOrigin.z, end.x, end.y, end.z],
-        idx * 6
-      )
+      const ptr = idx * 6
+      linePositions[ptr] = seg.baseOrigin.x
+      linePositions[ptr + 1] = seg.baseOrigin.y
+      linePositions[ptr + 2] = seg.baseOrigin.z
+      linePositions[ptr + 3] = end.x
+      linePositions[ptr + 4] = end.y
+      linePositions[ptr + 5] = end.z
+
+      nodePositions[ptr] = seg.baseOrigin.x
+      nodePositions[ptr + 1] = seg.baseOrigin.y
+      nodePositions[ptr + 2] = seg.baseOrigin.z
+      nodePositions[ptr + 3] = end.x
+      nodePositions[ptr + 4] = end.y
+      nodePositions[ptr + 5] = end.z
     })
 
     const lg = new THREE.BufferGeometry()
     lg.setAttribute('position', new THREE.BufferAttribute(linePositions, 3))
     const ng = new THREE.BufferGeometry()
     ng.setAttribute('position', new THREE.BufferAttribute(nodePositions, 3))
-    return { lineGeo: lg, nodeGeo: ng }
-  }, [segments])
+    return {
+      lineGeo: lg,
+      nodeGeo: ng,
+      linePosBuffer: linePositions,
+      nodePosBuffer: nodePositions,
+    }
+  }, [segments, segmentCount])
 
-  // Mouse interaction loop
+  // Zero-allocation high-performance interaction loop
   useFrame(({ clock }, delta) => {
     const elapsed = clock.getElapsedTime()
     const px = pointerWorldRef.current.x
     const py = pointerWorldRef.current.y
     const isPointerActive = isPointerActiveRef.current
-
-    const linePosArray: number[] = []
-    const nodePosArray: number[] = []
 
     for (let i = 0; i < segments.length; i++) {
       const seg = segments[i]
@@ -269,20 +277,28 @@ function FullPageStickScene({ isMobile = false }: { isMobile?: boolean }) {
       const ey = sy + rdy * currentLength
       const ez = sz
 
-      linePosArray.push(sx, sy, sz, ex, ey, ez)
-      nodePosArray.push(sx, sy, sz, ex, ey, ez)
+      const ptr = i * 6
+      linePosBuffer[ptr] = sx
+      linePosBuffer[ptr + 1] = sy
+      linePosBuffer[ptr + 2] = sz
+      linePosBuffer[ptr + 3] = ex
+      linePosBuffer[ptr + 4] = ey
+      linePosBuffer[ptr + 5] = ez
+
+      nodePosBuffer[ptr] = sx
+      nodePosBuffer[ptr + 1] = sy
+      nodePosBuffer[ptr + 2] = sz
+      nodePosBuffer[ptr + 3] = ex
+      nodePosBuffer[ptr + 4] = ey
+      nodePosBuffer[ptr + 5] = ez
     }
 
     if (linesRef.current) {
-      const posAttr = linesRef.current.geometry.attributes.position as THREE.BufferAttribute
-      posAttr.array.set(linePosArray)
-      posAttr.needsUpdate = true
+      linesRef.current.geometry.attributes.position.needsUpdate = true
     }
 
     if (nodesRef.current) {
-      const posAttr = nodesRef.current.geometry.attributes.position as THREE.BufferAttribute
-      posAttr.array.set(nodePosArray)
-      posAttr.needsUpdate = true
+      nodesRef.current.geometry.attributes.position.needsUpdate = true
     }
   })
 

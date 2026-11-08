@@ -6,10 +6,7 @@ import { scrollToSheet } from '../../lib/scrollUtils'
 import { useEventCountdown } from '../../hooks/useEventCountdown'
 import { TextCountdownCounter } from '../ui/TextCountdownCounter'
 
-// Lazy-load the heavy 3D Three.js stick field so it does not block initial paint
-const FullPageStickField = React.lazy(() =>
-  import('../ui/FullPageStickField').then(m => ({ default: m.FullPageStickField }))
-)
+import { FullPageStickField } from '../ui/FullPageStickField'
 
 function subscribeMobile(callback: () => void) {
   const mq = window.matchMedia('(max-width: 1023px)')
@@ -102,12 +99,8 @@ export const MainContentPanel: React.FC<MainContentPanelProps> = ({
       id="home"
       className="relative w-full min-h-screen flex flex-col justify-center bg-[#000000] text-white pt-16 sm:pt-20 lg:pt-20 xl:pt-24 pb-8 sm:pb-10 lg:pb-12 px-6 sm:px-10 lg:px-12 xl:px-16 2xl:px-20 overflow-hidden select-none"
     >
-      {/* ── INTERACTIVE STICK EFFECT ON THE BACKSIDE OF THE WHOLE PAGE ── */}
-      {isHeroReady && (
-        <Suspense fallback={null}>
-          <FullPageStickField isMobile={isMobile} />
-        </Suspense>
-      )}
+      {/* ── INTERACTIVE STICK EFFECT ON THE BACKSIDE OF THE WHOLE PAGE (Pre-loaded & active during preloader) ── */}
+      <FullPageStickField isMobile={isMobile} />
 
       <div
         ref={contentGridRef}
