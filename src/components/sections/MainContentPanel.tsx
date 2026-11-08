@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useSyncExternalStore, Suspense } from 'react'
+import React, { useRef, useEffect, useSyncExternalStore } from 'react'
 import gsap from 'gsap'
 import { siteConfig } from '../../config/siteConfig'
 import { EVENT_CONFIG } from '../../data/eventConfig'

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Calendar, MapPin, Mail, ArrowRight, Home, Sparkles } from 'lucide-react'
+import { Calendar, MapPin, Mail, ArrowRight, Home } from 'lucide-react'
 import { siteConfig } from '../../config/siteConfig'
 import { scrollToSheet } from '../../lib/scrollUtils'
 import { BrandEmblem } from '../ui/BrandEmblem'
@@ -95,7 +95,7 @@ export const PanelHeader: React.FC = () => {
       >
         <div className="w-full max-w-[1720px] 2xl:max-w-[1800px] mx-auto px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20 flex items-center justify-between">
           {/* ================================================================
-              LEFT: Brand Emblem Logo & Edition Badge
+              LEFT: Brand Emblem Logo
               ================================================================ */}
           <div className="flex items-center gap-3">
             <a
@@ -106,12 +106,6 @@ export const PanelHeader: React.FC = () => {
             >
               <BrandEmblem className="h-8 sm:h-9 md:h-10 w-auto object-contain shrink-0 transition-transform duration-200 group-hover:scale-105" />
             </a>
-
-            <div className="hidden xl:flex items-center gap-2 pl-3 border-l border-white/10">
-              <span className="font-mono text-[11px] uppercase tracking-wider text-[#888888]">
-                IEDC IDEA SPRINT 2026
-              </span>
-            </div>
           </div>
 
           {/* ================================================================
@@ -202,23 +196,7 @@ export const PanelHeader: React.FC = () => {
             : 'max-h-0 opacity-0 pointer-events-none -translate-y-2'
         }`}
       >
-        <div className="max-w-[1720px] mx-auto px-5 sm:px-8 py-6 flex flex-col gap-4">
-          {/* Header Info Banner in Drawer */}
-          <div className="flex items-center justify-between pb-3 border-b border-white/10">
-            <div>
-              <p className="font-sans font-bold text-sm text-white flex items-center gap-1.5">
-                <Sparkles className="h-3.5 w-3.5 text-white" />
-                IDEA SPRINT 2026
-              </p>
-              <p className="text-xs text-[#777777] mt-0.5">
-                24-Hour Student Ideathon · IEDC BOOTCAMP CEC
-              </p>
-            </div>
-            <span className="font-mono text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full border border-white/15 bg-white/5 text-[#A0A0A0]">
-              NAVIGATE
-            </span>
-          </div>
-
+        <div className="max-w-[1720px] mx-auto px-5 sm:px-8 py-5 flex flex-col gap-3">
           {/* Navigation Links with Icons and Sublabels */}
           <nav className="flex flex-col gap-1.5" aria-label="Mobile Primary Navigation">
             {NAV_LINKS.map((link, index) => {
@@ -257,7 +235,7 @@ export const PanelHeader: React.FC = () => {
           </nav>
 
           {/* Primary Action Button in Drawer */}
-          <div className="pt-2">
+          <div className="pt-1">
             <a
               href="#register"
               onClick={handleRegisterClick}
@@ -266,13 +244,6 @@ export const PanelHeader: React.FC = () => {
               <span>Register for Idea Sprint 2026</span>
               <ArrowRight className="h-4 w-4" />
             </a>
-          </div>
-
-          {/* Drawer Footer Information */}
-          <div className="pt-2 text-center">
-            <p className="font-mono text-[10px] uppercase tracking-widest text-[#555555]">
-              College of Engineering Chengannur · Kerala 689121
-            </p>
           </div>
         </div>
       </div>

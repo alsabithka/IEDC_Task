@@ -66,22 +66,13 @@ export interface FooterProps {
  * - Verified official contact coordinates & social accounts
  * - Fully responsive with GSAP scroll-reveal synergy
  */
-export const Footer: React.FC<FooterProps> = ({ onNavigateToGame }) => {
+export const Footer: React.FC<FooterProps> = ({ onNavigateToGame: _onNavigateToGame }) => {
   const footerRef = useRef<HTMLElement>(null)
   useScrollReveal(footerRef, 'footer')
 
   const handleAnchorClick = (e: React.MouseEvent<HTMLAnchorElement>, targetId: string) => {
     e.preventDefault()
     scrollToSheet(targetId)
-  }
-
-  const handleGameClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    e.preventDefault()
-    if (onNavigateToGame) {
-      onNavigateToGame()
-    } else {
-      window.location.hash = '#/train-game'
-    }
   }
 
   return (
@@ -252,16 +243,6 @@ export const Footer: React.FC<FooterProps> = ({ onNavigateToGame }) => {
               </li>
               <li>
                 <a
-                  href="#about"
-                  onClick={(e) => handleAnchorClick(e, '#home')}
-                  className="group inline-flex items-center gap-2.5 text-sm sm:text-base text-[#A0A0A0] hover:text-white transition-colors duration-150 font-sans font-medium cursor-pointer"
-                >
-                  <span className="h-[1px] w-3 bg-[#333333] group-hover:w-4 group-hover:bg-white transition-all duration-200" />
-                  About the Event
-                </a>
-              </li>
-              <li>
-                <a
                   href="#schedule"
                   onClick={(e) => handleAnchorClick(e, '#schedule')}
                   className="group inline-flex items-center gap-2.5 text-sm sm:text-base text-[#A0A0A0] hover:text-white transition-colors duration-150 font-sans font-medium cursor-pointer"
@@ -272,15 +253,12 @@ export const Footer: React.FC<FooterProps> = ({ onNavigateToGame }) => {
               </li>
               <li>
                 <a
-                  href="#/train-game"
-                  onClick={handleGameClick}
+                  href="#venue"
+                  onClick={(e) => handleAnchorClick(e, '#venue')}
                   className="group inline-flex items-center gap-2.5 text-sm sm:text-base text-[#A0A0A0] hover:text-white transition-colors duration-150 font-sans font-medium cursor-pointer"
                 >
                   <span className="h-[1px] w-3 bg-[#333333] group-hover:w-4 group-hover:bg-white transition-all duration-200" />
-                  <span>Interactive Experience</span>
-                  <span className="font-mono text-[10px] px-2 py-0.5 rounded-full border border-white/20 bg-white/5 text-white">
-                    3D
-                  </span>
+                  Venue
                 </a>
               </li>
               <li>
