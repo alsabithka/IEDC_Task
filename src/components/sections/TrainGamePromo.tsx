@@ -28,7 +28,7 @@ export const TrainGamePromo: React.FC<TrainGamePromoProps> = ({
             onClick={onPlayGame}
             className="group inline-flex items-center justify-center gap-3 rounded-full bg-white text-black px-7 sm:px-9 py-4 font-sans text-xs sm:text-sm font-black uppercase tracking-wider shadow-[0_0_25px_rgba(255,255,255,0.18)] hover:shadow-[0_0_35px_rgba(255,255,255,0.32)] hover:bg-[#EAEAEA] hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 cursor-pointer"
           >
-            <span>GET INTO THE LOCO</span>
+            <span>LETS DRIVE THE TRAIN</span>
             <ArrowRight className="h-4 w-4 text-black group-hover:translate-x-1 transition-transform duration-200" />
           </button>
         </div>

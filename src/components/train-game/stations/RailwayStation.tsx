@@ -386,14 +386,14 @@ export const RailwayStation: React.FC<RailwayStationProps> = ({
             </Billboard>
           </group>
 
-          {/* 5b. Platform Center Station Nameboard at Z = +2.4 */}
-          <group position={[0.15, 2.15, 2.4]}>
-            <mesh position={[-0.8, -0.85, -0.04]} castShadow>
-              <cylinderGeometry args={[0.04, 0.04, 1.7, 8]} />
+          {/* 5b. Platform Center Station Nameboard at Z = +2.4 (Positioned safely along rear platform wall) */}
+          <group position={[-0.6, 2.45, 2.4]}>
+            <mesh position={[-0.6, -0.95, -0.04]} castShadow>
+              <cylinderGeometry args={[0.04, 0.04, 1.9, 8]} />
               <meshStandardMaterial color="#1E293B" metalness={0.8} roughness={0.3} />
             </mesh>
-            <mesh position={[0.8, -0.85, -0.04]} castShadow>
-              <cylinderGeometry args={[0.04, 0.04, 1.7, 8]} />
+            <mesh position={[0.6, -0.95, -0.04]} castShadow>
+              <cylinderGeometry args={[0.04, 0.04, 1.9, 8]} />
               <meshStandardMaterial color="#1E293B" metalness={0.8} roughness={0.3} />
             </mesh>
 

@@ -45,11 +45,11 @@ export const DriverCamera: React.FC<DriverCameraProps> = ({
     // 2. Get locomotive world position and direction from the track curve
     const { position: trackPos, tangent, normal, up } = getTrackFrameAt(trackProgress)
 
-    // 3. Compute Driver's Eye position inside the locomotive cabin:
-    // Placed slightly further back inside the cabin so the driver can see the rich cockpit,
-    // dashboard gauges, radar screen, and teak wood controls framing the windshield
-    const eyeHeight = 1.26
-    const forwardOffset = -0.38
+    // 3. Compute Driver's Eye position:
+    // Moved forward past the enclosed cabin so there is no inside cockpit enclosure,
+    // positioning the camera to just show the lower edge of the console and levers.
+    const eyeHeight = 1.22
+    const forwardOffset = 0.08
     const sideOffset = 0.0
 
     // Add subtle speed vibration / track click-clack when moving
@@ -76,11 +76,11 @@ export const DriverCamera: React.FC<DriverCameraProps> = ({
     state.camera.position.copy(eyePosition)
 
     // 4. Compute Base Forward Look Direction along Track Tangent
-    // Look 20m ahead with a subtle natural downward pitch (-1.86 deg) to frame rails and horizon
+    // Look 20m ahead with a subtle natural downward pitch to frame rails, horizon and lower levers
     const forwardTarget = new THREE.Vector3()
       .copy(eyePosition)
       .addScaledVector(tangent, 20)
-      .addScaledVector(up, -1.2)
+      .addScaledVector(up, -1.3)
 
     // 5. Smooth Camera Look Interpolation (Controlled via Touch/Mouse windshield drag)
     const targetLookX = inputRef?.current?.cameraLookX ?? 0
