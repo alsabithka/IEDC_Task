@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://iedc.ceconline.edu/sitemap.xml

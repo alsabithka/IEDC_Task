@@ -88,66 +88,69 @@ export const Footer: React.FC<FooterProps> = ({ onNavigateToGame }) => {
     <footer
       ref={footerRef}
       id="footer"
-      className="relative z-10 w-full border-t border-[#1a1a1a] bg-transparent text-white select-none"
+      className="relative z-10 w-full text-white select-none"
     >
-      <div className="w-full max-w-[1720px] 2xl:max-w-[1800px] mx-auto px-6 sm:px-10 lg:px-12 xl:px-16 2xl:px-20 pt-16 sm:pt-24 lg:pt-28 pb-10 sm:pb-14">
-        {/* ==================================================================
-            1. MAIN CLOSING STATEMENT BANNER (HIGH-IMPACT EDITORIAL HERO CLOSING)
-            ================================================================== */}
-        <div
-          data-reveal-group="closing"
-          className="mb-16 sm:mb-20 lg:mb-24 pb-14 sm:pb-18 lg:pb-20 border-b border-[#1f1f1f]"
-        >
-          {/* Accent Eyebrow Label */}
-          <div data-reveal className="flex items-center gap-2.5 mb-4 sm:mb-6">
-            <span
-              className="w-[3px] h-4 sm:h-5 bg-white shrink-0 rounded-xs"
-              aria-hidden="true"
-            />
-            <span className="font-mono text-xs sm:text-sm font-bold uppercase tracking-[0.24em] text-[#A0A0A0]">
-              COLLEGE OF ENGINEERING CHENGANNUR
-            </span>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
-            {/* Statement Text */}
-            <div className="lg:col-span-7 xl:col-span-7">
-              <h2
-                data-reveal
-                className="font-display font-normal uppercase text-white tracking-[-0.02em] leading-[0.92] text-4xl sm:text-6xl md:text-7xl lg:text-[5.2rem] xl:text-[6.2rem]"
-              >
-                BIG IDEAS.<br />
-                BOLD MINDS.<br />
-                BUILT AT CEC.
-              </h2>
-              <p
-                data-reveal
-                className="mt-5 sm:mt-6 text-base sm:text-lg lg:text-xl text-[#A0A0A0] font-sans font-medium max-w-xl leading-relaxed"
-              >
-                One idea can start something extraordinary. Bring yours to IDEA SPRINT 2026.
-              </p>
+      {/* ==================================================================
+          1. COLLEGE OF ENGINEERING SESSION (No solid black bg -> Transparent with bubbles & grain)
+          ================================================================== */}
+      <div className="relative w-full border-t border-[#1a1a1a] bg-transparent">
+        <div className="w-full max-w-[1720px] 2xl:max-w-[1800px] mx-auto px-6 sm:px-10 lg:px-12 xl:px-16 2xl:px-20 pt-16 sm:pt-24 lg:pt-28 pb-14 sm:pb-18 lg:pb-20">
+          <div data-reveal-group="closing">
+            {/* Accent Eyebrow Label */}
+            <div data-reveal className="flex items-center gap-2.5 mb-4 sm:mb-6">
+              <span
+                className="w-[3px] h-4 sm:h-5 bg-white shrink-0 rounded-xs"
+                aria-hidden="true"
+              />
+              <span className="font-mono text-xs sm:text-sm font-bold uppercase tracking-[0.24em] text-[#A0A0A0]">
+                COLLEGE OF ENGINEERING CHENGANNUR
+              </span>
             </div>
 
-            {/* Venue Map Panel (Replacing "BE PART OF THE SPRINT") */}
-            <div data-reveal className="lg:col-span-5 xl:col-span-5 lg:flex lg:justify-end w-full">
-              <HeroVenueMap className="w-full max-w-[500px]" />
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+              {/* Statement Text */}
+              <div className="lg:col-span-7 xl:col-span-7">
+                <h2
+                  data-reveal
+                  className="font-display font-normal uppercase text-white tracking-[-0.02em] leading-[0.92] text-4xl sm:text-6xl md:text-7xl lg:text-[5.2rem] xl:text-[6.2rem]"
+                >
+                  BIG IDEAS.<br />
+                  BOLD MINDS.<br />
+                  BUILT AT CEC.
+                </h2>
+                <p
+                  data-reveal
+                  className="mt-5 sm:mt-6 text-base sm:text-lg lg:text-xl text-[#A0A0A0] font-sans font-medium max-w-xl leading-relaxed"
+                >
+                  One idea can start something extraordinary. Bring yours to IDEA SPRINT 2026.
+                </p>
+              </div>
+
+              {/* Venue Map Panel (Replacing "BE PART OF THE SPRINT") */}
+              <div data-reveal className="lg:col-span-5 xl:col-span-5 lg:flex lg:justify-end w-full">
+                <HeroVenueMap className="w-full max-w-[500px]" />
+              </div>
             </div>
           </div>
         </div>
+      </div>
 
-        {/* ==================================================================
-            2. STRUCTURED MULTI-COLUMN INFORMATION & NAVIGATION GRID
-            ================================================================== */}
-        <div
-          data-reveal-group="details"
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-10 sm:gap-12 lg:gap-10 pb-16 sm:pb-20"
-        >
+      {/* ==================================================================
+          2. ABOUT & CONTACT INFORMATION SESSION (Solid pure black bg #000000, strictly NO bubbles or grains)
+          ================================================================== */}
+      <div className="relative z-20 w-full border-t border-[#1f1f1f] bg-[#000000]">
+        <div className="w-full max-w-[1720px] 2xl:max-w-[1800px] mx-auto px-6 sm:px-10 lg:px-12 xl:px-16 2xl:px-20 pt-16 sm:pt-20 pb-10 sm:pb-14">
+          {/* Structured Multi-Column Information & Navigation Grid */}
+          <div
+            data-reveal-group="details"
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-10 sm:gap-12 lg:gap-10 pb-16 sm:pb-20"
+          >
           {/* Column 1: Organization Identity & Official Socials (5 Cols) */}
           <div data-reveal className="lg:col-span-5 flex flex-col justify-between">
             <div>
               {/* Official Brand Emblem & Event Identity */}
               <div className="flex items-center gap-3.5 mb-4">
-                <BrandEmblem className="h-10 sm:h-12 w-auto object-contain shrink-0" />
+                <BrandEmblem className="h-10 sm:h-12 w-auto object-contain shrink-0" loading="lazy" />
                 <div>
                   <h3 className="font-sans text-base sm:text-lg font-black uppercase text-white tracking-tight leading-none">
                     {siteConfig.brand.name}
@@ -360,19 +363,18 @@ export const Footer: React.FC<FooterProps> = ({ onNavigateToGame }) => {
           </div>
         </div>
 
-        {/* ==================================================================
-            3. BOTTOM FOOTER STRIP
-            ================================================================== */}
-        <div
-          data-reveal="bottom-strip"
-          className="pt-8 sm:pt-10 border-t border-[#1a1a1a] flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left"
-        >
-          <span className="font-mono text-xs uppercase tracking-wider text-[#777777]">
-            © 2026 IEDC BOOTCAMP CEC. ALL RIGHTS RESERVED.
-          </span>
-          <div className="flex items-center gap-2 font-mono text-xs uppercase tracking-wider text-[#888888]">
-            <span className="inline-block w-1.5 h-1.5 rounded-full bg-white/40" aria-hidden="true" />
-            <span>MADE WITH IDEAS AT CEC.</span>
+          {/* Bottom Footer Strip */}
+          <div
+            data-reveal="bottom-strip"
+            className="pt-8 sm:pt-10 border-t border-[#1a1a1a] flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left"
+          >
+            <span className="font-mono text-xs uppercase tracking-wider text-[#777777]">
+              © 2026 IEDC BOOTCAMP CEC. ALL RIGHTS RESERVED.
+            </span>
+            <div className="flex items-center gap-2 font-mono text-xs uppercase tracking-wider text-[#888888]">
+              <span className="inline-block w-1.5 h-1.5 rounded-full bg-white/40" aria-hidden="true" />
+              <span>MADE WITH IDEAS AT CEC.</span>
+            </div>
           </div>
         </div>
       </div>

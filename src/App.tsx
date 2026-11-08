@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback, Suspense } from 'react'
 import { Preloader } from './components/ui/Preloader'
-import { ParticleBackgroundLayer } from './components/ui/ParticleBackgroundLayer'
 import { Layout } from './components/layout/Layout'
 import { MainContentPanel } from './components/sections/MainContentPanel'
 import { ScheduleRoadmapSection } from './components/sections/ScheduleRoadmapSection'
@@ -8,6 +7,9 @@ import { RegistrationSection } from './components/sections/RegistrationSection'
 import { Footer } from './components/layout/Footer'
 import { SmoothScrollProvider } from './providers/SmoothScrollProvider'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+
+// Lazy-load sub-hero floating bubble background layer
+const ParticleBackgroundLayer = React.lazy(() => import('./components/ui/ParticleBackgroundLayer'))
 
 // In-memory runtime tracking for preloader completion across client-side route navigation.
 // Resets naturally on every full browser reload (F5 / Ctrl + R) so the preloader always shows.
@@ -162,7 +164,9 @@ export const App: React.FC = () => {
 
           {/* 2. Sub-Hero Website Sections with Shared Particle & Grain Texture Layer */}
           <div className="relative w-full bg-[#000000]">
-            <ParticleBackgroundLayer />
+            <Suspense fallback={null}>
+              <ParticleBackgroundLayer />
+            </Suspense>
             <ScheduleRoadmapSection onPlayGame={navigateToGame} />
             <RegistrationSection />
             <Footer onNavigateToGame={navigateToGame} />

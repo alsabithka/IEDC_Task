@@ -1,0 +1,21 @@
+# IEDC IDEA SPRINT 2026
+
+> A 24-hour student ideathon and venture sprint hosted by IEDC BOOTCAMP CEC at College of Engineering Chengannur.
+
+IEDC IDEA SPRINT 2026 brings together student innovators, product designers, and aspiring entrepreneurs to pressure-test bold technological concepts, receive industry mentorship, and pitch transformative ventures.
+
+## Key Event Details
+- **Event Name**: IEDC IDEA SPRINT 2026
+- **Organizer**: [IEDC BOOTCAMP CEC](https://iedc.ceconline.edu/#about)
+- **Institution**: College of Engineering Chengannur, Kerala - 689121
+- **Venue Directions**: [Google Maps Destination](https://www.google.com/maps/search/?api=1&query=College%20of%20Engineering%20Chengannur%208J88%2BWXQ%2C%20Engineering%20College%20Road%20opp.%20FEDERALBANK%20Alapuzha%20District%2C%20SH%201%2C%20Chengannur%2C%20Kerala%20689121)
+- **Plus Code**: 8J88+WXQ
+- **Schedule**: [Event Schedule & Roadmap](https://iedc.ceconline.edu/#schedule)
+- **Registration**: [Online Team & Individual Registration](https://iedc.ceconline.edu/#register)
+- **Contact**: [iedc@ceconline.edu](mailto:iedc@ceconline.edu)
+
+## Navigation Shortcuts
+- [Home & Countdown](https://iedc.ceconline.edu/#home)
+- [Event Schedule](https://iedc.ceconline.edu/#schedule)
+- [Registration Form](https://iedc.ceconline.edu/#register)
+- [Venue & Directions](https://iedc.ceconline.edu/#footer)

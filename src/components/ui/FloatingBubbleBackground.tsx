@@ -328,6 +328,18 @@ export const FloatingBubbleBackground: React.FC<FloatingBubbleBackgroundProps> =
       aria-hidden="true"
       className={`absolute inset-0 pointer-events-none select-none z-0 overflow-hidden ${className}`}
     >
+      {/* 1. Subtle Fine-Grain Film Noise Texture Tile (Eliminates flat black voids with organic matte depth) */}
+      <div
+        className="absolute inset-0 opacity-[0.065] mix-blend-screen pointer-events-none"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
+          backgroundRepeat: 'repeat',
+          backgroundSize: '160px 160px',
+        }}
+        aria-hidden="true"
+      />
+
+      {/* 2. Floating Bubbles Canvas */}
       <canvas
         ref={canvasRef}
         className="absolute inset-0 w-full h-full pointer-events-none"

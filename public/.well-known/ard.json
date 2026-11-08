@@ -1,0 +1,17 @@
+{
+  "entries": [
+    {
+      "identifier": "urn:air:iedc.ceconline.edu:events:idea-sprint-2026",
+      "displayName": "IEDC IDEA SPRINT 2026",
+      "type": "application/agent-card+json",
+      "description": "24-Hour Student Ideathon & Venture Acceleration Marathon at College of Engineering Chengannur.",
+      "url": "https://iedc.ceconline.edu/",
+      "representativeQueries": [
+        "idea sprint",
+        "iedc registration",
+        "cec ideathon",
+        "college of engineering chengannur"
+      ]
+    }
+  ]
+}
