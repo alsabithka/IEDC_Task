@@ -5,6 +5,7 @@ import { Layout } from './components/layout/Layout'
 import { MainContentPanel } from './components/sections/MainContentPanel'
 import { ScheduleRoadmapSection } from './components/sections/ScheduleRoadmapSection'
 import { RegistrationSection } from './components/sections/RegistrationSection'
+import { Footer } from './components/layout/Footer'
 import { SmoothScrollProvider } from './providers/SmoothScrollProvider'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
@@ -45,13 +46,21 @@ export const App: React.FC = () => {
   const [showPreloader, setShowPreloader] = useState<boolean>(
     () => !hasPreloaderCompletedInRuntime
   )
+  const [isHeroReady, setIsHeroReady] = useState<boolean>(
+    () => hasPreloaderCompletedInRuntime
+  )
   const preloaderFinishedRef = useRef<boolean>(false)
+
+  const handlePreloaderStartExit = useCallback(() => {
+    setIsHeroReady(true)
+  }, [])
 
   const handlePreloaderComplete = useCallback(() => {
     if (preloaderFinishedRef.current) return
     preloaderFinishedRef.current = true
     hasPreloaderCompletedInRuntime = true
 
+    setIsHeroReady(true)
     setShowPreloader(false)
     ScrollTrigger.refresh()
   }, [])
@@ -139,20 +148,24 @@ export const App: React.FC = () => {
     <>
       {/* GSAP Cinematic Preloader (Runs once per session on the first genuine website visit) */}
       {showPreloader && (
-        <Preloader onComplete={handlePreloaderComplete} />
+        <Preloader
+          onStartExit={handlePreloaderStartExit}
+          onComplete={handlePreloaderComplete}
+        />
       )}
 
       {/* Main Website Flow: Hero Section, Event Schedule & Train Game Promo, Registration */}
       <SmoothScrollProvider isPaused={showPreloader}>
         <Layout>
           {/* 1. Hero Section (Strictly NO particle/grain texture applied) */}
-          <MainContentPanel />
+          <MainContentPanel isHeroReady={isHeroReady} />
 
           {/* 2. Sub-Hero Website Sections with Shared Particle & Grain Texture Layer */}
           <div className="relative w-full bg-[#000000]">
             <ParticleBackgroundLayer />
             <ScheduleRoadmapSection onPlayGame={navigateToGame} />
             <RegistrationSection />
+            <Footer onNavigateToGame={navigateToGame} />
           </div>
         </Layout>
       </SmoothScrollProvider>

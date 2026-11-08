@@ -13,25 +13,12 @@ import type { DaySchedule } from './ScheduleRoadmapSection'
 
 gsap.registerPlugin(ScrollTrigger)
 
-// In-memory runtime cache (clears on full browser reload, preserves across tab switching & client navigation)
-let day1SessionCached = false
-
-// Clean up any legacy sessionStorage key so full reload resets animations
-if (typeof window !== 'undefined') {
-  try {
-    sessionStorage.removeItem('iedc_day1_cinematic_cached')
-  } catch {
-    // Ignore security/quota errors
-  }
-}
-
-const isDay1Cached = (): boolean => {
-  return day1SessionCached
-}
-
-const markDay1Cached = () => {
-  day1SessionCached = true
-}
+// In-memory runtime tracking of revealed milestones for Day 1
+// Automatically resets on full browser reload (F5 / browser refresh)
+// Preserves already-revealed milestones when switching tabs (e.g. Day 1 <-> Day 2)
+const revealedDay1CardIndices = new Set<number>()
+let isDay1FinishRevealed = false
+let isDay1ContainerRevealed = false
 
 interface Day1CinematicTrackProps {
   daySchedule: DaySchedule
@@ -83,8 +70,6 @@ export const Day1CinematicTrack: React.FC<Day1CinematicTrackProps> = ({
       '(prefers-reduced-motion: reduce)'
     ).matches
 
-    const cached = isDay1Cached()
-
     // Calculate exact geometry: Line starts at center of Start Node and ends at center of Flag Node
     const calculateLineGeometry = () => {
       if (!innerTrackRef.current || !startNodeRef.current || !finishNodeRef.current || !lineTrackRef.current) {
@@ -110,7 +95,6 @@ export const Day1CinematicTrack: React.FC<Day1CinematicTrackProps> = ({
 
     // CASE 1: If reduced motion is requested, immediately present all content statically
     if (prefersReducedMotion) {
-      markDay1Cached()
       if (cardRefs.current) {
         gsap.set(cardRefs.current.filter(Boolean), {
           autoAlpha: 1,
@@ -148,109 +132,6 @@ export const Day1CinematicTrack: React.FC<Day1CinematicTrackProps> = ({
       return
     }
 
-    // CASE 2: ALREADY CACHED IN THIS SESSION
-    // Skip loader/entrance animation. Keep cards and stations visible without re-animating.
-    // Line continues to scrub smoothly back and forth with scroll.
-    if (cached) {
-      const ctx = gsap.context(() => {
-        if (
-          !containerRef.current ||
-          !innerTrackRef.current ||
-          !startNodeRef.current ||
-          !finishNodeRef.current ||
-          !svgLineRef.current ||
-          !lineTrackRef.current
-        ) {
-          return
-        }
-
-        // Outer container visible immediately without delay
-        gsap.set(containerRef.current, { autoAlpha: 1, y: 0 })
-
-        // All cards visible immediately in settled state
-        gsap.set(cardRefs.current.filter(Boolean), {
-          autoAlpha: 1,
-          y: 0,
-          scale: 1,
-          borderColor: '#222222',
-        })
-
-        // Staggered internal text elements visible
-        gsap.set(cardBadgeRefs.current.filter(Boolean), { autoAlpha: 1, y: 0 })
-        gsap.set(cardTitleRefs.current.filter(Boolean), { autoAlpha: 1, y: 0 })
-        gsap.set(cardDescRefs.current.filter(Boolean), { autoAlpha: 1, y: 0 })
-        gsap.set(cardFooterRefs.current.filter(Boolean), { autoAlpha: 1, y: 0 })
-
-        // Destination markers in active illuminated state
-        gsap.set(nodeRefs.current.filter(Boolean), {
-          backgroundColor: '#ffffff',
-          color: '#000000',
-          borderColor: '#ffffff',
-          boxShadow: '0 0 14px rgba(255, 255, 255, 0.75)',
-          scale: 1.1,
-        })
-
-        // Finish flag node in active illuminated state
-        if (finishNodeRef.current) {
-          gsap.set(finishNodeRef.current, {
-            backgroundColor: '#ffffff',
-            color: '#000000',
-            borderColor: '#ffffff',
-            boxShadow: '0 0 14px rgba(255, 255, 255, 0.75)',
-            scale: 1.1,
-          })
-        }
-        if (finishFlagRef.current) {
-          gsap.set(finishFlagRef.current, { scale: 1, autoAlpha: 1 })
-        }
-        if (completionBadgeRef.current) {
-          gsap.set(completionBadgeRef.current, { autoAlpha: 1, y: 0 })
-        }
-
-        const totalLineLength = calculateLineGeometry()
-
-        gsap.set(svgLineRef.current, {
-          strokeDasharray: totalLineLength,
-          strokeDashoffset: totalLineLength,
-        })
-
-        // Scroll-Driven Timeline Drawing continues to scrub back and forth with scroll
-        gsap.to(svgLineRef.current, {
-          strokeDashoffset: 0,
-          ease: 'none',
-          scrollTrigger: {
-            trigger: startNodeRef.current,
-            start: 'top 65%',
-            endTrigger: finishNodeRef.current,
-            end: 'center center',
-            scrub: 0.3,
-            onRefresh: (self) => {
-              const h = calculateLineGeometry()
-              if (svgLineRef.current) {
-                gsap.set(svgLineRef.current, {
-                  strokeDasharray: h,
-                  strokeDashoffset: (1 - self.progress) * h,
-                })
-              }
-            },
-          },
-        })
-      }, containerRef)
-
-      const timer = setTimeout(() => {
-        ScrollTrigger.refresh()
-      }, 100)
-
-      return () => {
-        clearTimeout(timer)
-        ctx.revert()
-      }
-    }
-
-    // CASE 3: FIRST VISIT IN THIS SESSION (Uncached)
-    // Mark cached immediately so switching away and returning never reloads/replays
-    markDay1Cached()
-
     const ctx = gsap.context(() => {
       if (
         !containerRef.current ||
@@ -270,64 +151,33 @@ export const Day1CinematicTrack: React.FC<Day1CinematicTrackProps> = ({
         strokeDashoffset: totalLineLength,
       })
 
-      // 1. Initial State: All cards hidden with subtle elevation & scale
-      gsap.set(cardRefs.current.filter(Boolean), {
-        autoAlpha: 0.12,
-        y: 20,
-        scale: 0.98,
-        borderColor: '#202020',
-      })
-
-      // Card internal staggered elements initially muted
-      gsap.set(cardBadgeRefs.current.filter(Boolean), { autoAlpha: 0.2, y: 6 })
-      gsap.set(cardTitleRefs.current.filter(Boolean), { autoAlpha: 0.2, y: 6 })
-      gsap.set(cardDescRefs.current.filter(Boolean), { autoAlpha: 0.2, y: 6 })
-      gsap.set(cardFooterRefs.current.filter(Boolean), { autoAlpha: 0.2, y: 6 })
-
-      // Destination markers start in subtle inactive dark state
-      gsap.set(nodeRefs.current.filter(Boolean), {
-        backgroundColor: '#0c0c0c',
-        color: '#666666',
-        borderColor: 'rgba(255, 255, 255, 0.22)',
-        scale: 1,
-      })
-
-      // Completion elements: starts dark inactive like the other numbers
-      if (finishNodeRef.current) {
-        gsap.set(finishNodeRef.current, {
-          backgroundColor: '#0c0c0c',
-          color: '#666666',
-          borderColor: 'rgba(255, 255, 255, 0.22)',
-          scale: 1,
-        })
+      // Outer Container Entrance (reveals on scroll, stays visible once entered)
+      if (!isDay1ContainerRevealed) {
+        gsap.fromTo(
+          containerRef.current,
+          { autoAlpha: 0, y: 16 },
+          {
+            autoAlpha: 1,
+            y: 0,
+            duration: 0.6,
+            ease: 'power2.out',
+            scrollTrigger: {
+              trigger: containerRef.current,
+              start: 'top 85%',
+              toggleActions: 'play none none none',
+              once: true,
+              onEnter: () => {
+                isDay1ContainerRevealed = true
+              },
+            },
+          }
+        )
+      } else {
+        gsap.set(containerRef.current, { autoAlpha: 1, y: 0 })
       }
-      if (finishFlagRef.current) {
-        gsap.set(finishFlagRef.current, { scale: 0.85, autoAlpha: 0.7 })
-      }
-      if (completionBadgeRef.current) {
-        gsap.set(completionBadgeRef.current, { autoAlpha: 0, y: 10 })
-      }
-
-      // Outer Container Smooth Entrance (plays once on scroll down)
-      gsap.fromTo(
-        containerRef.current,
-        { autoAlpha: 0.7, y: 16 },
-        {
-          autoAlpha: 1,
-          y: 0,
-          duration: 0.6,
-          ease: 'power2.out',
-          scrollTrigger: {
-            trigger: containerRef.current,
-            start: 'top 85%',
-            toggleActions: 'play none none none',
-            once: true,
-          },
-        }
-      )
 
       // Scroll-Driven Timeline Drawing (Fine glowing white hairline connecting directly to the flag symbol)
-      // The line smoothly travels back and forth in accordance with scroll even after first load
+      // The line smoothly travels back and forth in accordance with scroll
       gsap.to(svgLineRef.current, {
         strokeDashoffset: 0,
         ease: 'none',
@@ -350,8 +200,8 @@ export const Day1CinematicTrack: React.FC<Day1CinematicTrackProps> = ({
       })
 
       // Station Destinations Sequence:
-      // Appears as user scrolls down for the first time.
-      // Once revealed, scrolling back up does NOT disappear or replay.
+      // Cards start blank and load progressively as user scrolls down.
+      // Already revealed cards in the session stay visible without replay.
       cardRefs.current.forEach((card, idx) => {
         if (!card) return
         const node = nodeRefs.current[idx]
@@ -359,20 +209,160 @@ export const Day1CinematicTrack: React.FC<Day1CinematicTrackProps> = ({
         const title = cardTitleRefs.current[idx]
         const desc = cardDescRefs.current[idx]
         const footer = cardFooterRefs.current[idx]
+        const internalElements = [badge, title, desc, footer].filter(Boolean)
 
-        const cardTl = gsap.timeline({
-          scrollTrigger: {
-            trigger: card,
-            start: 'top 75%',
-            toggleActions: 'play none none none',
-            once: true,
-          },
-        })
+        if (revealedDay1CardIndices.has(idx)) {
+          // Card already revealed in this session: maintain settled state
+          gsap.set(card, {
+            autoAlpha: 1,
+            y: 0,
+            scale: 1,
+            borderColor: '#222222',
+          })
+          if (node) {
+            gsap.set(node, {
+              backgroundColor: '#ffffff',
+              color: '#000000',
+              borderColor: '#ffffff',
+              boxShadow: '0 0 14px rgba(255, 255, 255, 0.75)',
+              scale: 1.1,
+            })
+          }
+          if (internalElements.length > 0) {
+            gsap.set(internalElements, { autoAlpha: 1, y: 0 })
+          }
+        } else {
+          // Card NOT yet reached: starts completely blank (invisible)
+          gsap.set(card, {
+            autoAlpha: 0,
+            y: 20,
+            scale: 0.98,
+            borderColor: '#202020',
+          })
+          if (node) {
+            gsap.set(node, {
+              backgroundColor: '#0c0c0c',
+              color: '#666666',
+              borderColor: 'rgba(255, 255, 255, 0.22)',
+              scale: 1,
+            })
+          }
+          if (internalElements.length > 0) {
+            gsap.set(internalElements, { autoAlpha: 0, y: 6 })
+          }
 
-        // A. Destination marker activates to white
-        if (node) {
+          // Progressive scroll-triggered entrance: as user scrolls down, element appears
+          const cardTl = gsap.timeline({
+            scrollTrigger: {
+              trigger: card,
+              start: 'top 75%',
+              toggleActions: 'play none none none',
+              once: true,
+              onEnter: () => {
+                revealedDay1CardIndices.add(idx)
+              },
+            },
+          })
+
+          if (node) {
+            cardTl.to(
+              node,
+              {
+                backgroundColor: '#ffffff',
+                color: '#000000',
+                borderColor: '#ffffff',
+                boxShadow: '0 0 14px rgba(255, 255, 255, 0.75)',
+                scale: 1.1,
+                duration: 0.45,
+                ease: 'power2.out',
+              },
+              0
+            )
+          }
+
           cardTl.to(
-            node,
+            card,
+            {
+              autoAlpha: 1,
+              y: 0,
+              scale: 1,
+              borderColor: 'rgba(255, 255, 255, 0.45)',
+              duration: 0.5,
+              ease: 'power2.out',
+            },
+            0
+          )
+
+          cardTl.to(
+            card,
+            {
+              borderColor: '#222222',
+              duration: 0.3,
+              ease: 'power1.out',
+            },
+            0.3
+          )
+
+          if (internalElements.length > 0) {
+            cardTl.to(
+              internalElements,
+              {
+                autoAlpha: 1,
+                y: 0,
+                stagger: 0.05,
+                duration: 0.4,
+                ease: 'power2.out',
+              },
+              0.1
+            )
+          }
+        }
+      })
+
+      // Final Destination: Finish Flag & Day 1 Completion Sequence
+      if (finishNodeRef.current) {
+        if (isDay1FinishRevealed) {
+          gsap.set(finishNodeRef.current, {
+            backgroundColor: '#ffffff',
+            color: '#000000',
+            borderColor: '#ffffff',
+            boxShadow: '0 0 14px rgba(255, 255, 255, 0.75)',
+            scale: 1.1,
+          })
+          if (finishFlagRef.current) {
+            gsap.set(finishFlagRef.current, { scale: 1, autoAlpha: 1 })
+          }
+          if (completionBadgeRef.current) {
+            gsap.set(completionBadgeRef.current, { autoAlpha: 1, y: 0 })
+          }
+        } else {
+          gsap.set(finishNodeRef.current, {
+            backgroundColor: '#0c0c0c',
+            color: '#666666',
+            borderColor: 'rgba(255, 255, 255, 0.22)',
+            scale: 1,
+          })
+          if (finishFlagRef.current) {
+            gsap.set(finishFlagRef.current, { scale: 0.85, autoAlpha: 0.7 })
+          }
+          if (completionBadgeRef.current) {
+            gsap.set(completionBadgeRef.current, { autoAlpha: 0, y: 10 })
+          }
+
+          const finishTl = gsap.timeline({
+            scrollTrigger: {
+              trigger: finishNodeRef.current,
+              start: 'top 75%',
+              toggleActions: 'play none none none',
+              once: true,
+              onEnter: () => {
+                isDay1FinishRevealed = true
+              },
+            },
+          })
+
+          finishTl.to(
+            finishNodeRef.current,
             {
               backgroundColor: '#ffffff',
               color: '#000000',
@@ -384,91 +374,22 @@ export const Day1CinematicTrack: React.FC<Day1CinematicTrackProps> = ({
             },
             0
           )
-        }
 
-        // B. Card reveals with subtle upward motion & border illumination
-        cardTl.to(
-          card,
-          {
-            autoAlpha: 1,
-            y: 0,
-            scale: 1,
-            borderColor: 'rgba(255, 255, 255, 0.45)',
-            duration: 0.5,
-            ease: 'power2.out',
-          },
-          0
-        )
-        // Settle border to crisp dark
-        cardTl.to(
-          card,
-          {
-            borderColor: '#222222',
-            duration: 0.3,
-            ease: 'power1.out',
-          },
-          0.3
-        )
+          if (finishFlagRef.current) {
+            finishTl.to(
+              finishFlagRef.current,
+              { scale: 1, autoAlpha: 1, duration: 0.45, ease: 'back.out(2)' },
+              0
+            )
+          }
 
-        // C. Staggered internal text reveals
-        const internalElements = [badge, title, desc, footer].filter(Boolean)
-        if (internalElements.length > 0) {
-          cardTl.to(
-            internalElements,
-            {
-              autoAlpha: 1,
-              y: 0,
-              stagger: 0.05,
-              duration: 0.4,
-              ease: 'power2.out',
-            },
-            0.1
-          )
-        }
-      })
-
-      // Final Destination: Finish Flag & Day 1 Completion Sequence
-      // As the line approaches, the flag becomes white coloured like the other numbers.
-      // Once revealed, scrolling back up does NOT disappear or replay.
-      if (finishNodeRef.current) {
-        const finishTl = gsap.timeline({
-          scrollTrigger: {
-            trigger: finishNodeRef.current,
-            start: 'top 75%',
-            toggleActions: 'play none none none',
-            once: true,
-          },
-        })
-
-        // Turns white like the other numbers
-        finishTl.to(
-          finishNodeRef.current,
-          {
-            backgroundColor: '#ffffff',
-            color: '#000000',
-            borderColor: '#ffffff',
-            boxShadow: '0 0 14px rgba(255, 255, 255, 0.75)',
-            scale: 1.1,
-            duration: 0.45,
-            ease: 'power2.out',
-          },
-          0
-        )
-
-        if (finishFlagRef.current) {
-          finishTl.to(
-            finishFlagRef.current,
-            { scale: 1, autoAlpha: 1, duration: 0.45, ease: 'back.out(2)' },
-            0
-          )
-        }
-
-        if (completionBadgeRef.current) {
-          finishTl.to(
-            completionBadgeRef.current,
-            { autoAlpha: 1, y: 0, duration: 0.45, ease: 'power2.out' },
-            0.1
-          )
+          if (completionBadgeRef.current) {
+            finishTl.to(
+              completionBadgeRef.current,
+              { autoAlpha: 1, y: 0, duration: 0.45, ease: 'power2.out' },
+              0.1
+            )
+          }
         }
       }
     }, containerRef)
@@ -478,8 +399,15 @@ export const Day1CinematicTrack: React.FC<Day1CinematicTrackProps> = ({
       ScrollTrigger.refresh()
     }, 100)
 
+    const handleResize = () => {
+      calculateLineGeometry()
+      ScrollTrigger.refresh()
+    }
+    window.addEventListener('resize', handleResize)
+
     return () => {
       clearTimeout(timer)
+      window.removeEventListener('resize', handleResize)
       ctx.revert()
     }
   }, [daySchedule])

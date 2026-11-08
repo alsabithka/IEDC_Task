@@ -6,6 +6,7 @@ gsap.registerPlugin(useGSAP)
 
 export interface PreloaderProps {
   onComplete?: () => void
+  onStartExit?: () => void
 }
 
 /**
@@ -21,7 +22,7 @@ export interface PreloaderProps {
  * 4. Curtain Lift Reveal: The entire full-screen overlay animates upwards (yPercent: -100)
  *    to reveal the already rendered website underneath.
  */
-export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
+export const Preloader: React.FC<PreloaderProps> = ({ onComplete, onStartExit }) => {
   const containerRef = useRef<HTMLDivElement>(null)
   const initialWordRef = useRef<HTMLDivElement>(null)
   const targetRef = useRef<HTMLDivElement>(null)
@@ -151,6 +152,7 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
 
       const tl = gsap.timeline({
         onComplete: () => {
+          onComplete?.()
           setIsRemoved(true)
         },
       })
@@ -302,6 +304,14 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
             duration: 0.85,
             ease: 'power4.inOut',
           },
+        )
+        // Trigger main content loading 1 second back from preloader finish
+        .call(
+          () => {
+            onStartExit?.()
+          },
+          [],
+          '-=1.0'
         )
     },
     { dependencies: [fontsLoaded], scope: containerRef },

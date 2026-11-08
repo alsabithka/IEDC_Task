@@ -1,4 +1,5 @@
-import React, { useRef, useSyncExternalStore } from 'react'
+import React, { useRef, useEffect, useSyncExternalStore } from 'react'
+import gsap from 'gsap'
 import { siteConfig } from '../../config/siteConfig'
 import { EVENT_CONFIG } from '../../data/eventConfig'
 import { scrollToSheet } from '../../lib/scrollUtils'
@@ -20,10 +21,69 @@ function getMobileServerSnapshot() {
   return false
 }
 
-export const MainContentPanel: React.FC = () => {
+// In-memory runtime flag for hero entrance animation.
+// Cleared automatically on full browser reload (F5 / Ctrl + R).
+// Preserves already-animated hero state across client-side navigation (e.g. returning from train game).
+let hasHeroAnimatedInRuntime = false
+
+export interface MainContentPanelProps {
+  isHeroReady?: boolean
+  isPreloaderActive?: boolean
+}
+
+export const MainContentPanel: React.FC<MainContentPanelProps> = ({
+  isHeroReady = true,
+  isPreloaderActive,
+}) => {
   const countdown = useEventCountdown()
   const isMobile = useSyncExternalStore(subscribeMobile, getMobileSnapshot, getMobileServerSnapshot)
   const leftColRef = useRef<HTMLDivElement>(null)
+  const contentGridRef = useRef<HTMLDivElement>(null)
+
+  // Determine whether hero animation is cleared to start
+  const shouldAnimate = isPreloaderActive !== undefined ? !isPreloaderActive : isHeroReady
+
+  // Elegant intro entrance transition on load
+  // Starts 1 second back from preloader finish so the main content loads smoothly as the preloader exits
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const container = contentGridRef.current
+    if (!container) return
+
+    const prefersReducedMotion = window.matchMedia(
+      '(prefers-reduced-motion: reduce)'
+    ).matches
+
+    const targets = container.querySelectorAll('[data-hero-item]')
+    if (!targets.length) return
+
+    if (prefersReducedMotion || hasHeroAnimatedInRuntime) {
+      gsap.set(targets, { opacity: 1, y: 0, clearProps: 'all' })
+      return
+    }
+
+    // While preloader is running, keep hero elements in initial blank state
+    if (!shouldAnimate) {
+      gsap.set(targets, { opacity: 0, y: 22 })
+      return
+    }
+
+    // Starts loading 1 second back from preloader finish
+    hasHeroAnimatedInRuntime = true
+
+    gsap.fromTo(
+      targets,
+      { opacity: 0, y: 22 },
+      {
+        opacity: 1,
+        y: 0,
+        duration: 1.0,
+        stagger: 0.08,
+        ease: 'power2.out',
+        clearProps: 'transform',
+      }
+    )
+  }, [shouldAnimate])
 
   const handleRegisterClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     const target = document.querySelector(siteConfig.hero.ctaPrimary.href || '#register')
@@ -41,7 +101,10 @@ export const MainContentPanel: React.FC = () => {
       {/* ── INTERACTIVE STICK EFFECT ON THE BACKSIDE OF THE WHOLE PAGE ── */}
       <FullPageStickField isMobile={isMobile} />
 
-      <div className="w-full max-w-[1720px] 2xl:max-w-[1800px] mx-auto grid grid-cols-1 lg:grid-cols-[minmax(0,45fr)_minmax(0,55fr)] gap-8 lg:gap-10 xl:gap-14 items-center relative z-10">
+      <div
+        ref={contentGridRef}
+        className="w-full max-w-[1720px] 2xl:max-w-[1800px] mx-auto grid grid-cols-1 lg:grid-cols-[minmax(0,45fr)_minmax(0,55fr)] gap-8 lg:gap-10 xl:gap-14 items-center relative z-10"
+      >
         {/* ==================================================================
             LEFT COLUMN: IDENTIFICATION LABEL, EDITORIAL STATEMENT, DESCRIPTION, CTA (45%)
             ================================================================== */}
@@ -50,7 +113,7 @@ export const MainContentPanel: React.FC = () => {
           className="flex flex-col items-start text-left z-10 w-full"
         >
           {/* 1. Identification Label with white bar accent */}
-          <div className="flex items-center gap-2.5 mb-3 sm:mb-4 lg:mb-5">
+          <div data-hero-item className="flex items-center gap-2.5 mb-3 sm:mb-4 lg:mb-5">
             <span
               className="w-[3px] h-4 sm:h-5 bg-white shrink-0 rounded-xs"
               aria-hidden="true"
@@ -61,19 +124,19 @@ export const MainContentPanel: React.FC = () => {
           </div>
 
           {/* 2. Main Three-Line Editorial Statement (Large, Bold, High-Impact) */}
-          <h1 className="font-display font-normal uppercase text-white tracking-[-0.015em] leading-[0.93] text-[clamp(3.2rem,8.5vw,4.8rem)] lg:text-[clamp(4.2rem,5.8vw+0.4rem,8.2rem)] text-left">
+          <h1 data-hero-item className="font-display font-normal uppercase text-white tracking-[-0.015em] leading-[0.93] text-[clamp(3.2rem,8.5vw,4.8rem)] lg:text-[clamp(4.2rem,5.8vw+0.4rem,8.2rem)] text-left">
             <span className="block">IDEAS</span>
             <span className="block">BUILD</span>
             <span className="block">REALITY</span>
           </h1>
 
           {/* 3. Short Event Description */}
-          <p className="mt-4 sm:mt-5 lg:mt-6 text-sm sm:text-base md:text-lg lg:text-xl text-[#D0D0D0] font-sans font-medium leading-relaxed max-w-md sm:max-w-xl text-left">
+          <p data-hero-item className="mt-4 sm:mt-5 lg:mt-6 text-sm sm:text-base md:text-lg lg:text-xl text-[#D0D0D0] font-sans font-medium leading-relaxed max-w-md sm:max-w-xl text-left">
             A 24-hour student ideathon by IEDC BOOTCAMP CEC.
           </p>
 
           {/* 4. Desktop Registration CTA Button */}
-          <div className="mt-6 sm:mt-8 lg:mt-9 hidden lg:block">
+          <div data-hero-item className="mt-6 sm:mt-8 lg:mt-9 hidden lg:block">
             <a
               href={siteConfig.hero.ctaPrimary.href || '#register'}
               onClick={handleRegisterClick}
@@ -87,7 +150,7 @@ export const MainContentPanel: React.FC = () => {
         {/* ==================================================================
             RIGHT COLUMN: TEXT-DRIVEN COUNTDOWN COUNTER WITH DATE (55%)
             ================================================================== */}
-        <div className="flex flex-col items-center lg:items-end justify-center w-full relative">
+        <div data-hero-item className="flex flex-col items-center lg:items-end justify-center w-full relative">
           <TextCountdownCounter
             days={countdown.days}
             hours={countdown.hours}

@@ -68,25 +68,30 @@ export const animateReveal = (
   const triggerEl = options.trigger || (targets as HTMLElement)
   if (!triggerEl) return null
 
-  // 3. One-time ScrollTrigger entrance
-  return ScrollTrigger.create({
-    trigger: triggerEl,
-    start: options.start || 'top 88%',
-    once: true,
-    onEnter: () => {
-      completedRevealIds.add(options.id)
-      gsap.fromTo(
-        targets,
-        { opacity: 0, y: options.y ?? 20 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: options.duration ?? 0.65,
-          stagger: options.stagger ?? 0.08,
-          ease: 'power2.out',
-          clearProps: 'transform',
-        }
-      )
-    },
+  // 3. Immediately initialize elements to BLANK (opacity: 0, translated down)
+  // so while scrolling, the page is blank first until each element is scrolled into view
+  gsap.set(targets, {
+    opacity: 0,
+    y: options.y ?? 24,
   })
+
+  // 4. Scroll-triggered entrance: as user scrolls down, elements smoothly appear from blank
+  const tween = gsap.to(targets, {
+    opacity: 1,
+    y: 0,
+    duration: options.duration ?? 0.7,
+    stagger: options.stagger ?? 0.08,
+    ease: 'power2.out',
+    scrollTrigger: {
+      trigger: triggerEl,
+      start: options.start || 'top 85%',
+      once: true,
+      onEnter: () => {
+        completedRevealIds.add(options.id)
+      },
+    },
+    clearProps: 'transform',
+  })
+
+  return tween.scrollTrigger ?? null
 }
