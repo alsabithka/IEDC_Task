@@ -8,11 +8,40 @@ import {
   Flag,
   Navigation,
   ArrowRight,
-  ArrowLeft,
 } from 'lucide-react'
 import type { DaySchedule } from './ScheduleRoadmapSection'
 
 gsap.registerPlugin(ScrollTrigger)
+
+// Session cache tracking (in-memory + sessionStorage)
+const DAY2_SESSION_STORAGE_KEY = 'iedc_day2_cinematic_cached'
+let day2SessionCached = false
+
+const isDay2Cached = (): boolean => {
+  if (day2SessionCached) return true
+  try {
+    if (typeof window !== 'undefined' && window.sessionStorage) {
+      if (sessionStorage.getItem(DAY2_SESSION_STORAGE_KEY) === 'true') {
+        day2SessionCached = true
+        return true
+      }
+    }
+  } catch {
+    // Ignore security/quota errors in restricted environments
+  }
+  return false
+}
+
+const markDay2Cached = () => {
+  day2SessionCached = true
+  try {
+    if (typeof window !== 'undefined' && window.sessionStorage) {
+      sessionStorage.setItem(DAY2_SESSION_STORAGE_KEY, 'true')
+    }
+  } catch {
+    // Ignore security/quota errors
+  }
+}
 
 interface Day2CinematicTrackProps {
   daySchedule: DaySchedule
@@ -30,11 +59,12 @@ interface Day2CinematicTrackProps {
  * - Station destination markers (05-08) illuminate as the line reaches each station
  * - Session cards reveal as they approach the center of the page
  * - Completion flag pops when reached
- * - Back to Day 1 button glides smoothly back up
+ * - Once revealed or loaded, sessions are cached per session (no re-hiding, no loader replay when switching tabs)
+ * - The line smoothly travels back and forth in accordance with scroll even after first load
+ * - Supports smooth reverse scrolling and prefers-reduced-motion fallback
  */
 export const Day2CinematicTrack: React.FC<Day2CinematicTrackProps> = ({
   daySchedule,
-  onBackToDay1,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null)
   const innerTrackRef = useRef<HTMLDivElement>(null)
@@ -57,23 +87,58 @@ export const Day2CinematicTrack: React.FC<Day2CinematicTrackProps> = ({
   const finishNodeRef = useRef<HTMLDivElement>(null)
   const finishFlagRef = useRef<HTMLDivElement>(null)
   const completionBadgeRef = useRef<HTMLDivElement>(null)
-  const day1BtnRef = useRef<HTMLButtonElement>(null)
 
   useEffect(() => {
     const prefersReducedMotion = window.matchMedia(
       '(prefers-reduced-motion: reduce)'
     ).matches
 
+    const cached = isDay2Cached()
+
+    // Calculate exact geometry: Line starts at center of Start Node and ends at center of Flag Node
+    const calculateLineGeometry = () => {
+      if (!innerTrackRef.current || !startNodeRef.current || !finishNodeRef.current || !lineTrackRef.current) {
+        return 800
+      }
+      const innerRect = innerTrackRef.current.getBoundingClientRect()
+      const startRect = startNodeRef.current.getBoundingClientRect()
+      const finishRect = finishNodeRef.current.getBoundingClientRect()
+
+      const startY = (startRect.top - innerRect.top) + (startRect.height / 2)
+      const finishY = (finishRect.top - innerRect.top) + (finishRect.height / 2)
+      const totalLineLength = Math.max(0, finishY - startY)
+
+      lineTrackRef.current.style.top = `${startY}px`
+      lineTrackRef.current.style.height = `${totalLineLength}px`
+
+      if (svgLineRef.current) {
+        svgLineRef.current.setAttribute('y2', String(totalLineLength))
+      }
+
+      return totalLineLength
+    }
+
+    // CASE 1: If reduced motion is requested, immediately present all content statically
     if (prefersReducedMotion) {
+      markDay2Cached()
       if (cardRefs.current) {
         gsap.set(cardRefs.current.filter(Boolean), {
           autoAlpha: 1,
           y: 0,
           scale: 1,
+          borderColor: '#222222',
         })
       }
       if (nodeRefs.current) {
         gsap.set(nodeRefs.current.filter(Boolean), {
+          backgroundColor: '#ffffff',
+          color: '#000000',
+          borderColor: '#ffffff',
+          scale: 1,
+        })
+      }
+      if (finishNodeRef.current) {
+        gsap.set(finishNodeRef.current, {
           backgroundColor: '#ffffff',
           color: '#000000',
           borderColor: '#ffffff',
@@ -86,19 +151,115 @@ export const Day2CinematicTrack: React.FC<Day2CinematicTrackProps> = ({
       if (completionBadgeRef.current) {
         gsap.set(completionBadgeRef.current, { autoAlpha: 1, y: 0 })
       }
-      if (day1BtnRef.current) {
-        gsap.set(day1BtnRef.current, {
-          autoAlpha: 1,
-          y: 0,
-          scale: 1,
-          pointerEvents: 'auto',
-        })
-      }
       if (svgLineRef.current) {
-        gsap.set(svgLineRef.current, { strokeDashoffset: 0 })
+        const totalLineLength = calculateLineGeometry()
+        gsap.set(svgLineRef.current, { strokeDasharray: totalLineLength, strokeDashoffset: 0 })
       }
       return
     }
+
+    // CASE 2: ALREADY CACHED IN THIS SESSION
+    // Skip loader/entrance animation. Keep cards and stations visible without re-animating.
+    // Line continues to scrub smoothly back and forth with scroll.
+    if (cached) {
+      const ctx = gsap.context(() => {
+        if (
+          !containerRef.current ||
+          !innerTrackRef.current ||
+          !startNodeRef.current ||
+          !finishNodeRef.current ||
+          !svgLineRef.current ||
+          !lineTrackRef.current
+        ) {
+          return
+        }
+
+        // Outer container visible immediately without delay
+        gsap.set(containerRef.current, { autoAlpha: 1, y: 0 })
+
+        // All cards visible immediately in settled state
+        gsap.set(cardRefs.current.filter(Boolean), {
+          autoAlpha: 1,
+          y: 0,
+          scale: 1,
+          borderColor: '#222222',
+        })
+
+        // Staggered internal text elements visible
+        gsap.set(cardBadgeRefs.current.filter(Boolean), { autoAlpha: 1, y: 0 })
+        gsap.set(cardTitleRefs.current.filter(Boolean), { autoAlpha: 1, y: 0 })
+        gsap.set(cardDescRefs.current.filter(Boolean), { autoAlpha: 1, y: 0 })
+        gsap.set(cardFooterRefs.current.filter(Boolean), { autoAlpha: 1, y: 0 })
+
+        // Destination markers in active illuminated state
+        gsap.set(nodeRefs.current.filter(Boolean), {
+          backgroundColor: '#ffffff',
+          color: '#000000',
+          borderColor: '#ffffff',
+          boxShadow: '0 0 14px rgba(255, 255, 255, 0.75)',
+          scale: 1.1,
+        })
+
+        // Finish flag node in active illuminated state
+        if (finishNodeRef.current) {
+          gsap.set(finishNodeRef.current, {
+            backgroundColor: '#ffffff',
+            color: '#000000',
+            borderColor: '#ffffff',
+            boxShadow: '0 0 14px rgba(255, 255, 255, 0.75)',
+            scale: 1.1,
+          })
+        }
+        if (finishFlagRef.current) {
+          gsap.set(finishFlagRef.current, { scale: 1, autoAlpha: 1 })
+        }
+        if (completionBadgeRef.current) {
+          gsap.set(completionBadgeRef.current, { autoAlpha: 1, y: 0 })
+        }
+
+        const totalLineLength = calculateLineGeometry()
+
+        gsap.set(svgLineRef.current, {
+          strokeDasharray: totalLineLength,
+          strokeDashoffset: totalLineLength,
+        })
+
+        // Scroll-Driven Timeline Drawing continues to scrub back and forth with scroll
+        gsap.to(svgLineRef.current, {
+          strokeDashoffset: 0,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: startNodeRef.current,
+            start: 'top 65%',
+            endTrigger: finishNodeRef.current,
+            end: 'center center',
+            scrub: 0.3,
+            onRefresh: (self) => {
+              const h = calculateLineGeometry()
+              if (svgLineRef.current) {
+                gsap.set(svgLineRef.current, {
+                  strokeDasharray: h,
+                  strokeDashoffset: (1 - self.progress) * h,
+                })
+              }
+            },
+          },
+        })
+      }, containerRef)
+
+      const timer = setTimeout(() => {
+        ScrollTrigger.refresh()
+      }, 100)
+
+      return () => {
+        clearTimeout(timer)
+        ctx.revert()
+      }
+    }
+
+    // CASE 3: FIRST VISIT IN THIS SESSION (Uncached)
+    // Mark cached immediately so switching away and returning never reloads/replays
+    markDay2Cached()
 
     const ctx = gsap.context(() => {
       if (
@@ -110,29 +271,6 @@ export const Day2CinematicTrack: React.FC<Day2CinematicTrackProps> = ({
         !lineTrackRef.current
       ) {
         return
-      }
-
-      // Calculate exact geometry: Line starts at center of Start Node and ends at center of Flag Node
-      const calculateLineGeometry = () => {
-        if (!innerTrackRef.current || !startNodeRef.current || !finishNodeRef.current || !lineTrackRef.current) {
-          return 800
-        }
-        const innerRect = innerTrackRef.current.getBoundingClientRect()
-        const startRect = startNodeRef.current.getBoundingClientRect()
-        const finishRect = finishNodeRef.current.getBoundingClientRect()
-
-        const startY = (startRect.top - innerRect.top) + (startRect.height / 2)
-        const finishY = (finishRect.top - innerRect.top) + (finishRect.height / 2)
-        const totalLineLength = Math.max(0, finishY - startY)
-
-        lineTrackRef.current.style.top = `${startY}px`
-        lineTrackRef.current.style.height = `${totalLineLength}px`
-
-        if (svgLineRef.current) {
-          svgLineRef.current.setAttribute('y2', String(totalLineLength))
-        }
-
-        return totalLineLength
       }
 
       const totalLineLength = calculateLineGeometry()
@@ -162,22 +300,23 @@ export const Day2CinematicTrack: React.FC<Day2CinematicTrackProps> = ({
         scale: 1,
       })
 
+      // Completion elements: starts dark inactive like other numbers
+      if (finishNodeRef.current) {
+        gsap.set(finishNodeRef.current, {
+          backgroundColor: '#0c0c0c',
+          color: '#666666',
+          borderColor: 'rgba(255, 255, 255, 0.22)',
+          scale: 1,
+        })
+      }
       if (finishFlagRef.current) {
-        gsap.set(finishFlagRef.current, { scale: 0, autoAlpha: 0 })
+        gsap.set(finishFlagRef.current, { scale: 0.85, autoAlpha: 0.7 })
       }
       if (completionBadgeRef.current) {
         gsap.set(completionBadgeRef.current, { autoAlpha: 0, y: 10 })
       }
-      if (day1BtnRef.current) {
-        gsap.set(day1BtnRef.current, {
-          autoAlpha: 0,
-          y: 18,
-          scale: 0.95,
-          pointerEvents: 'none',
-        })
-      }
 
-      // Outer Container Smooth Entrance
+      // Outer Container Smooth Entrance (plays once on scroll down)
       gsap.fromTo(
         containerRef.current,
         { autoAlpha: 0.7, y: 16 },
@@ -189,11 +328,14 @@ export const Day2CinematicTrack: React.FC<Day2CinematicTrackProps> = ({
           scrollTrigger: {
             trigger: containerRef.current,
             start: 'top 85%',
+            toggleActions: 'play none none none',
+            once: true,
           },
         }
       )
 
-      // Scroll-Driven Timeline Drawing: connects directly to flag symbol as it approaches center of page
+      // Scroll-Driven Timeline Drawing (Fine glowing white hairline connecting directly to the flag symbol)
+      // The line smoothly travels back and forth in accordance with scroll even after first load
       gsap.to(svgLineRef.current, {
         strokeDashoffset: 0,
         ease: 'none',
@@ -216,6 +358,7 @@ export const Day2CinematicTrack: React.FC<Day2CinematicTrackProps> = ({
       })
 
       // Station Destinations Sequence: Each marker activates & card reveals as it approaches center of the page
+      // Once revealed, scrolling back up does NOT disappear or replay.
       cardRefs.current.forEach((card, idx) => {
         if (!card) return
         const node = nodeRefs.current[idx]
@@ -228,8 +371,8 @@ export const Day2CinematicTrack: React.FC<Day2CinematicTrackProps> = ({
           scrollTrigger: {
             trigger: card,
             start: 'top 75%',
-            end: 'top 48%',
-            scrub: 0.3,
+            toggleActions: 'play none none none',
+            once: true,
           },
         })
 
@@ -242,6 +385,7 @@ export const Day2CinematicTrack: React.FC<Day2CinematicTrackProps> = ({
               borderColor: '#ffffff',
               boxShadow: '0 0 14px rgba(255, 255, 255, 0.75)',
               scale: 1.1,
+              duration: 0.45,
               ease: 'power2.out',
             },
             0
@@ -255,6 +399,7 @@ export const Day2CinematicTrack: React.FC<Day2CinematicTrackProps> = ({
             y: 0,
             scale: 1,
             borderColor: 'rgba(255, 255, 255, 0.45)',
+            duration: 0.5,
             ease: 'power2.out',
           },
           0
@@ -264,9 +409,10 @@ export const Day2CinematicTrack: React.FC<Day2CinematicTrackProps> = ({
           card,
           {
             borderColor: '#222222',
+            duration: 0.3,
             ease: 'power1.out',
           },
-          0.25
+          0.3
         )
 
         const internalElements = [badge, title, desc, footer].filter(Boolean)
@@ -277,28 +423,45 @@ export const Day2CinematicTrack: React.FC<Day2CinematicTrackProps> = ({
               autoAlpha: 1,
               y: 0,
               stagger: 0.05,
+              duration: 0.4,
               ease: 'power2.out',
             },
-            0.08
+            0.1
           )
         }
       })
 
       // Final Destination: Finish Flag & Day 2 Completion Sequence
+      // Once revealed, scrolling back up does NOT disappear or replay.
       if (finishNodeRef.current) {
         const finishTl = gsap.timeline({
           scrollTrigger: {
             trigger: finishNodeRef.current,
             start: 'top 75%',
-            end: 'center center',
-            scrub: 0.3,
+            toggleActions: 'play none none none',
+            once: true,
           },
         })
+
+        // Turns white like the other numbers as the line approaches
+        finishTl.to(
+          finishNodeRef.current,
+          {
+            backgroundColor: '#ffffff',
+            color: '#000000',
+            borderColor: '#ffffff',
+            boxShadow: '0 0 14px rgba(255, 255, 255, 0.75)',
+            scale: 1.1,
+            duration: 0.45,
+            ease: 'power2.out',
+          },
+          0
+        )
 
         if (finishFlagRef.current) {
           finishTl.to(
             finishFlagRef.current,
-            { scale: 1, autoAlpha: 1, ease: 'back.out(2)' },
+            { scale: 1, autoAlpha: 1, duration: 0.45, ease: 'back.out(2)' },
             0
           )
         }
@@ -306,22 +469,8 @@ export const Day2CinematicTrack: React.FC<Day2CinematicTrackProps> = ({
         if (completionBadgeRef.current) {
           finishTl.to(
             completionBadgeRef.current,
-            { autoAlpha: 1, y: 0, ease: 'power2.out' },
+            { autoAlpha: 1, y: 0, duration: 0.45, ease: 'power2.out' },
             0.1
-          )
-        }
-
-        if (day1BtnRef.current) {
-          finishTl.to(
-            day1BtnRef.current,
-            {
-              autoAlpha: 1,
-              y: 0,
-              scale: 1,
-              pointerEvents: 'auto',
-              ease: 'back.out(1.5)',
-            },
-            0.22
           )
         }
       }
@@ -375,7 +524,7 @@ export const Day2CinematicTrack: React.FC<Day2CinematicTrackProps> = ({
             ==================================================================== */}
         <div
           ref={lineTrackRef}
-          className="absolute left-[19px] sm:left-[29px] w-[2px] pointer-events-none z-0"
+          className="absolute left-[19px] sm:left-[29px] w-[2px] pointer-events-none z-10"
           aria-hidden="true"
         >
           <svg className="absolute inset-0 w-full h-full overflow-visible">
@@ -407,7 +556,7 @@ export const Day2CinematicTrack: React.FC<Day2CinematicTrackProps> = ({
 
         {/* Waypoint Start Node */}
         <div ref={startNodeRef} className="relative pl-12 sm:pl-16 mb-8">
-          <div className="absolute left-2 sm:left-4 top-0.5 flex h-6 w-6 sm:h-7 sm:w-7 items-center justify-center rounded-full bg-white text-black ring-4 ring-black shadow-lg z-10">
+          <div className="absolute left-2 sm:left-4 top-0.5 flex h-6 w-6 sm:h-7 sm:w-7 items-center justify-center rounded-full bg-white text-black ring-4 ring-black shadow-lg z-30">
             <Navigation className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-black" />
           </div>
 
@@ -439,7 +588,7 @@ export const Day2CinematicTrack: React.FC<Day2CinematicTrackProps> = ({
                   ref={(el) => {
                     nodeRefs.current[mIdx] = el
                   }}
-                  className="absolute left-2 sm:left-4 top-3.5 flex h-6 w-6 sm:h-7 sm:w-7 items-center justify-center rounded-full bg-[#0c0c0c] border-2 border-white/25 text-[#666666] ring-4 ring-black shadow-md z-10 transition-colors"
+                  className="absolute left-2 sm:left-4 top-3.5 flex h-6 w-6 sm:h-7 sm:w-7 items-center justify-center rounded-full bg-[#0c0c0c] border-2 border-white/25 text-[#666666] ring-4 ring-black shadow-md z-30 transition-colors"
                 >
                   <span className="font-mono text-[10px] sm:text-xs font-bold leading-none">
                     {milestone.stepNumber}
@@ -523,16 +672,18 @@ export const Day2CinematicTrack: React.FC<Day2CinematicTrackProps> = ({
 
         {/* ====================================================================
             WAYPOINT FINISH DESTINATION & DAY 2 COMPLETION
-            Timeline connects directly into the Flag symbol.
+            The flag sits in front of the line (z-30) and the line terminates
+            at the middle of the flag. As the line approaches, the flag turns
+            white like the other numbers.
             ==================================================================== */}
-        <div className="relative pl-12 sm:pl-16 mt-8 pt-1">
+        <div className="relative pl-12 sm:pl-16 mt-8 pb-2">
           {/* Finish Flag Node */}
           <div
             ref={finishNodeRef}
-            className="absolute left-2 sm:left-4 top-0.5 flex h-6 w-6 sm:h-7 sm:w-7 items-center justify-center rounded-full bg-white text-black ring-4 ring-black shadow-lg z-10"
+            className="absolute left-2 sm:left-4 top-0.5 flex h-6 w-6 sm:h-7 sm:w-7 items-center justify-center rounded-full bg-[#0c0c0c] border-2 border-white/25 text-[#666666] ring-4 ring-black shadow-md z-30 transition-colors"
           >
-            <div ref={finishFlagRef}>
-              <Flag className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-black" />
+            <div ref={finishFlagRef} className="flex items-center justify-center">
+              <Flag className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-current" />
             </div>
           </div>
 
@@ -549,24 +700,6 @@ export const Day2CinematicTrack: React.FC<Day2CinematicTrackProps> = ({
               </span>
             </div>
           </div>
-
-          {/* Day 2 Bottom Action: Back to Day 1 button if needed */}
-          {onBackToDay1 && (
-            <div className="mt-6 pt-5 border-t border-[#1f1f1f] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <p className="font-sans text-xs sm:text-sm text-[#888888]">
-                Review Day 01 inaugurations and collaboration sessions.
-              </p>
-              <button
-                ref={day1BtnRef}
-                type="button"
-                onClick={onBackToDay1}
-                className="group inline-flex items-center justify-center gap-2.5 rounded-full border border-white/20 bg-white/10 text-white hover:bg-white hover:text-black px-6 py-3 font-sans text-xs sm:text-sm font-black uppercase tracking-wider transition-all cursor-pointer shrink-0 shadow-lg"
-              >
-                <ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform duration-200" />
-                <span>BACK TO DAY 1</span>
-              </button>
-            </div>
-          )}
         </div>
       </div>
     </div>
