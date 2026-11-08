@@ -160,24 +160,49 @@ export const PanelHeader: React.FC = () => {
               aria-expanded={menuOpen}
               aria-controls="mobile-navigation-drawer"
             >
-              {/* Smooth Animated Hamburger to 'X' icon transition */}
-              <div className="relative w-4 h-3.5 flex flex-col justify-between">
-                <span
-                  className={`block h-0.5 w-full bg-white rounded-full transition-all duration-300 ease-out transform origin-left ${
-                    menuOpen ? 'rotate-45 translate-x-0.5 -translate-y-0.5' : ''
-                  }`}
+              {/* Perfectly centered, fluid SVG morph between 3 bars and symmetrical 'X' */}
+              <svg
+                className="w-4 h-4 overflow-visible"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.2"
+                strokeLinecap="round"
+                aria-hidden="true"
+              >
+                <line
+                  x1="4"
+                  y1="12"
+                  x2="20"
+                  y2="12"
+                  className="transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]"
+                  style={{
+                    transformOrigin: '12px 12px',
+                    transform: menuOpen ? 'rotate(45deg)' : 'translateY(-6px)',
+                  }}
                 />
-                <span
-                  className={`block h-0.5 w-full bg-white rounded-full transition-all duration-200 ease-out ${
-                    menuOpen ? 'opacity-0 scale-x-0' : 'opacity-100 scale-x-100'
-                  }`}
+                <line
+                  x1="4"
+                  y1="12"
+                  x2="20"
+                  y2="12"
+                  className="transition-opacity duration-200 ease-out"
+                  style={{
+                    opacity: menuOpen ? 0 : 1,
+                  }}
                 />
-                <span
-                  className={`block h-0.5 w-full bg-white rounded-full transition-all duration-300 ease-out transform origin-left ${
-                    menuOpen ? '-rotate-45 translate-x-0.5 translate-y-0.5' : ''
-                  }`}
+                <line
+                  x1="4"
+                  y1="12"
+                  x2="20"
+                  y2="12"
+                  className="transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]"
+                  style={{
+                    transformOrigin: '12px 12px',
+                    transform: menuOpen ? 'rotate(-45deg)' : 'translateY(6px)',
+                  }}
                 />
-              </div>
+              </svg>
             </button>
           </div>
         </div>
