@@ -1,4 +1,8 @@
-import type { RegistrationFormData, RegistrationFormErrors } from './types'
+import type {
+  RegistrationFormData,
+  RegistrationFormErrors,
+  TeamMemberErrors,
+} from './types'
 
 export const validateFullName = (value: string): string | null => {
   const trimmed = value.trim()
@@ -15,7 +19,8 @@ export const validateEmail = (value: string): string | null => {
   const trimmed = value.trim()
   if (!trimmed) return 'Email address is required.'
   // Strict standard email format check
-  const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/
+  const emailRegex =
+    /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/
   if (!emailRegex.test(trimmed)) {
     return 'Please enter a valid email address (e.g. name@college.edu).'
   }
@@ -72,16 +77,6 @@ export const validateTeamSize = (size: number): string | null => {
   return null
 }
 
-export const validateMemberName = (value: string, memberNumber: number): string | null => {
-  const trimmed = value.trim()
-  if (!trimmed) return `Member ${memberNumber} name is required.`
-  if (trimmed.length < 2) return `Member ${memberNumber} name must be at least 2 characters.`
-  if (!/^[a-zA-Z\s.'-]+$/.test(trimmed)) {
-    return `Member ${memberNumber} name should only contain letters, spaces, and hyphens.`
-  }
-  return null
-}
-
 export const validateEntireForm = (data: RegistrationFormData): {
   isValid: boolean
   errors: RegistrationFormErrors
@@ -112,22 +107,75 @@ export const validateEntireForm = (data: RegistrationFormData): {
   const teamSizeErr = validateTeamSize(data.teamSize)
   if (teamSizeErr) errors.teamSize = teamSizeErr
 
-  // Validate team members (members 2..N)
+  // Validate additional team members (Members 2..N)
   const memberCountNeeded = Math.max(0, data.teamSize - 1)
-  const memberErrors: string[] = []
+  const memberErrors: TeamMemberErrors[] = []
   let hasMemberError = false
 
   for (let i = 0; i < memberCountNeeded; i++) {
-    const memberVal = data.teamMembers[i] || ''
-    const err = validateMemberName(memberVal, i + 2)
-    memberErrors.push(err || '')
-    if (err) hasMemberError = true
+    const member = data.teamMembers[i] || {
+      fullName: '',
+      email: '',
+      phone: '',
+      college: '',
+      department: '',
+      yearOfStudy: '',
+    }
+    const memberErr: TeamMemberErrors = {}
+
+    const mNameErr = validateFullName(member.fullName)
+    if (mNameErr) {
+      memberErr.fullName = mNameErr
+      hasMemberError = true
+    }
+
+    const mEmailErr = validateEmail(member.email)
+    if (mEmailErr) {
+      memberErr.email = mEmailErr
+      hasMemberError = true
+    }
+
+    const mPhoneErr = validatePhone(member.phone)
+    if (mPhoneErr) {
+      memberErr.phone = mPhoneErr
+      hasMemberError = true
+    }
+
+    const mCollegeErr = validateCollege(member.college)
+    if (mCollegeErr) {
+      memberErr.college = mCollegeErr
+      hasMemberError = true
+    }
+
+    const mDeptErr = validateDepartment(member.department)
+    if (mDeptErr) {
+      memberErr.department = mDeptErr
+      hasMemberError = true
+    }
+
+    const mYearErr = validateYearOfStudy(member.yearOfStudy)
+    if (mYearErr) {
+      memberErr.yearOfStudy = mYearErr
+      hasMemberError = true
+    }
+
+    memberErrors.push(memberErr)
   }
 
   if (hasMemberError) {
     errors.teamMembers = memberErrors
   }
 
-  const isValid = Object.keys(errors).length === 0
+  const isValid =
+    !nameErr &&
+    !emailErr &&
+    !phoneErr &&
+    !collegeErr &&
+    !deptErr &&
+    !yearErr &&
+    !teamNameErr &&
+    !teamSizeErr &&
+    !hasMemberError
+
   return { isValid, errors }
 }

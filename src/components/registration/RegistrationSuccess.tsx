@@ -71,7 +71,7 @@ export const RegistrationSuccess: React.FC<RegistrationSuccessProps> = ({
           <div>
             <span className="text-[#666666] uppercase text-[10px] block mb-0.5">Team Size</span>
             <span className="text-white font-bold text-sm">
-              {data.teamSize} {data.teamSize === 1 ? 'Member (Solo)' : 'Members'}
+              {data.teamSize} {data.teamSize === 1 ? 'Person' : 'Persons'}
             </span>
           </div>
 
@@ -96,16 +96,27 @@ export const RegistrationSuccess: React.FC<RegistrationSuccessProps> = ({
           </div>
 
           {data.teamSize > 1 && data.teamMembers.length > 0 && (
-            <div className="md:col-span-2 pt-2 border-t border-[#1a1a1a]">
-              <span className="text-[#666666] uppercase text-[10px] block mb-1">Additional Teammates</span>
-              <div className="flex flex-wrap gap-2">
+            <div className="md:col-span-2 pt-3 border-t border-[#1a1a1a] space-y-3">
+              <span className="text-[#666666] uppercase text-[10px] block font-mono">
+                Additional Team Members ({data.teamSize - 1} {data.teamSize === 2 ? 'Person' : 'Persons'})
+              </span>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {data.teamMembers.slice(0, data.teamSize - 1).map((member, i) => (
-                  <span
+                  <div
                     key={i}
-                    className="inline-block px-2.5 py-1 rounded-lg bg-white/5 border border-white/10 text-white font-sans text-xs"
+                    className="p-3.5 rounded-xl bg-white/5 border border-white/10 font-mono text-xs space-y-1.5"
                   >
-                    Member {i + 2}: <strong>{member}</strong>
-                  </span>
+                    <div className="flex items-center justify-between text-white font-bold">
+                      <span>Member 0{i + 2}: {member.fullName}</span>
+                      <span className="text-[10px] text-[#888888]">{member.yearOfStudy}</span>
+                    </div>
+                    <div className="text-[11px] text-[#A0A0A0]">
+                      {member.email} · {member.phone}
+                    </div>
+                    <div className="text-[11px] text-[#777777]">
+                      {member.college} ({member.department})
+                    </div>
+                  </div>
                 ))}
               </div>
             </div>

@@ -1,3 +1,12 @@
+export interface TeamMemberData {
+  fullName: string
+  email: string
+  phone: string
+  college: string
+  department: string
+  yearOfStudy: string
+}
+
 export interface RegistrationFormData {
   fullName: string
   email: string
@@ -8,7 +17,16 @@ export interface RegistrationFormData {
   teamName: string
   teamSize: number
   teamLeaderName: string
-  teamMembers: string[] // Members 2..N
+  teamMembers: TeamMemberData[] // Additional members 2..N with personal details
+}
+
+export interface TeamMemberErrors {
+  fullName?: string
+  email?: string
+  phone?: string
+  college?: string
+  department?: string
+  yearOfStudy?: string
 }
 
 export interface RegistrationFormErrors {
@@ -21,7 +39,16 @@ export interface RegistrationFormErrors {
   teamName?: string
   teamSize?: string
   teamLeaderName?: string
-  teamMembers?: string[]
+  teamMembers?: TeamMemberErrors[]
+}
+
+export interface TeamMemberTouched {
+  fullName?: boolean
+  email?: boolean
+  phone?: boolean
+  college?: boolean
+  department?: boolean
+  yearOfStudy?: boolean
 }
 
 export type SubmissionStatus = 'idle' | 'loading' | 'success' | 'error'
@@ -35,6 +62,17 @@ export const YEAR_OF_STUDY_OPTIONS = [
   'Other / Dual Degree',
 ] as const
 
+export const createDefaultMember = (
+  college = 'College of Engineering Chengannur'
+): TeamMemberData => ({
+  fullName: '',
+  email: '',
+  phone: '',
+  college: college,
+  department: '',
+  yearOfStudy: '',
+})
+
 export const DEFAULT_FORM_VALUES: RegistrationFormData = {
   fullName: '',
   email: '',
@@ -45,5 +83,5 @@ export const DEFAULT_FORM_VALUES: RegistrationFormData = {
   teamName: '',
   teamSize: 2,
   teamLeaderName: '',
-  teamMembers: [''], // 1 extra member for teamSize 2
+  teamMembers: [createDefaultMember()], // 1 extra member for teamSize 2
 }
