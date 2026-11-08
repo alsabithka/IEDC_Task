@@ -88,7 +88,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigateToGame }) => {
     <footer
       ref={footerRef}
       id="footer"
-      className="relative z-10 w-full border-t border-[#1a1a1a] bg-[#000000] text-white select-none"
+      className="relative z-10 w-full border-t border-[#1a1a1a] bg-transparent text-white select-none"
     >
       <div className="w-full max-w-[1720px] 2xl:max-w-[1800px] mx-auto px-6 sm:px-10 lg:px-12 xl:px-16 2xl:px-20 pt-16 sm:pt-24 lg:pt-28 pb-10 sm:pb-14">
         {/* ==================================================================
