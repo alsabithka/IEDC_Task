@@ -549,83 +549,81 @@ export const RegistrationForm: React.FC = () => {
         )}
 
         {/* ==================================================================
-            STEP TRACKER (Shown only when teamSize > 1)
+            STEP TRACKER (Always visible to maintain rock-solid layout height)
             ================================================================== */}
-        {formData.teamSize > 1 && (
-          <div className="p-3 sm:p-4 rounded-2xl bg-[#0c0c0c] border border-[#222222]">
-            <div className="flex items-center justify-between gap-2">
-              {Array.from({ length: formData.teamSize }).map((_, idx) => {
-                const stepNum = idx + 1
-                const isActive = currentStep === stepNum
-                const isCompleted = currentStep > stepNum
-                const label =
-                  stepNum === 1 ? 'Leader & Team' : `Member 0${stepNum}`
+        <div className="p-3 sm:p-4 rounded-2xl bg-[#0c0c0c] border border-[#222222]">
+          <div className="flex items-center justify-between gap-2">
+            {Array.from({ length: formData.teamSize }).map((_, idx) => {
+              const stepNum = idx + 1
+              const isActive = currentStep === stepNum
+              const isCompleted = currentStep > stepNum
+              const label =
+                stepNum === 1 ? 'Leader & Team' : `Member 0${stepNum}`
 
-                return (
-                  <div key={stepNum} className="flex items-center gap-2 flex-1">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        if (isCompleted) {
-                          setCurrentStep(stepNum)
-                          formRef.current?.scrollIntoView({
-                            behavior: 'smooth',
-                            block: 'start',
-                          })
-                        }
-                      }}
-                      disabled={!isCompleted && !isActive}
-                      className={`flex items-center gap-2 text-left transition-all ${
-                        isCompleted
-                          ? 'cursor-pointer hover:opacity-80'
-                          : isActive
-                          ? 'cursor-default'
-                          : 'cursor-not-allowed opacity-40'
+              return (
+                <div key={stepNum} className="flex items-center gap-2 flex-1">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (isCompleted) {
+                        setCurrentStep(stepNum)
+                        formRef.current?.scrollIntoView({
+                          behavior: 'smooth',
+                          block: 'start',
+                        })
+                      }
+                    }}
+                    disabled={!isCompleted && !isActive}
+                    className={`flex items-center gap-2 text-left transition-all ${
+                      isCompleted
+                        ? 'cursor-pointer hover:opacity-80'
+                        : isActive
+                        ? 'cursor-default'
+                        : 'cursor-not-allowed opacity-40'
+                    }`}
+                  >
+                    <span
+                      className={`flex h-7 w-7 sm:h-8 sm:w-8 shrink-0 items-center justify-center rounded-xl font-mono text-xs font-bold transition-all ${
+                        isActive
+                          ? 'bg-white text-black shadow-md ring-2 ring-white/30'
+                          : isCompleted
+                          ? 'bg-white/20 text-white border border-white/30'
+                          : 'bg-[#181818] text-[#666666] border border-[#262626]'
                       }`}
                     >
+                      {isCompleted ? '✓' : `0${stepNum}`}
+                    </span>
+                    <div className="hidden md:block">
+                      <span className="block font-mono text-[9px] uppercase text-[#777777] leading-none">
+                        Step 0{stepNum}
+                      </span>
                       <span
-                        className={`flex h-7 w-7 sm:h-8 sm:w-8 shrink-0 items-center justify-center rounded-xl font-mono text-xs font-bold transition-all ${
+                        className={`block font-sans text-xs font-bold leading-tight mt-0.5 ${
                           isActive
-                            ? 'bg-white text-black shadow-md ring-2 ring-white/30'
+                            ? 'text-white'
                             : isCompleted
-                            ? 'bg-white/20 text-white border border-white/30'
-                            : 'bg-[#181818] text-[#666666] border border-[#262626]'
+                            ? 'text-[#D0D0D0]'
+                            : 'text-[#666666]'
                         }`}
                       >
-                        {isCompleted ? '✓' : `0${stepNum}`}
+                        {label}
                       </span>
-                      <div className="hidden md:block">
-                        <span className="block font-mono text-[9px] uppercase text-[#777777] leading-none">
-                          Step 0{stepNum}
-                        </span>
-                        <span
-                          className={`block font-sans text-xs font-bold leading-tight mt-0.5 ${
-                            isActive
-                              ? 'text-white'
-                              : isCompleted
-                              ? 'text-[#D0D0D0]'
-                              : 'text-[#666666]'
-                          }`}
-                        >
-                          {label}
-                        </span>
-                      </div>
-                    </button>
+                    </div>
+                  </button>
 
-                    {idx < formData.teamSize - 1 && (
-                      <div
-                        className={`h-[1px] flex-1 mx-1 sm:mx-2 transition-all ${
-                          isCompleted ? 'bg-white/40' : 'bg-[#222222]'
-                        }`}
-                        aria-hidden="true"
-                      />
-                    )}
-                  </div>
-                )
-              })}
-            </div>
+                  {idx < formData.teamSize - 1 && (
+                    <div
+                      className={`h-[1px] flex-1 mx-1 sm:mx-2 transition-all ${
+                        isCompleted ? 'bg-white/40' : 'bg-[#222222]'
+                      }`}
+                      aria-hidden="true"
+                    />
+                  )}
+                </div>
+              )
+            })}
           </div>
-        )}
+        </div>
 
         {/* ==================================================================
             STEP 1: PERSONAL INFORMATION & TEAM STRUCTURE
@@ -861,7 +859,7 @@ export const RegistrationForm: React.FC = () => {
                   />
                 </FormField>
 
-                {/* Team Size Selector (Replaced 'Pax' with 'Person' / 'Persons') */}
+                {/* Team Size Selector with Smooth Sliding Toggle Animation */}
                 <FormField
                   id="teamSize"
                   label="Number of Team Members"
@@ -869,23 +867,60 @@ export const RegistrationForm: React.FC = () => {
                   error={touched.teamSize ? errors.teamSize : undefined}
                   helperText="Official event rules allow 1 to 4 members per team"
                 >
-                  <div className="grid grid-cols-4 gap-2">
-                    {[1, 2, 3, 4].map((size) => (
-                      <button
-                        key={size}
-                        type="button"
-                        onClick={() => handleTeamSizeChange(size)}
-                        className={`py-3 px-2 rounded-xl border font-mono text-xs font-bold transition-all cursor-pointer text-center ${
-                          formData.teamSize === size
-                            ? 'border-white bg-white text-black shadow-md'
-                            : 'border-[#262626] bg-[#0a0a0a] text-[#888888] hover:text-white hover:border-[#444444]'
-                        }`}
-                      >
-                        <span>
-                          {size} {size === 1 ? 'Person' : 'Persons'}
-                        </span>
-                      </button>
+                  <div className="relative grid grid-cols-4 gap-2 select-none">
+                    {/* Background slots matching exact button boundaries */}
+                    {[1, 2, 3, 4].map((s) => (
+                      <div
+                        key={`bg-slot-${s}`}
+                        className="rounded-xl border border-[#262626] bg-[#0a0a0a] transition-colors duration-200"
+                        style={{
+                          gridColumn: `${s} / ${s + 1}`,
+                          gridRow: '1 / 2',
+                        }}
+                      />
                     ))}
+
+                    {/* Smooth Sliding Active White Pill */}
+                    <div
+                      className="absolute top-0 bottom-0 rounded-xl bg-white shadow-lg pointer-events-none z-[1] transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]"
+                      style={{
+                        left: 0,
+                        width: 'calc(25% - 6px)',
+                        transform:
+                          formData.teamSize === 1
+                            ? 'translate3d(0, 0, 0)'
+                            : formData.teamSize === 2
+                            ? 'translate3d(calc(100% + 8px), 0, 0)'
+                            : formData.teamSize === 3
+                            ? 'translate3d(calc(200% + 16px), 0, 0)'
+                            : 'translate3d(calc(300% + 24px), 0, 0)',
+                      }}
+                    />
+
+                    {/* Interactive Button Elements */}
+                    {[1, 2, 3, 4].map((size) => {
+                      const isSelected = formData.teamSize === size
+                      return (
+                        <button
+                          key={size}
+                          type="button"
+                          onClick={() => handleTeamSizeChange(size)}
+                          className={`relative z-10 py-3 px-2 rounded-xl font-mono text-xs font-bold transition-colors duration-200 cursor-pointer text-center ${
+                            isSelected
+                              ? 'text-black font-black'
+                              : 'text-[#888888] hover:text-white'
+                          }`}
+                          style={{
+                            gridColumn: `${size} / ${size + 1}`,
+                            gridRow: '1 / 2',
+                          }}
+                        >
+                          <span>
+                            {size} {size === 1 ? 'Person' : 'Persons'}
+                          </span>
+                        </button>
+                      )
+                    })}
                   </div>
                 </FormField>
               </div>
