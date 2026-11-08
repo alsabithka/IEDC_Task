@@ -72,18 +72,18 @@ export const MainContentPanel: React.FC<MainContentPanelProps> = ({
       return
     }
 
-    // Starts loading 1 second back from preloader finish
+    // Hero entrance animates smoothly as preloader curtain lifts
     hasHeroAnimatedInRuntime = true
 
     gsap.fromTo(
       targets,
-      { opacity: 0, y: 22 },
+      { opacity: 0, y: 18 },
       {
         opacity: 1,
         y: 0,
-        duration: 1.0,
-        stagger: 0.08,
-        ease: 'power2.out',
+        duration: 0.6,
+        stagger: 0.04,
+        ease: 'power3.out',
         clearProps: 'transform',
       }
     )

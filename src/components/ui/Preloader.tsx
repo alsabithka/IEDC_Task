@@ -157,31 +157,31 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete, onStartExit })
         },
       })
 
-      // 1. Initial State: IDEA SPRINT entrance
+      // 1. Initial State: IDEA SPRINT entrance (crisp, quick settle)
       tl.fromTo(
         initialWordRef.current,
         {
           opacity: 0,
-          y: 20,
+          y: 16,
         },
         {
           opacity: 1,
           y: 0,
-          duration: 0.55,
+          duration: 0.35,
           ease: 'power3.out',
         },
       )
-        // Hold IDEA SPRINT briefly
-        .to({}, { duration: 0.35 })
+        // Hold IDEA SPRINT briefly so it's clearly readable
+        .to({}, { duration: 0.22 })
 
-        // 2. SPRINT and the letter A fade out naturally downwards
+        // 2. SPRINT and the letter A fade out smoothly downwards
         .to(
           sprintLettersRef.current,
           {
             opacity: 0,
-            y: 24,
-            stagger: 0.03,
-            duration: 0.35,
+            y: 18,
+            stagger: 0.015,
+            duration: 0.22,
             ease: 'power2.in',
           },
           'rearrange',
@@ -190,14 +190,14 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete, onStartExit })
           letterA,
           {
             opacity: 0,
-            y: 18,
-            duration: 0.35,
+            y: 14,
+            duration: 0.20,
             ease: 'power2.in',
           },
           'rearrange',
         )
 
-        // 3. PHYSICAL LETTER REARRANGEMENT WITHOUT CLOGGING
+        // 3. PHYSICAL LETTER REARRANGEMENT (Swift, fluid, 60fps GPU transforms)
         // Letter I travels smoothly to slot 1
         .to(
           letterI,
@@ -205,113 +205,116 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete, onStartExit })
             x: deltaI.x,
             y: deltaI.y,
             scale: deltaI.scale,
-            color: '#FFFFFF',
-            duration: 1.15,
+            duration: 0.58,
             ease: 'power3.inOut',
             transformOrigin: 'center center',
+            force3D: true,
           },
-          'rearrange+=0.1',
+          'rearrange+=0.04',
         )
 
-        // Letter E moves to slot 2 (crosses OVER D with an upward arc to prevent collision)
+        // Letter E moves to slot 2 (fluid arc OVER D in 2.5D space)
         .to(
           letterE,
           {
             x: deltaE.x,
             scale: deltaE.scale,
-            color: '#FFFFFF',
-            duration: 1.15,
+            duration: 0.58,
             ease: 'power3.inOut',
             transformOrigin: 'center center',
+            force3D: true,
           },
-          'rearrange+=0.1',
+          'rearrange+=0.04',
         )
         .to(
           letterE,
           {
             keyframes: [
-              { y: deltaE.y - 32, duration: 0.55, ease: 'power2.out' },
-              { y: deltaE.y, duration: 0.60, ease: 'power2.in' },
+              { y: deltaE.y - 28, duration: 0.29, ease: 'sine.out' },
+              { y: deltaE.y, duration: 0.29, ease: 'sine.in' },
             ],
           },
-          'rearrange+=0.1',
+          'rearrange+=0.04',
         )
 
-        // Letter D moves to slot 3 (crosses BEHIND E with a slight downward dip)
+        // Letter D moves to slot 3 (subtle dip BEHIND E)
         .to(
           letterD,
           {
             x: deltaD.x,
             scale: deltaD.scale,
-            color: '#FFFFFF',
-            duration: 1.15,
+            duration: 0.58,
             ease: 'power3.inOut',
             transformOrigin: 'center center',
+            force3D: true,
           },
-          'rearrange+=0.1',
+          'rearrange+=0.04',
         )
         .to(
           letterD,
           {
             keyframes: [
-              { y: deltaD.y + 16, duration: 0.55, ease: 'power2.out' },
-              { y: deltaD.y, duration: 0.60, ease: 'power2.in' },
+              { y: deltaD.y + 14, duration: 0.29, ease: 'sine.out' },
+              { y: deltaD.y, duration: 0.29, ease: 'sine.in' },
             ],
           },
-          'rearrange+=0.1',
+          'rearrange+=0.04',
         )
 
-        // Letter C comes along into slot 4 in sync with IDE
+        // Letter C enters slot 4 dynamically in sync
         .fromTo(
           letterC,
           {
             opacity: 0,
-            scale: 0.4,
-            y: 25,
+            scale: 0.45,
+            y: 18,
             transformOrigin: 'center center',
           },
           {
             opacity: 1,
             scale: 1,
             y: 0,
-            duration: 1.15,
+            duration: 0.58,
             ease: 'power3.inOut',
+            force3D: true,
           },
-          'rearrange+=0.1',
+          'rearrange+=0.04',
         )
 
         // 4. SEAMLESS HANDOFF TO NATIVE FLEXBOX SLOTS
-        // Instantly activates the native unscaled Flexbox slots so letters never misalign or clog
         .set(
           [slotI, slotE, slotD],
           { opacity: 1 },
-          'rearrange+=1.25',
+          'rearrange+=0.62',
         )
         .set(
           [letterI, letterE, letterD],
           { opacity: 0 },
-          'rearrange+=1.25',
+          'rearrange+=0.62',
         )
 
-        // 5. Final IEDC Hold: Clean, bold, perfectly spaced native IEDC holds
-        .to({}, { duration: 0.65 })
+        // 5. Final IEDC Hold: Clean, bold, perfectly spaced native IEDC hold
+        .to({}, { duration: 0.30 })
 
-        // 6. Full-Screen Upward Lift: Curtain lifts away from y: 0 to yPercent: -100
-        .to(
-          containerRef.current,
-          {
-            yPercent: -100,
-            duration: 0.85,
-            ease: 'power4.inOut',
-          },
-        )
-        // Trigger main content loading 1 second back from preloader finish
+        // 6. Trigger hero entrance as curtain begins to lift
         .call(
           () => {
             onStartExit?.()
           },
           [],
-          '-=1.0'
+          'curtain',
+        )
+
+        // 7. Full-Screen Upward Lift: Curtain lifts away with dynamic ease
+        .to(
+          containerRef.current,
+          {
+            yPercent: -100,
+            duration: 0.52,
+            ease: 'power4.inOut',
+            force3D: true,
+          },
+          'curtain',
         )
     },
     { dependencies: [fontsLoaded], scope: containerRef },
