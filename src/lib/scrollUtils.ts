@@ -1,3 +1,5 @@
+import { getLenis } from './smoothScroll'
+
 export const SECTION_IDS = [
   'home',
   'about',
@@ -47,6 +49,17 @@ export const scrollToSheet = (targetId: string) => {
     }
   }
 
-  // Fallback for mobile or elements outside track
+  // Lenis smooth scroll if active
+  const lenis = getLenis()
+  if (lenis) {
+    lenis.scrollTo(targetEl, {
+      offset: 0,
+      duration: 1.2,
+      easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+    })
+    return
+  }
+
+  // Fallback for native scrolling
   targetEl.scrollIntoView({ behavior: 'smooth' })
 }

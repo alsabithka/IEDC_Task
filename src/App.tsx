@@ -5,6 +5,7 @@ import { Layout } from './components/layout/Layout'
 import { MainContentPanel } from './components/sections/MainContentPanel'
 import { ScheduleRoadmapSection } from './components/sections/ScheduleRoadmapSection'
 import { RegistrationSection } from './components/sections/RegistrationSection'
+import { SmoothScrollProvider } from './providers/SmoothScrollProvider'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
 const PRELOADER_STORAGE_KEY = 'iedc_preloader_completed'
@@ -136,17 +137,19 @@ export const App: React.FC = () => {
       )}
 
       {/* Main Website Flow: Hero Section, Event Schedule & Train Game Promo, Registration */}
-      <Layout>
-        {/* 1. Hero Section (Strictly NO particle/grain texture applied) */}
-        <MainContentPanel />
+      <SmoothScrollProvider isPaused={showPreloader}>
+        <Layout>
+          {/* 1. Hero Section (Strictly NO particle/grain texture applied) */}
+          <MainContentPanel />
 
-        {/* 2. Sub-Hero Website Sections with Shared Particle & Grain Texture Layer */}
-        <div className="relative w-full bg-[#000000]">
-          <ParticleBackgroundLayer />
-          <ScheduleRoadmapSection onPlayGame={navigateToGame} />
-          <RegistrationSection />
-        </div>
-      </Layout>
+          {/* 2. Sub-Hero Website Sections with Shared Particle & Grain Texture Layer */}
+          <div className="relative w-full bg-[#000000]">
+            <ParticleBackgroundLayer />
+            <ScheduleRoadmapSection onPlayGame={navigateToGame} />
+            <RegistrationSection />
+          </div>
+        </Layout>
+      </SmoothScrollProvider>
     </>
   )
 }

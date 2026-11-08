@@ -1,7 +1,8 @@
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
 import { TrainGamePromo } from './TrainGamePromo'
 import { Day1CinematicTrack } from './Day1CinematicTrack'
 import { Day2CinematicTrack } from './Day2CinematicTrack'
+import { useScrollReveal } from '../../hooks/useScrollReveal'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import {
@@ -233,9 +234,12 @@ export const ScheduleRoadmapSection: React.FC<ScheduleRoadmapSectionProps> = ({
   }
 
   const visibleDays = SCHEDULE_ROADMAP.filter((day) => day.dayId === activeTab)
+  const sectionRef = useRef<HTMLElement>(null)
+  useScrollReveal(sectionRef, 'schedule')
 
   return (
     <section
+      ref={sectionRef}
       id="schedule"
       className="relative z-10 w-full min-h-screen scroll-mt-16 sm:scroll-mt-20 bg-transparent text-white pt-12 sm:pt-16 lg:pt-20 pb-4 sm:pb-6 px-4 sm:px-8 lg:px-12 xl:px-16 2xl:px-20 border-t border-[#1a1a1a] select-none"
     >
@@ -243,9 +247,9 @@ export const ScheduleRoadmapSection: React.FC<ScheduleRoadmapSectionProps> = ({
         {/* ==================================================================
             1. SECTION HEADER (High-Impact Editorial Header)
             ================================================================== */}
-        <div className="mb-6 sm:mb-8">
+        <div data-reveal-group="header" className="mb-6 sm:mb-8">
           {/* Identification Label */}
-          <div className="flex items-center gap-2.5 mb-3 sm:mb-4">
+          <div data-reveal className="flex items-center gap-2.5 mb-3 sm:mb-4">
             <span
               className="w-[3px] h-4 sm:h-5 bg-white shrink-0 rounded-xs"
               aria-hidden="true"
@@ -256,7 +260,7 @@ export const ScheduleRoadmapSection: React.FC<ScheduleRoadmapSectionProps> = ({
           </div>
 
           {/* Main Headline */}
-          <h2 className="font-display font-normal uppercase text-white tracking-[-0.015em] leading-[0.93] text-4xl sm:text-6xl lg:text-7xl">
+          <h2 data-reveal className="font-display font-normal uppercase text-white tracking-[-0.015em] leading-[0.93] text-4xl sm:text-6xl lg:text-7xl">
             EVENT SCHEDULE
           </h2>
         </div>
@@ -265,7 +269,7 @@ export const ScheduleRoadmapSection: React.FC<ScheduleRoadmapSectionProps> = ({
             2. PROMOTIONAL TRAIN GAME CALLOUT (GAME SESSION)
             "WHY SCROLL THROUGH THE SCHEDULE WHEN YOU CAN RIDE THROUGH IT?"
             ================================================================== */}
-        <div className="mb-8 sm:mb-10">
+        <div data-reveal="promo" className="mb-8 sm:mb-10">
           <TrainGamePromo
             onPlayGame={
               onPlayGame ||
@@ -279,7 +283,7 @@ export const ScheduleRoadmapSection: React.FC<ScheduleRoadmapSectionProps> = ({
         {/* ==================================================================
             3. DAY 1 / DAY 2 TAB SELECTOR (SMOOTH TOGGLE TRANSFER)
             ================================================================== */}
-        <div id="day-tab-selector" className="w-full max-w-4xl mx-auto flex items-center justify-between mb-6 sm:mb-8 scroll-mt-24">
+        <div data-reveal="day-tabs" id="day-tab-selector" className="w-full max-w-4xl mx-auto flex items-center justify-between mb-6 sm:mb-8 scroll-mt-24">
           <div className="relative inline-flex items-center p-1 rounded-full bg-[#0d0d0d] border border-[#222222] select-none">
             {/* Smooth Sliding Pill Thumb */}
             <div

@@ -31,7 +31,6 @@ import {
   AlertCircle,
   Loader2,
   RefreshCw,
-  Sparkles,
   ArrowRight,
   ArrowLeft,
 } from 'lucide-react'
