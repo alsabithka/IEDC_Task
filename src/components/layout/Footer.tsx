@@ -127,7 +127,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigateToGame }) => {
               </div>
 
               {/* Venue Map Panel (Replacing "BE PART OF THE SPRINT") */}
-              <div data-reveal className="lg:col-span-5 xl:col-span-5 lg:flex lg:justify-end w-full">
+              <div id="venue" data-reveal className="lg:col-span-5 xl:col-span-5 lg:flex lg:justify-end w-full scroll-mt-24">
                 <HeroVenueMap className="w-full max-w-[500px]" />
               </div>
             </div>
@@ -138,7 +138,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigateToGame }) => {
       {/* ==================================================================
           2. ABOUT & CONTACT INFORMATION SESSION (Solid pure black bg #000000, strictly NO bubbles or grains)
           ================================================================== */}
-      <div className="relative z-20 w-full border-t border-[#1f1f1f] bg-[#000000]">
+      <div id="contact" className="relative z-20 w-full border-t border-[#1f1f1f] bg-[#000000] scroll-mt-20">
         <div className="w-full max-w-[1720px] 2xl:max-w-[1800px] mx-auto px-6 sm:px-10 lg:px-12 xl:px-16 2xl:px-20 pt-16 sm:pt-20 pb-10 sm:pb-14">
           {/* Structured Multi-Column Information & Navigation Grid */}
           <div

@@ -10,6 +10,8 @@ export const SECTION_IDS = [
   'matcher',
   'register',
   'faq',
+  'venue',
+  'contact',
 ]
 
 /**
